@@ -36,27 +36,13 @@ public:
     void generatePsip();
     void generateDarkPhoton();
     void generatePythiaSingle();
+    void generateGeant4Single();
     void generatePhaseSpace();
     void generateCustom();
+    void generateDebug();
 
     //Dimuon phase space generator
     bool generateDimuon(double mass, double xF, DPMCDimuon& dimuon);
-
-    //test which generator is selected
-    bool generatorSelected(int generator) { return (generatorType & generator) != 0; }
-
-    //Generator type
-    enum GenType
-    {
-        DrellYanGen   = GenBit(0),
-        JPsiGen       = GenBit(1),
-        PsipGen       = GenBit(2),
-        DarkPhotonGen = GenBit(3),
-        CustomGen     = GenBit(4),
-        PhaseSpace    = GenBit(5),
-        PythiaSingleGen = GenBit(6),
-    };
-    int generatorType;
 
 private:
     //pointer to the configuration
@@ -84,12 +70,21 @@ private:
     Pythia8::Pythia ppGen;
     Pythia8::Pythia pnGen;
 
+    //pointer to the real generator
+    typedef void (DPPrimaryGeneratorAction::*GenPtr)();
+    GenPtr p_generator;
+
     //Used for custom input
     TFile* customInputFile;
     TTree* customInputTree;
     int customParticlePDGs[10000];
     TClonesArray* customPositions;
     TClonesArray* customMomentums;
+
+    //Common particles to save time
+    G4ParticleDefinition* proton;
+    G4ParticleDefinition* mup;
+    G4ParticleDefinition* mum;
 };
 
 #endif

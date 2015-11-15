@@ -1,5 +1,7 @@
 #include "DPIOManager.h"
 
+#include "G4SDManager.hh"
+
 DPIOManager* DPIOManager::p_IOmamnger = NULL;
 DPIOManager* DPIOManager::instance()
 {
@@ -10,6 +12,11 @@ DPIOManager* DPIOManager::instance()
 DPIOManager::DPIOManager(): saveFile(NULL), saveTree(NULL), rawEvent(NULL)
 {
     p_config = DPSimConfig::instance();
+    sensHitColID = -1;
+
+    //normally we expect less than 500 tracks, 2000 hits
+    tracks.reserve(500);
+    hits.reserve(2000);
 }
 
 DPIOManager::~DPIOManager()
@@ -110,7 +117,19 @@ void DPIOManager::updateOneTrack(unsigned int trackID, G4ThreeVector pos, G4Thre
 
 void DPIOManager::fillHitsVector(const G4Event* theEvent)
 {
+    if(sensHitColID < 0) sensHitColID = G4SDManager::GetSDMpointer()->GetCollectionID("sensDetHitCol");
 
+    G4HCofThisEvent* HCE = theEvent->GetHCofThisEvent();
+    if(!HCE) return;
+
+    DPVHitCollection* sensHC = (DPVHitCollection*)HCE->GetHC(sensHitColID);
+    if(!sensHC) return;
+
+    int nHits = sensHC->entries();
+    for(int i = 0; i < nHits; ++i)
+    {
+        hits.push_back(*((*sensHC)[i]));
+    }
 }
 
 void DPIOManager::reIndex()

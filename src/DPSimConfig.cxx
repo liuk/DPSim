@@ -34,15 +34,15 @@ void DPSimConfig::init(TString configFile)
     beamMomentum = pDouble("beamMomentum", 120.);
     beamCurrent = pDouble("beamCurrent", 1.E12);
 
+    geometryGDMLInput = pString("geometryGDMLInput");
     geometrySchema = pString("geometrySchema");
     mysqlServer = pString("mysqlServer");
     mysqlPort = pInt("mysqlPort", 3306);
     login = pString("login");
     password = pString("password");
 
-    magnetPath = pString("magnetPath");
-    fMagName = pString("fMagName");
-    kMagName = pString("kMagName");
+    fMagMap = pString("fMagMap");
+    kMagMap = pString("kMagMap");
     fMagMultiplier = pDouble("fMagMultiplier", 1.);
     kMagMultiplier = pDouble("kMagMultiplier", 1.);
 
@@ -64,6 +64,10 @@ void DPSimConfig::init(TString configFile)
     massMax = pDouble("massMax", 10.);
     cosThetaMin = pDouble("cosThetaMin", -1.);
     cosThetaMax = pDouble("cosThetaMax", 1.);
+
+    nEventsThrown = 0;
+    nEventsPhysics = 0;
+    nEventsAccepted = 0;
 }
 
 void DPSimConfig::parseConfig(TString configFile)

@@ -41,40 +41,65 @@ DPPrimaryGeneratorAction::DPPrimaryGeneratorAction()
 
     particleGun = new G4ParticleGun(1);
     particleDict = G4ParticleTable::GetParticleTable();
+    proton = particleDict->FindParticle(2212);
+    mup = particleDict->FindParticle(-13);
+    mum = particleDict->FindParticle(13);
 
     pdf = LHAPDF::mkPDF("CT10nlo", 0);
 
-    //Pythia8::RndmEngine* randomEng = new GeantRandom();
-    //ppGen.setRndmEnginPtr(randomEng);
-    ppGen.readString("PDF:pSet = 7");
-    ppGen.readString("PhaseSpace:mHatMin = 0");
-    ppGen.readString("ParticleDecays:limitTau = on");
-    ppGen.readString("ParticleDecays:limitTau0 = on");
-    ppGen.readString("SoftQCD:all = on");
-    ppGen.readString("HardQCD:hardccbar = on");
-
-    //pnGen.setRndmEnginPtr(randomEng);
-    //pnGen.readString("PDF:pSet = 7");
-    pnGen.readString("PhaseSpace:mHatMin = 0");
-    pnGen.readString("ParticleDecays:limitTau = on");
-    pnGen.readString("ParticleDecays:limitTau0 = on");
-    pnGen.readString("SoftQCD:all = on");
-    pnGen.readString("HardQCD:hardccbar = on");
-
-    ppGen.init(2212, 2212, 120., 0.);
-    pnGen.init(2212, 2112, 120., 0.);
-
-    generatorType = 0;
-    if(p_config->generator == "DrellYan") generatorType |= DrellYanGen;
-    if(p_config->generator == "JPsi")     generatorType |= JPsiGen;
-    if(p_config->generator == "Psip")     generatorType |= PsipGen;
-    if(p_config->generator == "DarkPhoton")   generatorType |= DarkPhotonGen;
-    if(p_config->generator == "Custom")       generatorType |= CustomGen;
-    if(p_config->generator == "PythiaSingle") generatorType |= PythiaSingleGen;
-
-    //initialization part of custom generator
-    if(generatorSelected(CustomGen))
+    //initilize all kinds of generators
+    if(p_config->generator == "DrellYan")
     {
+        p_generator = &DPPrimaryGeneratorAction::generateDrellYan;
+    }
+    else if(p_config->generator == "JPsi")
+    {
+        p_generator = &DPPrimaryGeneratorAction::generateJPsi;
+    }
+    else if(p_config->generator == "Psip")
+    {
+        p_generator = &DPPrimaryGeneratorAction::generatePsip;
+    }
+    else if(p_config->generator == "DarkPhoton")
+    {
+        p_generator = &DPPrimaryGeneratorAction::generateDarkPhoton;
+    }
+    else if(p_config->generator == "PythiaSingle")
+    {
+        p_generator = &DPPrimaryGeneratorAction::generatePythiaSingle;
+
+        //Pythia8::RndmEngine* randomEng = new GeantRandom();
+        //ppGen.setRndmEnginPtr(randomEng);
+        ppGen.readString("PDF:pSet = 7");
+        ppGen.readString("PhaseSpace:mHatMin = 0");
+        ppGen.readString("ParticleDecays:limitTau = on");
+        ppGen.readString("ParticleDecays:limitTau0 = on");
+        ppGen.readString("SoftQCD:all = on");
+        ppGen.readString("HardQCD:hardccbar = on");
+
+        //pnGen.setRndmEnginPtr(randomEng);
+        //pnGen.readString("PDF:pSet = 7");
+        pnGen.readString("PhaseSpace:mHatMin = 0");
+        pnGen.readString("ParticleDecays:limitTau = on");
+        pnGen.readString("ParticleDecays:limitTau0 = on");
+        pnGen.readString("SoftQCD:all = on");
+        pnGen.readString("HardQCD:hardccbar = on");
+
+        ppGen.init(2212, 2212, 120., 0.);
+        pnGen.init(2212, 2112, 120., 0.);
+    }
+    else if(p_config->generator == "Geant4Single")
+    {
+        p_generator = &DPPrimaryGeneratorAction::generateGeant4Single;
+    }
+    else if(p_config->generator == "PhaseSpace")
+    {
+        p_generator = &DPPrimaryGeneratorAction::generatePhaseSpace;
+    }
+    else if(p_config->generator == "Custom")
+    {
+        p_generator = &DPPrimaryGeneratorAction::generateCustom;
+
         customInputFile = new TFile(p_config->customInput.Data(), "READ");
         customInputTree = (TTree*)customInputFile->Get("save");
 
@@ -85,6 +110,10 @@ DPPrimaryGeneratorAction::DPPrimaryGeneratorAction()
         customInputTree->SetBranchAddress("pos", customPositions);
         customInputTree->SetBranchAddress("mom", customMomentums);
     }
+    else if(p_config->generator == "Debug")
+    {
+        p_generator = &DPPrimaryGeneratorAction::generateDebug;
+    }
 }
 
 DPPrimaryGeneratorAction::~DPPrimaryGeneratorAction()
@@ -94,31 +123,10 @@ DPPrimaryGeneratorAction::~DPPrimaryGeneratorAction()
 
 void DPPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 {
+    p_config->nEventsThrown++;
+
     theEvent = anEvent;
-    if(generatorSelected(DrellYanGen))
-    {
-        generateDrellYan();
-    }
-    else if(generatorSelected(JPsiGen))
-    {
-        generateJPsi();
-    }
-    else if(generatorSelected(PsipGen))
-    {
-        generatePsip();
-    }
-    else if(generatorSelected(DarkPhotonGen))
-    {
-        generateDarkPhoton();
-    }
-    else if(generatorSelected(CustomGen))
-    {
-        generateCustom();
-    }
-    else if(generatorSelected(PythiaSingleGen))
-    {
-        generatePythiaSingle();
-    }
+    (this->*p_generator)();
 }
 
 void DPPrimaryGeneratorAction::generateDrellYan()
@@ -146,9 +154,32 @@ void DPPrimaryGeneratorAction::generatePythiaSingle()
 
 }
 
+void DPPrimaryGeneratorAction::generateGeant4Single()
+{
+    particleGun->SetParticleDefinition(proton);
+    particleGun->SetParticlePosition(G4ThreeVector(0., 0., -600*cm));
+    particleGun->SetParticleMomentum(G4ThreeVector(0., 0., p_config->beamMomentum*GeV));
+    particleGun->GeneratePrimaryVertex(theEvent);
+}
+
 void DPPrimaryGeneratorAction::generatePhaseSpace()
 {
-    
+    DPMCDimuon dimuon;
+    double mass = G4UniformRand()*(p_config->massMax - p_config->massMin) + p_config->massMin;
+    double xF = G4UniformRand()*(p_config->xfMax - p_config->xfMin) + p_config->xfMin;
+    if(!generateDimuon(mass, xF, dimuon)) return;
+
+    p_config->nEventsPhysics++;
+
+    particleGun->SetParticleDefinition(mup);
+    particleGun->SetParticlePosition(G4ThreeVector(dimuon.fVertex.X()*cm, dimuon.fVertex.Y()*cm, dimuon.fVertex.Z()*cm));
+    particleGun->SetParticleMomentum(G4ThreeVector(dimuon.fPosMomentum.X()*GeV, dimuon.fPosMomentum.Y()*GeV, dimuon.fPosMomentum.Z()*GeV));
+    particleGun->GeneratePrimaryVertex(theEvent);
+
+    particleGun->SetParticleDefinition(mum);
+    particleGun->SetParticlePosition(G4ThreeVector(dimuon.fVertex.X()*cm, dimuon.fVertex.Y()*cm, dimuon.fVertex.Z()*cm));
+    particleGun->SetParticleMomentum(G4ThreeVector(dimuon.fNegMomentum.X()*GeV, dimuon.fNegMomentum.Y()*GeV, dimuon.fNegMomentum.Z()*GeV));
+    particleGun->GeneratePrimaryVertex(theEvent);
 }
 
 void DPPrimaryGeneratorAction::generateCustom()
@@ -168,6 +199,14 @@ void DPPrimaryGeneratorAction::generateCustom()
     }
 }
 
+void DPPrimaryGeneratorAction::generateDebug()
+{
+    particleGun->SetParticleDefinition(mup);
+    particleGun->SetParticlePosition(G4ThreeVector(0., 0., -500.*cm));
+    particleGun->SetParticleMomentum(G4ThreeVector(0., 0., 50.*GeV));
+    particleGun->GeneratePrimaryVertex(theEvent);
+}
+
 bool DPPrimaryGeneratorAction::generateDimuon(double mass, double xF, DPMCDimuon& dimuon)
 {
     double pz = xF*(sqrts - mass*mass/sqrts)/2.;
@@ -181,7 +220,7 @@ bool DPPrimaryGeneratorAction::generateDimuon(double mass, double xF, DPMCDimuon
     {
         pT = pTmax*sqrt(G4UniformRand());
     }
-    else if(generatorSelected(DrellYanGen))
+    else if(p_generator == &DPPrimaryGeneratorAction::generateDrellYan || p_generator == &DPPrimaryGeneratorAction::generatePhaseSpace)
     {
         while(pT > pTmax) pT = pT0DY*sqrt(1./pow(G4UniformRand(), pTpowDY) - 1.);
     }
@@ -207,6 +246,7 @@ bool DPPrimaryGeneratorAction::generateDimuon(double mass, double xF, DPMCDimuon
     dimuon.calcVariables();
     if(dimuon.fx1 < p_config->x1Min || dimuon.fx1 > p_config->x1Max) return false;
     if(dimuon.fx2 < p_config->x2Min || dimuon.fx2 > p_config->x2Max) return false;
+    if(dimuon.fCosTh < p_config->cosThetaMin || dimuon.fCosTh > p_config->cosThetaMax) return false;
 
     return true;
 }

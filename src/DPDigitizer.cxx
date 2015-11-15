@@ -164,6 +164,8 @@ DPDigitizer::DPDigitizer()
 
 void DPDigitizer::digitize(DPVirtualHit& vHit)
 {
+    //For hodoscope hits maybe do it a different way -- TODO
+
     double tx = vHit.mom[0]/vHit.mom[2];
     double ty = vHit.mom[1]/vHit.mom[2];
     double x0 = (vHit.pos[0] - tx*vHit.pos[2])/cm;

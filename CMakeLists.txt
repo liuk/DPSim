@@ -27,10 +27,12 @@ file(GLOB headers ${PROJECT_SOURCE_DIR}/include/*.h)
 add_executable(DPSim DPSim.cxx ${sources} ${headers} ${PROJECT_SOURCE_DIR}/src/DPMCRawEventDict.cxx ${PROJECT_SOURCE_DIR}/src/DPSimConfigDict.cxx)
 
 # Geant4 and ROOT
+find_package(Geant4 REQUIRED gdml vis_all)
 execute_process(COMMAND geant4-config --prefix OUTPUT_VARIABLE GEANT4_PREFIX OUTPUT_STRIP_TRAILING_WHITESPACE)
 execute_process(COMMAND geant4-config --libs OUTPUT_VARIABLE GEANT4_LINK OUTPUT_STRIP_TRAILING_WHITESPACE)
 include_directories(${GEANT4_PREFIX}/include/Geant4)
 target_link_libraries(DPSim ${GEANT4_LINK})
+target_link_libraries(DPSim ${Geant4_LIBRARIES})
 
 execute_process(COMMAND root-config --prefix OUTPUT_VARIABLE ROOT_PREFIX OUTPUT_STRIP_TRAILING_WHITESPACE)
 execute_process(COMMAND root-config --libs   OUTPUT_VARIABLE ROOT_LINK   OUTPUT_STRIP_TRAILING_WHITESPACE)
@@ -64,4 +66,5 @@ include_directories(${MYSQL_INCLUDE})
 target_link_libraries(DPSim ${MYSQL_LINK})
 
 # additional clean
-set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES ${PROJECT_SOURCE_DIR}/src/MCEventStructDict.h)
+set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES ${PROJECT_SOURCE_DIR}/src/DPMCRawEventDict.h)
+set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES ${PROJECT_SOURCE_DIR}/src/DPSimConfigDict.h)

@@ -5,6 +5,7 @@
 #include "globals.hh"
 
 #include "G4VPhysicalVolume.hh"
+#include "G4GDMLParser.hh"
 
 #include "DPMagField.h"
 
@@ -23,6 +24,9 @@ private:
 
     //pointer to the global magnetic field
     DPMagField* globalField;
+
+    //GDML parser
+    G4GDMLParser gdmlParser;
 
 };
 

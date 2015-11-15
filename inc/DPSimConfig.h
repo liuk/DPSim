@@ -33,6 +33,7 @@ public:
     Double_t beamCurrent;
 
     //Detector setup
+    TString geometryGDMLInput;// The GDML file for geometry
     TString geometrySchema;   // The sql schema that GMC pulls the geometry information from
     TString mysqlServer;      // Address of the SQL Server, shouldn't need to modify
     Int_t   mysqlPort;          // The port number for MySQL
@@ -40,9 +41,8 @@ public:
     TString password;         // The password for the SQL server
 
     //Magnetic field setup
-    TString magnetPath;       // Absolute path to the magnetic field map
-    TString fMagName;         // Name of the ascii text file that contains the fmag map
-    TString kMagName;         // Name of the ascii text file that contains the kmag map
+    TString fMagMap;          // Name of the ascii text file that contains the fmag map
+    TString kMagMap;          // Name of the ascii text file that contains the kmag map
     Double_t fMagMultiplier;  // Multiplies the strength of FMAG's field
     Double_t kMagMultiplier;  // Multiplies the strength of KMAG's field
 
@@ -67,6 +67,11 @@ public:
     Double_t massMax;
     Double_t cosThetaMin;
     Double_t cosThetaMax;
+
+    //Run-accumulated variables
+    Int_t nEventsThrown;
+    Int_t nEventsPhysics;
+    Int_t nEventsAccepted;  //TODO: add this in the IO manager to keep track of in-acceptance dimuons
 
 private: //used only for parsing
     //general parser

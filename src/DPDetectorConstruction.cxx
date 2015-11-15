@@ -1,6 +1,7 @@
 #include "DPDetectorConstruction.h"
 #include "DPMagField.h"
 #include "DPSensitiveDetector.h"
+#include "DPSimConfig.h"
 
 #include "G4SystemOfUnits.hh"
 #include "G4VSolid.hh"
@@ -18,25 +19,44 @@
 #include "G4Mag_UsualEqRhs.hh"
 #include "G4MagIntegratorStepper.hh"
 
+#include "G4SDManager.hh"
+
+#include <iostream>
+
 DPDetectorConstruction::DPDetectorConstruction() {}
 DPDetectorConstruction::~DPDetectorConstruction() {}
 
 G4VPhysicalVolume* DPDetectorConstruction::Construct()
 {
-    bool checkOverlaps = false;
+    std::cout << "DETECTOR" << std::endl;
+    DPSimConfig* p_config = DPSimConfig::instance();
 
-    //world volume
-    G4NistManager* nistDict = G4NistManager::Instance();
-    G4Material* air = nistDict->FindOrBuildMaterial("Air");
-    G4VSolid* worldSolid = new G4Box("worldBox", 800.*cm, 600.*cm, 12000.*cm);
-    G4LogicalVolume* worldLogical = new G4LogicalVolume(worldSolid, air, "worldLogical");
-    physicalWorld = new G4PVPlacement(0, G4ThreeVector(), worldLogical, "worldPhysical", 0, false, 0, checkOverlaps);
+    gdmlParser.Read(p_config->geometryGDMLInput.Data());
+    physicalWorld = gdmlParser.GetWorldVolume();
 
     return physicalWorld;
 }
 
 void DPDetectorConstruction::ConstructSDandField()
 {
+    std::cout << "SD DETECTOR" << std::endl;
+
+    //Construct sensitive detectors
+    DPSensitiveDetector* sensDet= new DPSensitiveDetector("SensDet", "sensDetHitCol");
+    G4SDManager::GetSDMpointer()->AddNewDetector(sensDet);
+
+    const G4GDMLAuxMapType* auxMap = gdmlParser.GetAuxMap();
+    for(G4GDMLAuxMapType::const_iterator iter = auxMap->begin(); iter != auxMap->end(); ++iter)
+    {
+        for(G4GDMLAuxListType::const_iterator jter = iter->second.begin(); jter != iter->second.end(); ++jter)
+        {
+            if(jter->type == "SensDet")
+            {
+                iter->first->SetSensitiveDetector(sensDet);
+            }
+        }
+    }
+
     //construct magnetif field
     globalField = new DPMagField();
     G4FieldManager* fieldManager = G4TransportationManager::GetTransportationManager()->GetFieldManager();
@@ -46,5 +66,4 @@ void DPDetectorConstruction::ConstructSDandField()
     G4MagIntegratorStepper* stepper = new G4ClassicalRK4(equations);
     G4ChordFinder* chordFinder = new G4ChordFinder(globalField, 0.1*mm, stepper);
     fieldManager->SetChordFinder(chordFinder);
-
 }

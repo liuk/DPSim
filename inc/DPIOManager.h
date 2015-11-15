@@ -66,6 +66,9 @@ private:
     std::map<unsigned int, unsigned int> trackIDs; //maps real trackID to index in tracks vector
     std::vector<DPVirtualHit> hits;
     std::vector<DPMCTrack> tracks;
+
+    //ID of the hit collection
+    int sensHitColID;
 };
 
 #endif

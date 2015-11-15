@@ -8,8 +8,7 @@ DPEventAction::DPEventAction()
     p_IOmamnger = DPIOManager::instance();
 }
 
-DPEventAction::~DPEventAction()
-{}
+DPEventAction::~DPEventAction() {}
 
 void DPEventAction::BeginOfEventAction(const G4Event* theEvent)
 {

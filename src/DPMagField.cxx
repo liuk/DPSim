@@ -82,13 +82,11 @@ DPMagField::DPMagField()
     DPSimConfig* p_config = DPSimConfig::instance();
 
     //Load KMag
-    TString kMagFile = p_config->magnetPath + "/" + p_config->kMagName;
-    DPFieldMap* kMagMap = new DPFieldMap("KMag", kMagFile.Data(), p_config->kMagMultiplier, 1064.26*cm);
+    DPFieldMap* kMagMap = new DPFieldMap("KMag", p_config->kMagMap.Data(), p_config->kMagMultiplier, 1064.26*cm);
     fieldMaps.insert(std::map<TString, DPFieldMap*>::value_type("KMag", kMagMap));
 
     //Load FMag
-    TString fMagFile = p_config->magnetPath + "/" + p_config->fMagName;
-    DPFieldMap* fMagMap = new DPFieldMap("FMag", fMagFile.Data(), p_config->fMagMultiplier, 0.*cm);
+    DPFieldMap* fMagMap = new DPFieldMap("FMag", p_config->fMagMap.Data(), p_config->fMagMultiplier, 0.*cm);
     fieldMaps.insert(std::map<TString, DPFieldMap*>::value_type("FMag", fMagMap));
 }
 

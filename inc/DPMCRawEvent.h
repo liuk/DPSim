@@ -21,6 +21,8 @@ public:
     TLorentzVector fPosMomentum;
     TLorentzVector fNegMomentum;
 
+    bool fAccepted;
+
 public:   //derived variables
     void calcVariables();
     Double_t fMass, fpT, fxF, fx1, fx2, fCosTh, fPhi;
