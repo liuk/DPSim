@@ -39,6 +39,12 @@ int main(int argc, char* argv[])
     runManager->SetUserAction(new DPSteppingAction);
 
     runManager->Initialize();
+
+    G4UImanager* UImanager = G4UImanager::GetUIpointer();
+#ifdef DEBUG_TR
+    UImanager->ApplyCommand("/tracking/verbose 1");
+#endif
+
     runManager->BeamOn(p_config->nEvents);
 
     delete runManager;

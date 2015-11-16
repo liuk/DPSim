@@ -160,6 +160,15 @@ void DPIOManager::reIndex()
 #ifdef DEBUG_IO
     std::cout << __FILE__ << " " << __FUNCTION__ << " now reset all the index." << std::endl;
 #endif
+
+    //NOTE: here in each virtual hit, the particleID refers to the real track ID assigned by geant
+    //      and the index of this track in the track vector is stored in the map trackIDs, which maps
+    //      the real geant trackID to the track vector index
+    //      And the fTrackID stored in the digi hits (or DPMCHit), is the one has been re-assigned to
+    //      eliminate the large trackID number by dropping the hitless tracks.
+    //      In the re-index process, the trackID/particleID in virtual hits remains unchanged, only the
+    //      ones in DPMCHit are updated after re-ordering the tracks
+
     //Assign and fill the hitIDs to the tracks
     unsigned int hitID = 0;
     for(std::vector<DPVirtualHit>::iterator iter = hits.begin(); iter != hits.end(); ++iter)

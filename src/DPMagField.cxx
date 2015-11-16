@@ -62,7 +62,7 @@ DPFieldMap::DPFieldMap(G4String name, G4String fieldMapFile, double strength, do
         stringstream ss(line);
         ss >> x >> y >> z >> bx >> by >> bz;
 
-        x = x*cm; y = y*cm; z = z*cm;
+        x = x*cm; y = y*cm; z = z*cm + zcenter;
         bx = bx*tesla; by = by*tesla; bz = bz*tesla;
 
         grid[0]->Fill(x, y, z, bx*strength);
@@ -82,6 +82,8 @@ void DPFieldMap::GetFieldValue(const double Point[3], double* Bfield) const
     if(Point[0] < xmin || Point[0] > xmax || Point[1] < ymin || Point[1] > ymax || Point[2] < zmin || Point[2] > zmax) return;
 
     for(int i = 0; i < 3; ++i) Bfield[i] = grid[i]->Interpolate(Point[0], Point[1], Point[2]);
+    //std::cout << grid[0]->GetName() << " " << Point[0]/cm << " " << Point[1]/cm << " " << Point[2]/cm << std::endl;
+    //std::cout << "      " << Bfield[0]/tesla << " " << Bfield[1]/tesla << "  " << Bfield[2]/tesla << std::endl;
 }
 
 DPMagField::DPMagField()
