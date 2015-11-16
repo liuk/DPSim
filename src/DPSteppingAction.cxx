@@ -37,4 +37,8 @@ void DPSteppingAction::UserSteppingAction(const G4Step* theStep)
         theTrack->SetTrackStatus(fStopAndKill);
         return;
     }
+
+#ifdef DEBUG_TR
+    std::cout << "Track " << theTrack->GetTrackID() << " suvived this step!" << std::endl;
+#endif
 }

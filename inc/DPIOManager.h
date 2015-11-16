@@ -13,6 +13,7 @@
 #include <TTree.h>
 
 #include "DPSimConfig.h"
+#include "DPDigitizer.h"
 #include "DPMCRawEvent.h"
 #include "DPVirtualHit.h"
 
@@ -56,6 +57,9 @@ private:
 
     //Pointer to the configuration
     DPSimConfig* p_config;
+
+    //Pointer to the digitizer
+    DPDigitizer* p_digitizer;
 
     //Output file
     TFile* saveFile;

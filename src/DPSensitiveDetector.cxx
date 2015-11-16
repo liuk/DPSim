@@ -1,5 +1,8 @@
 #include "DPSensitiveDetector.h"
 #include "G4SDManager.hh"
+#include "G4SystemOfUnits.hh"
+
+#include <iostream>
 
 DPSensitiveDetector::DPSensitiveDetector(const G4String& name, const G4String& hitCollectionName): G4VSensitiveDetector(name), theHC(NULL), hcID(-1)
 {
@@ -34,8 +37,13 @@ G4bool DPSensitiveDetector::ProcessHits(G4Step* aStep, G4TouchableHistory* hist)
     newHit->pos = theTrack->GetPosition();
     newHit->detectorGroupName = theTrack->GetVolume()->GetName();
     newHit->digiHits.clear();
-
     theHC->insert(newHit);
+
+#ifdef DEBUG_TR
+    std::cout << __FILE__ << " " << __FUNCTION__ << " processing hits for track " << theTrack->GetTrackID()
+              << " with PDG = " << theTrack->GetDefinition()->GetPDGEncoding()
+              << " on " << newHit->detectorGroupName << std::endl;
+#endif
     return true;
 }
 

@@ -14,10 +14,13 @@ public:
 
 public:
     virtual void BeginOfEventAction(const G4Event*);
-    virtual void EndofEventAction(const G4Event*);
+    virtual void EndOfEventAction(const G4Event*);
 
 private:
     DPIOManager* p_IOmamnger;
+
+    //print frequency
+    int printFreq;
 };
 
 #endif

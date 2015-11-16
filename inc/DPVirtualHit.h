@@ -9,6 +9,7 @@
 
 #include "DPMCRawEvent.h"
 
+#include <iostream>
 #include <vector>
 
 class DPVirtualHit: public G4VHit
@@ -19,6 +20,8 @@ public:
 
     inline void* operator new(size_t);
     inline void  operator delete(void*);
+
+    friend ostream& operator << (std::ostream& os, const DPVirtualHit& hit);
 
 public:
     //general virtual hit information

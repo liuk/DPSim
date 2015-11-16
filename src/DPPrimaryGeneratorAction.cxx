@@ -50,22 +50,27 @@ DPPrimaryGeneratorAction::DPPrimaryGeneratorAction()
     //initilize all kinds of generators
     if(p_config->generator == "DrellYan")
     {
+        std::cout << " Using Drell-Yan generator ..." << endl;
         p_generator = &DPPrimaryGeneratorAction::generateDrellYan;
     }
     else if(p_config->generator == "JPsi")
     {
+        std::cout << " Using JPsi generator ..." << endl;
         p_generator = &DPPrimaryGeneratorAction::generateJPsi;
     }
     else if(p_config->generator == "Psip")
     {
+        std::cout << " Using Psip generator ..." << endl;
         p_generator = &DPPrimaryGeneratorAction::generatePsip;
     }
     else if(p_config->generator == "DarkPhoton")
     {
+        std::cout << " Using dark photon generator ..." << endl;
         p_generator = &DPPrimaryGeneratorAction::generateDarkPhoton;
     }
     else if(p_config->generator == "PythiaSingle")
     {
+        std::cout << " Using pythia single generator ..." << endl;
         p_generator = &DPPrimaryGeneratorAction::generatePythiaSingle;
 
         //Pythia8::RndmEngine* randomEng = new GeantRandom();
@@ -90,14 +95,17 @@ DPPrimaryGeneratorAction::DPPrimaryGeneratorAction()
     }
     else if(p_config->generator == "Geant4Single")
     {
+        std::cout << " Using geant4 single generator ..." << endl;
         p_generator = &DPPrimaryGeneratorAction::generateGeant4Single;
     }
     else if(p_config->generator == "PhaseSpace")
     {
+        std::cout << " Using phase space generator ..." << endl;
         p_generator = &DPPrimaryGeneratorAction::generatePhaseSpace;
     }
     else if(p_config->generator == "Custom")
     {
+        std::cout << " Using external custom generator ..." << endl;
         p_generator = &DPPrimaryGeneratorAction::generateCustom;
 
         customInputFile = new TFile(p_config->customInput.Data(), "READ");
@@ -112,6 +120,7 @@ DPPrimaryGeneratorAction::DPPrimaryGeneratorAction()
     }
     else if(p_config->generator == "Debug")
     {
+        std::cout << " Using simple debug generator ..." << endl;
         p_generator = &DPPrimaryGeneratorAction::generateDebug;
     }
 }

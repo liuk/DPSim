@@ -46,15 +46,24 @@ DPMCTrack::DPMCTrack()
     fHitIDs.clear();
 }
 
+std::ostream& operator << (std::ostream& os, const DPMCHit& hit)
+{
+    os << "Hit " << hit.fHitID << " comes from track " << hit.fTrackID << "\n"
+       << "   on detector " << hit.fDetectorID << " element " << hit.fElementID << " with distance to center = " << hit.fDriftDistance << "\n"
+       << "   real position = (" << hit.fPosition.X() << ", " << hit.fPosition.Y() << ", " << hit.fPosition.Z() << ") cm\n"
+       << "   real momentum = (" << hit.fMomentum.X() << ", " << hit.fMomentum.Y() << ", " << hit.fMomentum.Z() << ") cm";
+    return os;
+}
+
 DPMCRawEvent::DPMCRawEvent()
 {
-    if(!fDimuons) fDimuons = new TClonesArray("DPMCDimuon");
+    fDimuons = new TClonesArray("DPMCDimuon");
     fNDimuons = 0;
 
-    if(!fTracks) fTracks = new TClonesArray("DPMCTrack");
+    fTracks = new TClonesArray("DPMCTrack");
     fNTracks = 0;
 
-    if(!fHits) fHits = new TClonesArray("DPMCHit");
+    fHits = new TClonesArray("DPMCHit");
     fNHits = 0;
 
     fEvtHeader.fRunID = -1;

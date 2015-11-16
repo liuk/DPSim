@@ -1,6 +1,7 @@
 #ifndef DPMCEvent_H
 #define DPMCEvent_H
 
+#include <iostream>
 #include <vector>
 
 #include <TROOT.h>
@@ -83,6 +84,9 @@ public:
     TVector3 fMomentum;
     TVector3 fPosition;
     //Double_t fDepEnergy;
+
+public:
+    friend std::ostream& operator << (std::ostream& os, const DPMCHit& hit);
 
     ClassDef(DPMCHit, 1)
 };

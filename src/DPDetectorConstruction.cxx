@@ -28,8 +28,8 @@ DPDetectorConstruction::~DPDetectorConstruction() {}
 
 G4VPhysicalVolume* DPDetectorConstruction::Construct()
 {
-    std::cout << "DETECTOR" << std::endl;
     DPSimConfig* p_config = DPSimConfig::instance();
+    std::cout << "Initializing global geometry from GDML file " << p_config->geometryGDMLInput.Data() << std::endl;
 
     gdmlParser.Read(p_config->geometryGDMLInput.Data());
     physicalWorld = gdmlParser.GetWorldVolume();
@@ -39,7 +39,7 @@ G4VPhysicalVolume* DPDetectorConstruction::Construct()
 
 void DPDetectorConstruction::ConstructSDandField()
 {
-    std::cout << "SD DETECTOR" << std::endl;
+    std::cout << "Initializing sensitive detectors ..." << std::endl;
 
     //Construct sensitive detectors
     DPSensitiveDetector* sensDet= new DPSensitiveDetector("SensDet", "sensDetHitCol");

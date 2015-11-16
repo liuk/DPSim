@@ -23,6 +23,7 @@ public:
 
     //Number of events to run
     Int_t nEvents;
+    Int_t printFreq;
 
     //MC version hash string
     TString version;
@@ -49,8 +50,7 @@ public:
     //Event generation setup
     TString generator;        // The type of event generator running, i.e. gun or dimuon
     TString eventPos;         // Where the event is generated, target, dump or both.  Doesn't affect gun generator
-    TString dimuonSource;     // Whether the dimuons come from Drell-Yan, J/Psi, Psi', A', etc.
-
+    
     //I/O setup
     TString configFileName;   // name of configuration file
     TString outputFileName;   // The database name that output goes to

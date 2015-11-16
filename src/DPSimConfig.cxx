@@ -28,6 +28,7 @@ void DPSimConfig::init(TString configFile)
     //Fill the content
     seed = pInt("seed", 0);
     nEvents = pInt("nEvents", 100);
+    printFreq = pInt("printFreq", 10);
     version = pString("version");
 
     bucket_size = pInt("bucket_size", 40000);
@@ -48,7 +49,6 @@ void DPSimConfig::init(TString configFile)
 
     generator = pString("generator");
     eventPos = pString("eventPos");
-    dimuonSource = pString("dimuonSource");
 
     configFileName = configFile;
     outputFileName = pString("outputFileName");

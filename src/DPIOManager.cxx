@@ -1,6 +1,7 @@
 #include "DPIOManager.h"
 
 #include "G4SDManager.hh"
+#include "G4SystemOfUnits.hh"
 
 DPIOManager* DPIOManager::p_IOmamnger = NULL;
 DPIOManager* DPIOManager::instance()
@@ -12,6 +13,7 @@ DPIOManager* DPIOManager::instance()
 DPIOManager::DPIOManager(): saveFile(NULL), saveTree(NULL), rawEvent(NULL)
 {
     p_config = DPSimConfig::instance();
+    p_digitizer = DPDigitizer::instance();
     sensHitColID = -1;
 
     //normally we expect less than 500 tracks, 2000 hits
@@ -51,6 +53,9 @@ void DPIOManager::initialize(int runID)
 
 void DPIOManager::reset(int eventID)
 {
+#ifdef DEBUG_IO
+    std::cout << __FILE__ << " " << __FUNCTION__ << " reset IO manager for new event " << eventID << std::endl;
+#endif
     rawEvent->clear();
     rawEvent->eventHeader().fEventID = eventID;
 
@@ -61,12 +66,18 @@ void DPIOManager::reset(int eventID)
 
 void DPIOManager::fillOneDimuon(double weight, const DPMCDimuon& dimuon)
 {
+#ifdef DEBUG_IO
+    std::cout << __FILE__ << " " << __FUNCTION__ << " insert new dimuon with mass = " << dimuon.fMass << std::endl;
+#endif
     rawEvent->eventHeader().fSigWeight = weight;
     rawEvent->addDimuon(dimuon);
 }
 
 void DPIOManager::fillOneEvent(const G4Event* theEvent)
 {
+#ifdef DEBUG_IO
+    std::cout << __FILE__ << " " << __FUNCTION__ << " fill all the event info for eventID = " << theEvent->GetEventID() << std::endl;
+#endif
     //extract all the virtual hits and digitize
     fillHitsVector(theEvent);
 
@@ -77,6 +88,10 @@ void DPIOManager::fillOneEvent(const G4Event* theEvent)
     for(std::vector<DPMCTrack>::iterator iter = tracks.begin(); iter != tracks.end(); ++iter)
     {
         //only save the tracks that have at least one hits in detector
+#ifdef DEBUG_IO
+        std::cout << __FILE__ << " " << __FUNCTION__ << " track with ID = " << iter->fTrackID << " PDG = " << iter->fPDGCode
+                  << " has " << iter->fHitIDs.size() << " hits. " << std::endl;
+#endif
         if(!iter->fHitIDs.empty()) rawEvent->addTrack(*iter);
     }
 
@@ -95,6 +110,10 @@ void DPIOManager::fillOneEvent(const G4Event* theEvent)
 
 void DPIOManager::fillOneTrack(const DPMCTrack& mcTrack)
 {
+#ifdef DEBUG_IO
+    std::cout << __FILE__ << " " << __FUNCTION__ << " adding new track with ID = " << mcTrack.fTrackID
+              << ", PDG = " << mcTrack.fPDGCode << ", loc = " << tracks.size()-1 << std::endl;
+#endif
     if(trackIDs.find(mcTrack.fTrackID) == trackIDs.end()) //new track
     {
         tracks.push_back(mcTrack);
@@ -108,6 +127,9 @@ void DPIOManager::fillOneTrack(const DPMCTrack& mcTrack)
 
 void DPIOManager::updateOneTrack(unsigned int trackID, G4ThreeVector pos, G4ThreeVector mom)
 {
+#ifdef DEBUG_IO
+    std::cout << __FILE__ << " " << __FUNCTION__ << " updating final pos/mom for trackID = " << trackID << std::endl;
+#endif
     std::map<unsigned int, unsigned int>::iterator index = trackIDs.find(trackID);
     if(index == trackIDs.end()) std::cout << "WARNING! Track with ID = " << trackID << " not found!" << std::endl;
 
@@ -129,11 +151,15 @@ void DPIOManager::fillHitsVector(const G4Event* theEvent)
     for(int i = 0; i < nHits; ++i)
     {
         hits.push_back(*((*sensHC)[i]));
+        p_digitizer->digitize(hits.back());
     }
 }
 
 void DPIOManager::reIndex()
 {
+#ifdef DEBUG_IO
+    std::cout << __FILE__ << " " << __FUNCTION__ << " now reset all the index." << std::endl;
+#endif
     //Assign and fill the hitIDs to the tracks
     unsigned int hitID = 0;
     for(std::vector<DPVirtualHit>::iterator iter = hits.begin(); iter != hits.end(); ++iter)
@@ -141,7 +167,7 @@ void DPIOManager::reIndex()
         for(std::vector<DPMCHit>::iterator jter = iter->digiHits.begin(); jter != iter->digiHits.end(); ++jter)
         {
             jter->fHitID = hitID++;
-            tracks[iter->particleID].fHitIDs.push_back(jter->fHitID);
+            tracks[trackIDs[iter->particleID]].fHitIDs.push_back(jter->fHitID);
         }
     }
 
@@ -158,13 +184,16 @@ void DPIOManager::reIndex()
     {
         for(std::vector<DPMCHit>::iterator jter = iter->digiHits.begin(); jter != iter->digiHits.end(); ++jter)
         {
-            jter->fTrackID = tracks[iter->particleID].fTrackID;
+            jter->fTrackID = tracks[trackIDs[iter->particleID]].fTrackID;
         }
     }
 }
 
 void DPIOManager::finalize()
 {
+#ifdef DEBUG_IO
+    std::cout << __FILE__ << " " << __FUNCTION__ << " closing up." << std::endl;
+#endif
     saveFile->cd();
     saveTree->Write();
     saveFile->Close();

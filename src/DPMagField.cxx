@@ -17,42 +17,49 @@ DPFieldMap::DPFieldMap(G4String name, G4String fieldMapFile, double strength, do
         cerr << "Field map input " << fieldMapFile << " does not exist." << endl;
         throw 1;
     }
+    cout << " Initializing magnetic field of " << name << " from field map " << fieldMapFile << endl;
 
     //Load the range and number of bins in each dimension
     string line;
-    stringstream ss;
 
     getline(fin, line);
-    ss.str(line);
-    ss >> nx >> xmin >> xmax;
+    stringstream ssx(line);
+    ssx >> nx >> xmin >> xmax;
     xmin = xmin*cm; xmax = xmax*cm;
     x0 = (xmax + xmin)/2.;
-    xmin = xmin - 0.5*(xmax - xmin)/nx;
-    xmax = xmax + 0.5*(xmax - xmin)/nx;
 
     getline(fin, line);
-    ss.str(line);
-    ss >> ny >> ymin >> ymax;
+    stringstream ssy(line);
+    ssy >> ny >> ymin >> ymax;
     ymin = ymin*cm; ymax = ymax*cm;
     y0 = (ymax + ymin)/2.;
-    ymin = ymin - 0.5*(ymax - ymin)/ny;
-    ymax = ymax + 0.5*(ymax - ymin)/ny;
 
     getline(fin, line);
-    ss.str(line);
-    ss >> nz >> zmin >> zmax;
+    stringstream ssz(line);
+    ssz >> nz >> zmin >> zmax;
     zmin = zmin*cm; zmax = zmax*cm;
+    zmin = zmin + zcenter;
+    zmax = zmax + zcenter;
     z0 = (zmax + zmin)/2. + zcenter;
-    zmin = zmin - 0.5*(zmax - zmin)/nz + zcenter;
-    zmax = zmax + 0.5*(zmax - zmin)/nz + zcenter;
+
+    cout << "  its demensions: " << endl;
+    cout << "    X: " << nx << " bins, " << xmin/cm << "cm -- " << xmax/cm << "cm." << endl;
+    cout << "    Y: " << ny << " bins, " << ymin/cm << "cm -- " << ymax/cm << "cm." << endl;
+    cout << "    Z: " << nz << " bins, " << zmin/cm << "cm -- " << zmax/cm << "cm." << endl;
 
     //Fill the grid
-    for(int i = 0; i < 3; ++i) grid[i] = new TH3D(Form("%s_%d", name.c_str(), i), Form("%s_%d", name.c_str(), i), nx, xmin, xmax, ny, ymin, ymax, nz, zmin, zmax);
+    for(int i = 0; i < 3; ++i)
+    {
+        grid[i] = new TH3D(Form("%s_%d", name.c_str(), i), Form("%s_%d", name.c_str(), i),
+                           nx, xmin - 0.5*(xmax - xmin)/(nx-1), xmax + 0.5*(xmax - xmin)/(nx-1),
+                           ny, ymin - 0.5*(ymax - ymin)/(ny-1), ymax + 0.5*(ymax - ymin)/(ny-1),
+                           nz, zmin - 0.5*(zmax - zmin)/(nz-1), zmax + 0.5*(zmax - zmin)/(nz-1));
+    }
     while(getline(fin, line))
     {
         double x, y, z, bx, by, bz;
 
-        ss.str(line);
+        stringstream ss(line);
         ss >> x >> y >> z >> bx >> by >> bz;
 
         x = x*cm; y = y*cm; z = z*cm;
@@ -72,7 +79,7 @@ DPFieldMap::~DPFieldMap()
 void DPFieldMap::GetFieldValue(const double Point[3], double* Bfield) const
 {
     for(int i = 0; i < 3; ++i) Bfield[i] = 0.;
-    if(Point[0] < xmin || Point[0] > xmax || Point[1] < ymin || Point[1] > ymax || Point[2] < ymin || Point[2] > ymax) return;
+    if(Point[0] < xmin || Point[0] > xmax || Point[1] < ymin || Point[1] > ymax || Point[2] < zmin || Point[2] > zmax) return;
 
     for(int i = 0; i < 3; ++i) Bfield[i] = grid[i]->Interpolate(Point[0], Point[1], Point[2]);
 }

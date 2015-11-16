@@ -27,6 +27,9 @@ public:
     double getH(double x, double y, double z) { return (x-xc)*xVec[0] + (y-yc)*xVec[1] + (z-zc)*xVec[2]; }
     double getV(double x, double y, double z) { return (x-xc)*yVec[0] + (y-yc)*yVec[1] + (z-zc)*yVec[2]; }
 
+    //stream output
+    friend std::ostream& operator << (std::ostream& os, const DPDigiPlane& plane);
+
 public:
     int detectorID;
     G4String detectorGroupName;     //large detector group that this plane belongs to

@@ -4,6 +4,7 @@
 #include "G4ParticleDefinition.hh"
 #include "G4VProcess.hh"
 #include "G4ThreeVector.hh"
+#include "G4SystemOfUnits.hh"
 
 DPTrackingAction::DPTrackingAction()
 {
@@ -15,6 +16,10 @@ DPTrackingAction::~DPTrackingAction()
 
 void DPTrackingAction::PreUserTrackingAction(const G4Track* theTrack)
 {
+#ifdef DEBUG_IO
+    std::cout << __FILE__ << " " << __FUNCTION__ << " " << theTrack->GetTrackID() << "  " << theTrack->GetDefinition()->GetPDGEncoding() << std::endl;
+#endif
+
     DPMCTrack mcTrack;
     mcTrack.fTrackID = theTrack->GetTrackID();
     mcTrack.fParentID = theTrack->GetParentID();
@@ -48,5 +53,8 @@ void DPTrackingAction::PreUserTrackingAction(const G4Track* theTrack)
 
 void DPTrackingAction::PostUserTrackingAction(const G4Track* theTrack)
 {
+#ifdef DEBUG_IO
+    std::cout << __FILE__ << " " << __FUNCTION__ << " " << theTrack->GetTrackID() << "  " << theTrack->GetDefinition()->GetPDGEncoding() << std::endl;
+#endif
     p_IOmanager->updateOneTrack(theTrack->GetTrackID(), theTrack->GetPosition(), theTrack->GetMomentum());
 }

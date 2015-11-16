@@ -5,16 +5,31 @@ project(DPSim CXX C)
 # Put executables into a bin
 SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 
+# Command line options
+OPTION(DEBUG_IN "Output massive initializing debugging info" OFF)
+OPTION(DEBUG_TR "Output massive tracking debugging info" OFF)
+OPTION(DEBUG_IO "Output massive I/O debugging info" OFF)
+
+IF(DEBUG_IN)
+  ADD_DEFINITIONS(-DDEBUG_IN)
+ENDIF(DEBUG_IN)
+IF(DEBUG_TR)
+  ADD_DEFINITIONS(-DDEBUG_TR)
+ENDIF(DEBUG_TR)
+IF(DEBUG_IO)
+  ADD_DEFINITIONS(-DDEBUG_IO)
+ENDIF(DEBUG_IO)
+
 # ROOT dict generation
 add_custom_command (
-  OUTPUT ${PROJECT_SOURCE_DIR}/src/DPMCRawEventDict.cxx
+  OUTPUT ${PROJECT_SOURCE_DIR}/src/DPMCRawEventDict.cxx ${PROJECT_SOURCE_DIR}/src/DPMCRawEventDict.h
   #DEPENDES ${PROJECT_SOURCE_DIR}/inc/DPMCRawEvent.h ${PROJECT_SOURCE_DIR}/inc/DPMCRawEventLinkDef.h
   COMMAND rootcint
   ARGS -f ${PROJECT_SOURCE_DIR}/src/DPMCRawEventDict.cxx -c ${PROJECT_SOURCE_DIR}/inc/DPMCRawEvent.h ${PROJECT_SOURCE_DIR}/inc/DPMCRawEventLinkDef.h
   )
 
 add_custom_command (
-  OUTPUT ${PROJECT_SOURCE_DIR}/src/DPSimConfigDict.cxx
+  OUTPUT ${PROJECT_SOURCE_DIR}/src/DPSimConfigDict.cxx ${PROJECT_SOURCE_DIR}/src/DPSimConfigDict.h
   #DEPENDES ${PROJECT_SOURCE_DIR}/inc/DPSimConfig.h ${PROJECT_SOURCE_DIR}/inc/DPSimConfigLinkDef.h
   COMMAND rootcint
   ARGS -f ${PROJECT_SOURCE_DIR}/src/DPSimConfigDict.cxx -c ${PROJECT_SOURCE_DIR}/inc/DPSimConfig.h ${PROJECT_SOURCE_DIR}/inc/DPSimConfigLinkDef.h
@@ -39,7 +54,7 @@ execute_process(COMMAND root-config --libs   OUTPUT_VARIABLE ROOT_LINK   OUTPUT_
 include_directories(${ROOT_PREFIX}/include)
 target_link_libraries(DPSim ${ROOT_LINK})
 
-# BOOST         For LHAPDF
+# BOOST
 include_directories($ENV{BOOST_ROOT})
 
 # LHAPDF
@@ -65,6 +80,6 @@ string(REPLACE "-I" "" MYSQL_INCLUDE ${MYSQL_INCLUDE})
 include_directories(${MYSQL_INCLUDE})
 target_link_libraries(DPSim ${MYSQL_LINK})
 
-# additional clean
-set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES ${PROJECT_SOURCE_DIR}/src/DPMCRawEventDict.h)
-set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES ${PROJECT_SOURCE_DIR}/src/DPSimConfigDict.h)
+# test stuff
+#add_executable(test_debug test/test.cxx ${sources} ${headers} ${PROJECT_SOURCE_DIR}/src/DPMCRawEventDict.cxx ${PROJECT_SOURCE_DIR}/src/DPSimConfigDict.cxx)
+#target_link_libraries(test_debug ${GEANT4_LINK} ${Geant4_LIBRARIES} ${ROOT_LINK} ${LHAPDF_LINK} ${PYTHIA_LINK} ${MYSQL_LINK})

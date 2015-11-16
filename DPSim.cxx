@@ -38,10 +38,9 @@ int main(int argc, char* argv[])
     runManager->SetUserAction(new DPTrackingAction);
     runManager->SetUserAction(new DPSteppingAction);
 
-    //User interface
-    G4UImanager* UImanager = G4UImanager::GetUIpointer();
-    UImanager->ApplyCommand("/control/initialize");
-    UImanager->ApplyCommand(Form("/run/beamOn %d", p_config->nEvents));
+    runManager->Initialize();
+    runManager->BeamOn(p_config->nEvents);
 
+    delete runManager;
     return EXIT_SUCCESS;
 }

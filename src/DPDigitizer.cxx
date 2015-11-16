@@ -2,7 +2,10 @@
 #include "DPSimConfig.h"
 #include "DPMCRawEvent.h"
 
+#include <iomanip>
 #include <cmath>
+
+#include "G4SystemOfUnits.hh"
 
 #include <TMath.h>
 #include <TSQLServer.h>
@@ -55,7 +58,7 @@ void DPDigiPlane::preCalculation()
     for(int i = 0; i < 3; ++i)
     {
         uVec[i] = 0.;
-        for(int j = 0; i < 3; ++j) uVec[i] += rotM[i][j]*temp[j];
+        for(int j = 0; j < 3; ++j) uVec[i] += rotM[i][j]*temp[j];
     }
 
     for(int i = 0; i < 3; ++i) temp[i] = vVec[i];
@@ -106,6 +109,13 @@ void DPDigiPlane::intercept(double tx, double ty, double x0, double y0, G4ThreeV
     w = (vcp[0]*dpos[0] + vcp[1]*dpos[1] + vcp[2]*dpos[2])/det;
 }
 
+std::ostream& operator << (std::ostream& os, const DPDigiPlane& plane)
+{
+    os << "DigiPlane ID = " << plane.detectorID << ", name = " << plane.detectorName << " belongs to group " << plane.detectorGroupName << "\n"
+       << "   nElements = " << plane.nElements << ",  center x = " << plane.xc << ", y = " << plane.yc << ", z = " << plane.zc;
+    return os;
+}
+
 DPDigitizer* DPDigitizer::p_digitizer = NULL;
 DPDigitizer* DPDigitizer::instance()
 {
@@ -123,7 +133,7 @@ DPDigitizer::DPDigitizer()
                    "xPrimeOffset,x0+deltaX,y0+deltaY,z0+deltaZ,planeWidth,planeHeight,theta_x+rotateAboutX,"
                    "theta_y+rotateAboutY,theta_z+rotateAboutZ,detectorID FROM %s.Planes,%s.PlaneOffsets WHERE "
                    "Planes.detectorName=PlaneOffsets.detectorName and (Planes.detectorName LIKE 'H__' OR "
-                   "Planes.detectorName LIKE 'H_____')", p_config->geometrySchema.Data(), p_config->geometrySchema.Data());
+                   "Planes.detectorName LIKE 'H____')", p_config->geometrySchema.Data(), p_config->geometrySchema.Data());
     TSQLServer* server = TSQLServer::Connect(Form("mysql://%s:%d", p_config->mysqlServer.Data(), p_config->mysqlPort), p_config->login, p_config->password);
     TSQLResult* res = server->Query(query);
 
@@ -155,6 +165,9 @@ DPDigitizer::DPDigitizer()
         digiPlane.preCalculation();
         digiPlanes[digiPlane.detectorGroupName].push_back(digiPlane);
 
+#ifdef DEBUG_IN
+        std::cout << digiPlane << std::endl;
+#endif
         delete row;
     }
 
@@ -182,7 +195,7 @@ void DPDigitizer::digitize(DPVirtualHit& vHit)
 
         int elementID = TMath::Nint((dp->nElements + 1.0)/2.0 + (w - dp->xPrimeOffset)/dp->spacing) - 1;
         double driftDistance = w - dp->spacing*(elementID + 0.5 - dp->nElements/2.) - dp->xPrimeOffset;
-        if(elementID > dp->nElements || fabs(driftDistance) > 0.5*dp->cellWidth) continue;
+        if(elementID < 1 || elementID > dp->nElements || fabs(driftDistance) > 0.5*dp->cellWidth) continue;
 
         DPMCHit digiHit;
         digiHit.fDetectorID = dp->detectorID;
