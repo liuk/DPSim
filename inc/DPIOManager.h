@@ -28,8 +28,8 @@ public:
     //Initialize, called at the beginning of each Run
     void initialize(int runID);
 
-    //reset the interal containers at the begining of each event
-    void reset(int eventID);
+    //reset the interal containers at the end of each event
+    void reset();
 
     //set the generation info
     void fillOneDimuon(double weight, const DPMCDimuon& dimuon);
@@ -64,6 +64,7 @@ private:
     //Output file
     TFile* saveFile;
     TTree* saveTree;
+    TTree* configTree;
     DPMCRawEvent* rawEvent;
 
     //container of tracks

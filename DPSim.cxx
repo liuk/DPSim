@@ -3,6 +3,7 @@
 #include "G4RunManager.hh"
 #include "G4UImanager.hh"
 #include "G4PhysListFactory.hh"
+#include "Randomize.hh"
 
 #include <TROOT.h>
 
@@ -21,6 +22,9 @@ int main(int argc, char* argv[])
     //Initialize the configuration
     DPSimConfig* p_config = DPSimConfig::instance();
     p_config->init(argv[1]);
+
+    //set random seed
+    CLHEP::HepRandom::setTheSeed(p_config->seed);
 
     //General Initialization
     G4RunManager* runManager = new G4RunManager;

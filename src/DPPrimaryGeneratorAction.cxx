@@ -25,6 +25,7 @@ const double ebeam = 120.;
 const TLorentzVector p_beam(0., 0., TMath::Sqrt(ebeam*ebeam - mp*mp), ebeam);
 const TLorentzVector p_target(0., 0., 0., mp);
 const TLorentzVector p_cms = p_beam + p_target;
+const TVector3 bv_cms = p_cms.BoostVector();
 const double scms = p_cms.M2();
 const double sqrts = p_cms.M();
 
@@ -189,6 +190,8 @@ void DPPrimaryGeneratorAction::generatePhaseSpace()
     particleGun->SetParticlePosition(G4ThreeVector(dimuon.fVertex.X()*cm, dimuon.fVertex.Y()*cm, dimuon.fVertex.Z()*cm));
     particleGun->SetParticleMomentum(G4ThreeVector(dimuon.fNegMomentum.X()*GeV, dimuon.fNegMomentum.Y()*GeV, dimuon.fNegMomentum.Z()*GeV));
     particleGun->GeneratePrimaryVertex(theEvent);
+
+    p_IOmamnger->fillOneDimuon(1., dimuon);
 }
 
 void DPPrimaryGeneratorAction::generateCustom()
@@ -245,6 +248,7 @@ bool DPPrimaryGeneratorAction::generateDimuon(double mass, double xF, DPMCDimuon
     //configure phase space generator
     TLorentzVector p_dimuon;
     p_dimuon.SetXYZM(px, py, pz, mass);
+    p_dimuon.Boost(bv_cms);
     double masses[2] = {mmu, mmu};
     phaseGen.SetDecay(p_dimuon, 2, masses);
 
