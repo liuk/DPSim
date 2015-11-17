@@ -16,8 +16,8 @@ DPIOManager::DPIOManager(): saveFile(NULL), saveTree(NULL), rawEvent(NULL)
     p_digitizer = DPDigitizer::instance();
     sensHitColID = -1;
 
-    //normally we expect less than 500 tracks, 2000 hits
-    tracks.reserve(500);
+    //normally we expect less than 2000 tracks, 2000 hits
+    tracks.reserve(2000);
     hits.reserve(2000);
 }
 
@@ -42,22 +42,18 @@ void DPIOManager::initialize(int runID)
     saveTree->Branch("rawEvent", &rawEvent, 256000, 99);
 
     //Configuration tree
-    TTree* configTree = new TTree("config", "config");
+    configTree = new TTree("config", "config");
     configTree->Branch("config", &p_config, 256000, 99);
 
-    configTree->Fill();
-    configTree->Write();
-
-    //in case there is an external input for the custom input
+    //in case there is an external input for the custom input, need to attach the raw input tree as well
 }
 
-void DPIOManager::reset(int eventID)
+void DPIOManager::reset()
 {
 #ifdef DEBUG_IO
-    std::cout << __FILE__ << " " << __FUNCTION__ << " reset IO manager for new event " << eventID << std::endl;
+    std::cout << __FILE__ << " " << __FUNCTION__ << " reset IO manager for this event " << std::endl;
 #endif
     rawEvent->clear();
-    rawEvent->eventHeader().fEventID = eventID;
 
     trackIDs.clear();
     tracks.clear();
@@ -104,6 +100,9 @@ void DPIOManager::fillOneEvent(const G4Event* theEvent)
     }
 
     //save the event
+#ifdef DEBUG_IO
+    rawEvent->print();
+#endif
     saveTree->Fill();
     if(saveTree->GetEntries() % 1000 == 0) saveTree->AutoSave("SaveSelf");
 }
@@ -205,5 +204,9 @@ void DPIOManager::finalize()
 #endif
     saveFile->cd();
     saveTree->Write();
+
+    configTree->Fill();
+    configTree->Write();
+
     saveFile->Close();
 }
