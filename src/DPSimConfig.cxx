@@ -53,6 +53,7 @@ void DPSimConfig::init(TString configFile)
     configFileName = configFile;
     outputFileName = pString("outputFileName");
     customInput = pString("customInput");
+    outputMode = pString("outputMode");
 
     x1Min = pDouble("x1Min", 0.);
     x1Max = pDouble("x1Max", 1.);

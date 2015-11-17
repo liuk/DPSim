@@ -4,6 +4,8 @@
 #include "G4UserEventAction.hh"
 #include "G4Event.hh"
 
+#include <TStopwatch.h>
+
 #include "DPIOManager.h"
 
 class DPEventAction: public G4UserEventAction
@@ -21,6 +23,9 @@ private:
 
     //print frequency
     int printFreq;
+
+    //Timer for performance benchmark
+    TStopwatch timer;
 };
 
 #endif

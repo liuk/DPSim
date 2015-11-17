@@ -11,26 +11,6 @@
 #include <TClonesArray.h>
 #include <TString.h>
 
-class DPMCDimuon: public TObject
-{
-public:
-    UInt_t fDimuonID;
-    UInt_t fPosTrackID;
-    UInt_t fNegTrackID;
-
-    TVector3 fVertex;
-    TLorentzVector fPosMomentum;
-    TLorentzVector fNegMomentum;
-
-    bool fAccepted;
-
-public:   //derived variables
-    void calcVariables();
-    Double_t fMass, fpT, fxF, fx1, fx2, fCosTh, fPhi;
-
-    ClassDef(DPMCDimuon, 1)
-};
-
 class DPMCHeader: public TObject
 {
 public:
@@ -41,33 +21,6 @@ public:
     Double_t fSigWeight;
 
     ClassDef(DPMCHeader, 1)
-};
-
-class DPMCTrack: public TObject
-{
-public:
-    DPMCTrack();
-
-public:
-    UInt_t fTrackID;
-    Short_t fCharge;
-    Int_t fPDGCode;
-
-    bool fInHodoAcc[4];
-    bool fInChamberAcc[4];
-
-    TVector3 fInitialPos;
-    TLorentzVector fInitialMom;
-
-    TVector3 fFinalPos;
-    TLorentzVector fFinalMom;
-
-    UInt_t fParentID;
-    TString fProcess;
-
-    std::vector<UInt_t> fHitIDs;
-
-    ClassDef(DPMCTrack, 1)
 };
 
 class DPMCHit: public TObject
@@ -89,6 +42,65 @@ public:
     friend std::ostream& operator << (std::ostream& os, const DPMCHit& hit);
 
     ClassDef(DPMCHit, 1)
+};
+
+class DPMCTrack: public TObject
+{
+public:
+    DPMCTrack();
+
+    //set the acceptance bit
+    void addHit(DPMCHit& hit);
+
+    //test if is accepted by all hodos
+    bool isAccepted() { return fInHodoAcc[0] && fInHodoAcc[1] && fInHodoAcc[2] && fInHodoAcc[3]; }
+
+    friend std::ostream& operator << (std::ostream& os, const DPMCTrack& track);
+
+public:
+    UInt_t fTrackID;
+    Short_t fCharge;
+    Int_t fPDGCode;
+
+    bool fInHodoAcc[4];
+    bool fInChamberAcc[4];
+
+    TVector3 fInitialPos;
+    TLorentzVector fInitialMom;
+
+    TVector3 fFinalPos;
+    TLorentzVector fFinalMom;
+
+    UInt_t fParentID;
+    Int_t fParentPDGCode;
+    TString fProcess;
+
+    std::vector<UInt_t> fHitIDs;
+
+    ClassDef(DPMCTrack, 1)
+};
+
+class DPMCDimuon: public TObject
+{
+public:
+    UInt_t fDimuonID;
+    UInt_t fPosTrackID;
+    UInt_t fNegTrackID;
+
+    TVector3 fVertex;
+    TLorentzVector fPosMomentum;
+    TLorentzVector fNegMomentum;
+
+    bool fAccepted;
+
+public:   //derived variables
+    void calcVariables();
+    Double_t fMass, fpT, fxF, fx1, fx2, fCosTh, fPhi;
+
+public:
+    friend std::ostream& operator << (std::ostream& os, const DPMCDimuon& dimuon);
+
+    ClassDef(DPMCDimuon, 1)
 };
 
 class DPMCRawEvent: public TObject
@@ -117,6 +129,9 @@ public:
     UInt_t addDimuon(DPMCDimuon dimuon, Int_t index = -1);
     UInt_t addTrack(DPMCTrack track, Int_t index = -1);
     UInt_t addHit(DPMCHit hit, Int_t trackID = -1, Int_t index = -1);
+
+    //debugging output
+    void print();
 
 private:
     DPMCHeader fEvtHeader;

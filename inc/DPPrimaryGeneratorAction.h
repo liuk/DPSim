@@ -15,11 +15,10 @@
 #include <TFile.h>
 #include <TClonesArray.h>
 #include <TGenPhaseSpace.h>
+#include <TVector3.h>
 
 #include "DPSimConfig.h"
 #include "DPIOManager.h"
-
-#define GenBit(n) (1 << (n))
 
 class DPPrimaryGeneratorAction: public G4VUserPrimaryGeneratorAction
 {
@@ -43,6 +42,12 @@ public:
 
     //Dimuon phase space generator
     bool generateDimuon(double mass, double xF, DPMCDimuon& dimuon);
+
+    //vertex generator
+    TVector3 generateVertex();
+
+    //test if in dimuon mode
+    bool isInDimuonMode() { return dimuonMode; }
 
 private:
     //pointer to the configuration
@@ -73,6 +78,7 @@ private:
     //pointer to the real generator
     typedef void (DPPrimaryGeneratorAction::*GenPtr)();
     GenPtr p_generator;
+    bool dimuonMode;
 
     //Used for custom input
     TFile* customInputFile;

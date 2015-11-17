@@ -49,25 +49,30 @@ DPPrimaryGeneratorAction::DPPrimaryGeneratorAction()
     pdf = LHAPDF::mkPDF("CT10nlo", 0);
 
     //initilize all kinds of generators
+    dimuonMode = false;
     if(p_config->generator == "DrellYan")
     {
         std::cout << " Using Drell-Yan generator ..." << endl;
         p_generator = &DPPrimaryGeneratorAction::generateDrellYan;
+        dimuonMode = true;
     }
     else if(p_config->generator == "JPsi")
     {
         std::cout << " Using JPsi generator ..." << endl;
         p_generator = &DPPrimaryGeneratorAction::generateJPsi;
+        dimuonMode = true;
     }
     else if(p_config->generator == "Psip")
     {
         std::cout << " Using Psip generator ..." << endl;
         p_generator = &DPPrimaryGeneratorAction::generatePsip;
+        dimuonMode = true;
     }
     else if(p_config->generator == "DarkPhoton")
     {
         std::cout << " Using dark photon generator ..." << endl;
         p_generator = &DPPrimaryGeneratorAction::generateDarkPhoton;
+        dimuonMode = true;
     }
     else if(p_config->generator == "PythiaSingle")
     {
@@ -103,6 +108,7 @@ DPPrimaryGeneratorAction::DPPrimaryGeneratorAction()
     {
         std::cout << " Using phase space generator ..." << endl;
         p_generator = &DPPrimaryGeneratorAction::generatePhaseSpace;
+        dimuonMode = true;
     }
     else if(p_config->generator == "Custom")
     {
@@ -128,6 +134,7 @@ DPPrimaryGeneratorAction::DPPrimaryGeneratorAction()
 
 DPPrimaryGeneratorAction::~DPPrimaryGeneratorAction()
 {
+    delete pdf;
     delete particleGun;
 }
 
@@ -178,6 +185,7 @@ void DPPrimaryGeneratorAction::generatePhaseSpace()
     double mass = G4UniformRand()*(p_config->massMax - p_config->massMin) + p_config->massMin;
     double xF = G4UniformRand()*(p_config->xfMax - p_config->xfMin) + p_config->xfMin;
     if(!generateDimuon(mass, xF, dimuon)) return;
+    dimuon.fVertex = generateVertex();
 
     p_config->nEventsPhysics++;
 
@@ -191,6 +199,8 @@ void DPPrimaryGeneratorAction::generatePhaseSpace()
     particleGun->SetParticleMomentum(G4ThreeVector(dimuon.fNegMomentum.X()*GeV, dimuon.fNegMomentum.Y()*GeV, dimuon.fNegMomentum.Z()*GeV));
     particleGun->GeneratePrimaryVertex(theEvent);
 
+    dimuon.fPosTrackID = 1;
+    dimuon.fNegTrackID = -1;
     p_IOmamnger->fillOneDimuon(1., dimuon);
 }
 
@@ -262,4 +272,14 @@ bool DPPrimaryGeneratorAction::generateDimuon(double mass, double xF, DPMCDimuon
     if(dimuon.fCosTh < p_config->cosThetaMin || dimuon.fCosTh > p_config->cosThetaMax) return false;
 
     return true;
+}
+
+TVector3 DPPrimaryGeneratorAction::generateVertex()
+{
+    TVector3 vtx;
+    vtx.SetX(G4RandGauss::shoot(0., 1.5));
+    vtx.SetY(G4RandGauss::shoot(0., 1.5));
+    vtx.SetZ(-150. + G4UniformRand()*50.);
+
+    return vtx;
 }

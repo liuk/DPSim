@@ -38,8 +38,8 @@ public:
     void fillOneEvent(const G4Event*);
 
     //Fill one track, called at the beginning of each track
-    void fillOneTrack(const DPMCTrack& mcTrack);
-    void updateOneTrack(unsigned int trackID, G4ThreeVector pos, G4ThreeVector mom);
+    void fillOneTrack(const DPMCTrack& mcTrack, bool keep = false);
+    void updateOneTrack(unsigned int trackID, G4ThreeVector pos, G4ThreeVector mom, bool keep = false);
 
     //Fill the hit vector from G4Event, and digitize the virtual hits
     //called by fillOneEvent
@@ -61,6 +61,10 @@ private:
     //Pointer to the digitizer
     DPDigitizer* p_digitizer;
 
+    //save mode
+    enum SaveMode {EVERYTHING, HITSONLY, INACCONLY};
+    SaveMode saveMode;
+
     //Output file
     TFile* saveFile;
     TTree* saveTree;
@@ -70,7 +74,7 @@ private:
     //container of tracks
     std::map<unsigned int, unsigned int> trackIDs; //maps real trackID to index in tracks vector
     std::vector<DPVirtualHit> hits;
-    std::vector<DPMCTrack> tracks;
+    std::vector<std::pair<DPMCTrack, bool> > tracks;
 
     //ID of the hit collection
     int sensHitColID;

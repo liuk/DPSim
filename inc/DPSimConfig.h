@@ -50,11 +50,12 @@ public:
     //Event generation setup
     TString generator;        // The type of event generator running, i.e. gun or dimuon
     TString eventPos;         // Where the event is generated, target, dump or both.  Doesn't affect gun generator
-    
+    TString customInput;      // Input ROOT file containing the generator info
+
     //I/O setup
     TString configFileName;   // name of configuration file
     TString outputFileName;   // The database name that output goes to
-    TString customInput;      // Input ROOT file containing the generator info
+    TString outputMode;       // save what kind of events to disk
 
     //phase space constrain
     Double_t x1Min;
