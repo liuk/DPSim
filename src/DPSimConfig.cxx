@@ -48,7 +48,9 @@ void DPSimConfig::init(TString configFile)
     kMagMultiplier = pDouble("kMagMultiplier", 1.);
 
     generator = pString("generator");
-    eventPos = pString("eventPos");
+    targetInBeam = pBool("targetInBeam", true);
+    dumpInBeam = pBool("dumpInBeam", false);
+    instruInBeam = pBool("instruInBeam", false);
 
     configFileName = configFile;
     outputFileName = pString("outputFileName");

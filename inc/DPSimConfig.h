@@ -49,8 +49,10 @@ public:
 
     //Event generation setup
     TString generator;        // The type of event generator running, i.e. gun or dimuon
-    TString eventPos;         // Where the event is generated, target, dump or both.  Doesn't affect gun generator
     TString customInput;      // Input ROOT file containing the generator info
+    bool targetInBeam;
+    bool dumpInBeam;
+    bool instruInBeam;
 
     //I/O setup
     TString configFileName;   // name of configuration file
