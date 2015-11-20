@@ -119,7 +119,7 @@ void DPIOManager::fillOneEvent(const G4Event* theEvent)
         //only save the tracks that have at least one hits in detector
 #ifdef DEBUG_IO
         std::cout << __FILE__ << " " << __FUNCTION__ << " track with ID = " << iter->first.fTrackID << " PDG = " << iter->first.fPDGCode
-                  << " has " << iter->first.fHitIDs.size() << " hits. " << std::endl;
+                  << " has " << iter->first.fHitIDs.size() << " hits, " << (iter->second ? "will be saved" : "will be discarded.") << std::endl;
 #endif
         if(iter->second) rawEvent->addTrack(iter->first);
     }
@@ -225,6 +225,7 @@ void DPIOManager::reIndex()
             continue;
         }
 
+        iter->second = !(iter->first.fHitIDs.empty());
         if(iter->first.fParentID == 0) continue;
         if(!iter->second) continue;
 
