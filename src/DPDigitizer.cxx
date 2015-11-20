@@ -130,10 +130,10 @@ DPDigitizer::DPDigitizer()
     //Load basic setup
     char query[500];
     sprintf(query, "SELECT Planes.detectorName,spacing,cellWidth,overlap,numElements,angleFromVert,"
-                   "xPrimeOffset,x0+deltaX,y0+deltaY,z0+deltaZ,planeWidth,planeHeight,theta_x+rotateAboutX,"
-                   "theta_y+rotateAboutY,theta_z+rotateAboutZ,detectorID FROM %s.Planes,%s.PlaneOffsets WHERE "
-                   "Planes.detectorName=PlaneOffsets.detectorName and (Planes.detectorName LIKE 'H__' OR "
-                   "Planes.detectorName LIKE 'H____')", p_config->geometrySchema.Data(), p_config->geometrySchema.Data());
+                   "xPrimeOffset,x0+deltaX,y0+deltaY,z0+deltaZ,planeWidth,planeHeight,theta_x+rotX,"
+                   "theta_y+rotY,theta_z+rotZ,Planes.detectorID,Planes.detectorGroupName FROM %s.Planes,%s.Alignments WHERE "
+                   "Planes.detectorName=Alignments.detectorName and Planes.detectorGroupName LIKE 'H%%'",
+                   p_config->geometrySchema.Data(), p_config->geometrySchema.Data());
     TSQLServer* server = TSQLServer::Connect(Form("mysql://%s:%d", p_config->mysqlServer.Data(), p_config->mysqlPort), p_config->login, p_config->password);
     TSQLResult* res = server->Query(query);
 
@@ -146,7 +146,7 @@ DPDigitizer::DPDigitizer()
         DPDigiPlane digiPlane;
         digiPlane.detectorID = boost::lexical_cast<int>(row->GetField(15));
         digiPlane.detectorName = row->GetField(0);
-        digiPlane.detectorGroupName = digiPlane.detectorName(0, 2);
+        digiPlane.detectorGroupName = row->GetField(16);
         digiPlane.spacing = boost::lexical_cast<double>(row->GetField(1));
         digiPlane.cellWidth = boost::lexical_cast<double>(row->GetField(2));
         digiPlane.overlap = boost::lexical_cast<double>(row->GetField(3));

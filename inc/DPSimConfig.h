@@ -74,7 +74,7 @@ public:
     //Run-accumulated variables
     Int_t nEventsThrown;
     Int_t nEventsPhysics;
-    Int_t nEventsAccepted;  //TODO: add this in the IO manager to keep track of in-acceptance dimuons
+    Int_t nEventsAccepted;
 
 private: //used only for parsing
     //general parser

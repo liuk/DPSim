@@ -9,6 +9,7 @@ SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 OPTION(DEBUG_IN "Output massive initializing debugging info" OFF)
 OPTION(DEBUG_TR "Output massive tracking debugging info" OFF)
 OPTION(DEBUG_IO "Output massive I/O debugging info" OFF)
+OPTION(DEBUG "General debug flag for non-production compiles" ON)
 
 IF(DEBUG_IN)
   ADD_DEFINITIONS(-DDEBUG_IN)
@@ -19,6 +20,9 @@ ENDIF(DEBUG_TR)
 IF(DEBUG_IO)
   ADD_DEFINITIONS(-DDEBUG_IO)
 ENDIF(DEBUG_IO)
+IF(NOT(DEBUG_IN OR DEBUG_TR OR DEBUG_IO OR DEBUG))
+  ADD_DEFINITION(_DNDEBUG)
+ENDIF(NOT(DEBUG_IN OR DEBUG_TR OR DEBUG_IO OR DEBUG))
 
 # ROOT dict generation
 add_custom_command (

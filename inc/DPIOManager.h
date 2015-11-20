@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <vector>
+#include <list>
 #include <map>
 
 #include "G4Event.hh"
@@ -41,9 +42,9 @@ public:
     void fillOneTrack(const DPMCTrack& mcTrack, bool keep = false);
     void updateOneTrack(unsigned int trackID, G4ThreeVector pos, G4ThreeVector mom, bool keep = false);
 
-    //Fill the hit vector from G4Event, and digitize the virtual hits
+    //Fill the hit list from G4Event, and digitize the virtual hits
     //called by fillOneEvent
-    void fillHitsVector(const G4Event* theEvent);
+    void fillHitsList(const G4Event* theEvent);
 
     //Re-index the tracks and hits, called by fillOneEvent
     void reIndex();
@@ -73,7 +74,7 @@ private:
 
     //container of tracks
     std::map<unsigned int, unsigned int> trackIDs; //maps real trackID to index in tracks vector
-    std::vector<DPVirtualHit> hits;
+    std::list<DPVirtualHit> hits;
     std::vector<std::pair<DPMCTrack, bool> > tracks;
 
     //ID of the hit collection

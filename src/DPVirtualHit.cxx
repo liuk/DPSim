@@ -10,6 +10,20 @@ DPVirtualHit::DPVirtualHit()
 DPVirtualHit::~DPVirtualHit()
 {}
 
+bool DPVirtualHit::operator < (const DPVirtualHit& elem) const
+{
+    if(particleID > elem.particleID) return false;
+    if(detectorGroupName > elem.detectorGroupName) return false;
+    if(edep < elem.edep) return false;
+
+    return true;
+}
+
+bool DPVirtualHit::operator == (const DPVirtualHit& elem) const
+{
+    return (particleID == elem.particleID) && (detectorGroupName == elem.detectorGroupName);
+}
+
 std::ostream& operator << (std::ostream& os, const DPVirtualHit& hit)
 {
     os << "Hit comes from track " << hit.particleID << ", with PDG = " << hit.particlePDG << "\n"

@@ -32,7 +32,6 @@ DPIOManager::DPIOManager(): saveFile(NULL), saveTree(NULL), rawEvent(NULL)
 
     //normally we expect less than 2000 tracks, 2000 hits
     tracks.reserve(2000);
-    hits.reserve(2000);
 }
 
 DPIOManager::~DPIOManager()
@@ -92,7 +91,7 @@ void DPIOManager::fillOneEvent(const G4Event* theEvent)
     rawEvent->eventHeader().fEventID = theEvent->GetEventID();
 
     //extract all the virtual hits and digitize
-    fillHitsVector(theEvent);
+    fillHitsList(theEvent);
 
     //set the index of tracks and hits
     reIndex();
@@ -109,6 +108,7 @@ void DPIOManager::fillOneEvent(const G4Event* theEvent)
             dimuon->fNegTrackID = tracks[trackIDs[dimuon->fNegTrackID]].first.fTrackID;
 
             dimuonAccepted = dimuonAccepted || dimuon->fAccepted;
+            if(dimuon->fAccepted) p_config->nEventsAccepted++;
         }
     }
     if(saveMode == INACCONLY && !dimuonAccepted) return;
@@ -125,7 +125,7 @@ void DPIOManager::fillOneEvent(const G4Event* theEvent)
     }
     if(saveMode == HITSONLY && rawEvent->getNTracks() < 1) return;
 
-    for(std::vector<DPVirtualHit>::iterator iter = hits.begin(); iter != hits.end(); ++iter)
+    for(std::list<DPVirtualHit>::iterator iter = hits.begin(); iter != hits.end(); ++iter)
     {
         for(std::vector<DPMCHit>::iterator jter = iter->digiHits.begin(); jter != iter->digiHits.end(); ++jter)
         {
@@ -143,15 +143,11 @@ void DPIOManager::fillOneEvent(const G4Event* theEvent)
 
 void DPIOManager::fillOneTrack(const DPMCTrack& mcTrack, bool keep)
 {
-    if(trackIDs.find(mcTrack.fTrackID) == trackIDs.end()) //new track
-    {
-        tracks.push_back(std::make_pair(mcTrack, keep));
-        trackIDs.insert(std::map<unsigned int, unsigned int>::value_type(mcTrack.fTrackID, tracks.size()-1));
-    }
-    else
-    {
-        std::cout << "WARNING! Duplicate track index! " << std::endl;
-    }
+    assert(trackIDs.find(mcTrack.fTrackID) == trackIDs.end() && "WARNING! Duplicate track index!");
+
+    tracks.push_back(std::make_pair(mcTrack, keep));
+    trackIDs.insert(std::map<unsigned int, unsigned int>::value_type(mcTrack.fTrackID, tracks.size()-1));
+
 #ifdef DEBUG_IO
     std::cout << __FILE__ << " " << __FUNCTION__ << " adding new track with ID = " << mcTrack.fTrackID
               << ", PDG = " << mcTrack.fPDGCode << ", loc = " << tracks.size()-1 << std::endl;
@@ -160,18 +156,19 @@ void DPIOManager::fillOneTrack(const DPMCTrack& mcTrack, bool keep)
 
 void DPIOManager::updateOneTrack(unsigned int trackID, G4ThreeVector pos, G4ThreeVector mom, bool keep)
 {
+    assert(trackIDs.find(trackID) != trackIDs.end() && "WARNING! trackID not found!");
+
 #ifdef DEBUG_IO
     std::cout << __FILE__ << " " << __FUNCTION__ << " updating final pos/mom for trackID = " << trackID << std::endl;
 #endif
-    std::map<unsigned int, unsigned int>::iterator index = trackIDs.find(trackID);
-    if(index == trackIDs.end()) std::cout << "WARNING! Track with ID = " << trackID << " not found!" << std::endl;
 
-    tracks[index->second].first.fFinalPos.SetXYZ(pos[0]/cm, pos[1]/cm, pos[2]/cm);
-    tracks[index->second].first.fFinalMom.SetXYZM(mom[0]/GeV, mom[1]/GeV, mom[2]/GeV, tracks[index->second].first.fInitialMom.M());
-    tracks[index->second].second = keep;
+    unsigned int loc = trackIDs[trackID];
+    tracks[loc].first.fFinalPos.SetXYZ(pos[0]/cm, pos[1]/cm, pos[2]/cm);
+    tracks[loc].first.fFinalMom.SetXYZM(mom[0]/GeV, mom[1]/GeV, mom[2]/GeV, tracks[loc].first.fInitialMom.M());
+    tracks[loc].second = keep;
 }
 
-void DPIOManager::fillHitsVector(const G4Event* theEvent)
+void DPIOManager::fillHitsList(const G4Event* theEvent)
 {
     if(sensHitColID < 0) sensHitColID = G4SDManager::GetSDMpointer()->GetCollectionID("sensDetHitCol");
 
@@ -185,7 +182,15 @@ void DPIOManager::fillHitsVector(const G4Event* theEvent)
     for(int i = 0; i < nHits; ++i)
     {
         hits.push_back(*((*sensHC)[i]));
-        p_digitizer->digitize(hits.back());
+    }
+
+    //remove duplicate virtual hits before digitization
+    hits.sort();
+    hits.unique();
+
+    for(std::list<DPVirtualHit>::iterator iter = hits.begin(); iter != hits.end(); ++iter)
+    {
+        p_digitizer->digitize(*iter);
     }
 }
 
@@ -205,14 +210,13 @@ void DPIOManager::reIndex()
 
     //Assign and fill the hitIDs to the tracks
     unsigned int hitID = 0;
-    for(std::vector<DPVirtualHit>::iterator iter = hits.begin(); iter != hits.end(); ++iter)
+    for(std::list<DPVirtualHit>::iterator iter = hits.begin(); iter != hits.end(); ++iter)
     {
         for(std::vector<DPMCHit>::iterator jter = iter->digiHits.begin(); jter != iter->digiHits.end(); ++jter)
         {
             jter->fHitID = hitID++;
             tracks[trackIDs[iter->particleID]].first.addHit(*jter);
         }
-        tracks[trackIDs[iter->particleID]].second = !iter->digiHits.empty(); //if hit list is non-empty, keep the corrsponding track
     }
 
     //label the tracks have at least one hit, or is the mother particle of the tracks with hits
@@ -257,7 +261,7 @@ void DPIOManager::reIndex()
     }
 
     //set the trackID in the digiHits vector inside each virtual hits
-    for(std::vector<DPVirtualHit>::iterator iter = hits.begin(); iter != hits.end(); ++iter)
+    for(std::list<DPVirtualHit>::iterator iter = hits.begin(); iter != hits.end(); ++iter)
     {
         for(std::vector<DPMCHit>::iterator jter = iter->digiHits.begin(); jter != iter->digiHits.end(); ++jter)
         {
