@@ -23,3 +23,6 @@
 
 #vim swp file
 *.swp
+
+# python byte code
+*.pyc
