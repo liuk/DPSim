@@ -35,6 +35,8 @@ public:
     void generateJPsi();
     void generatePsip();
     void generateDarkPhoton();
+    void generatePythiaDY();
+    void generatePythiaCharmonium();
     void generatePythiaSingle();
     void generateGeant4Single();
     void generatePhaseSpace();

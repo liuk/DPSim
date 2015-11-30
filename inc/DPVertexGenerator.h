@@ -58,6 +58,9 @@ public:
     //get the proton/neutron ratio of the piece, must be called after generateVertex
     double getPARatio() { return interactables[index].protonPerc; }
 
+    //get the relative luminosity on this target
+    double getLuminosity() { return interactables[index].prob; }
+
     //get the reference to the chosen objects
     const DPBeamLineObject& getInteractable() { return interactables[index]; }
 
