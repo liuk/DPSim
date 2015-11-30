@@ -9,9 +9,7 @@ DPSensitiveDetector::DPSensitiveDetector(const G4String& name, const G4String& h
     collectionName.insert(hitCollectionName);
 }
 
-DPSensitiveDetector::~DPSensitiveDetector()
-{
-}
+DPSensitiveDetector::~DPSensitiveDetector() {}
 
 void DPSensitiveDetector::Initialize(G4HCofThisEvent* HCE)  //may have memory leaks here, refer to BZ's code
 {

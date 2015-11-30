@@ -39,7 +39,9 @@ G4VPhysicalVolume* DPDetectorConstruction::Construct()
 
 void DPDetectorConstruction::ConstructSDandField()
 {
+#ifdef DEBUG_IN
     std::cout << "Initializing sensitive detectors ..." << std::endl;
+#endif
 
     //Construct sensitive detectors
     DPSensitiveDetector* sensDet= new DPSensitiveDetector("SensDet", "sensDetHitCol");

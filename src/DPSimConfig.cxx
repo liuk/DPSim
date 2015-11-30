@@ -51,6 +51,7 @@ void DPSimConfig::init(TString configFile)
     targetInBeam = pBool("targetInBeam", true);
     dumpInBeam = pBool("dumpInBeam", false);
     instruInBeam = pBool("instruInBeam", false);
+    airInBeam = pBool("airInBeam", false);
 
     configFileName = configFile;
     outputFileName = pString("outputFileName");

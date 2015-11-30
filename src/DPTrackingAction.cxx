@@ -11,8 +11,7 @@ DPTrackingAction::DPTrackingAction()
     p_IOmanager = DPIOManager::instance();
 }
 
-DPTrackingAction::~DPTrackingAction()
-{}
+DPTrackingAction::~DPTrackingAction() {}
 
 void DPTrackingAction::PreUserTrackingAction(const G4Track* theTrack)
 {

@@ -19,6 +19,7 @@
 
 #include "DPSimConfig.h"
 #include "DPIOManager.h"
+#include "DPVertexGenerator.h"
 
 class DPPrimaryGeneratorAction: public G4VUserPrimaryGeneratorAction
 {
@@ -43,9 +44,6 @@ public:
     //Dimuon phase space generator
     bool generateDimuon(double mass, double xF, DPMCDimuon& dimuon);
 
-    //vertex generator
-    TVector3 generateVertex();
-
     //test if in dimuon mode
     bool isInDimuonMode() { return dimuonMode; }
 
@@ -55,6 +53,9 @@ private:
 
     //pointer to the IO manager
     DPIOManager* p_IOmamnger;
+
+    //pointer to the vertex generator
+    DPVertexGenerator* p_vertexGen;
 
     //pointer to the current G4Event
     G4Event* theEvent;

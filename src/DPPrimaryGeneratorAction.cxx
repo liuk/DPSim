@@ -39,6 +39,7 @@ DPPrimaryGeneratorAction::DPPrimaryGeneratorAction()
 {
     p_config = DPSimConfig::instance();
     p_IOmamnger = DPIOManager::instance();
+    p_vertexGen = DPVertexGenerator::instance();
 
     particleGun = new G4ParticleGun(1);
     particleDict = G4ParticleTable::GetParticleTable();
@@ -185,7 +186,7 @@ void DPPrimaryGeneratorAction::generatePhaseSpace()
     double mass = G4UniformRand()*(p_config->massMax - p_config->massMin) + p_config->massMin;
     double xF = G4UniformRand()*(p_config->xfMax - p_config->xfMin) + p_config->xfMin;
     if(!generateDimuon(mass, xF, dimuon)) return;
-    dimuon.fVertex = generateVertex();
+    dimuon.fVertex = p_vertexGen->generateVertex();
 
     p_config->nEventsPhysics++;
 
@@ -272,14 +273,4 @@ bool DPPrimaryGeneratorAction::generateDimuon(double mass, double xF, DPMCDimuon
     if(dimuon.fCosTh < p_config->cosThetaMin || dimuon.fCosTh > p_config->cosThetaMax) return false;
 
     return true;
-}
-
-TVector3 DPPrimaryGeneratorAction::generateVertex()
-{
-    TVector3 vtx;
-    vtx.SetX(G4RandGauss::shoot(0., 1.5));
-    vtx.SetY(G4RandGauss::shoot(0., 1.5));
-    vtx.SetZ(-150. + G4UniformRand()*50.);
-
-    return vtx;
 }

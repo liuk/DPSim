@@ -4,11 +4,9 @@
 
 G4Allocator<DPVirtualHit> DPVHitAllocator;
 
-DPVirtualHit::DPVirtualHit()
-{}
+DPVirtualHit::DPVirtualHit() {}
 
-DPVirtualHit::~DPVirtualHit()
-{}
+DPVirtualHit::~DPVirtualHit() {}
 
 bool DPVirtualHit::operator < (const DPVirtualHit& elem) const
 {

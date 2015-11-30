@@ -5,11 +5,9 @@
 #include "G4ThreeVector.hh"
 #include "G4Track.hh"
 
-DPSteppingAction::DPSteppingAction()
-{}
+DPSteppingAction::DPSteppingAction() {}
 
-DPSteppingAction::~DPSteppingAction()
-{}
+DPSteppingAction::~DPSteppingAction() {}
 
 void DPSteppingAction::UserSteppingAction(const G4Step* theStep)
 {

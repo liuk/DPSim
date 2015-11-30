@@ -5,9 +5,9 @@ from xml.dom import minidom
 
 query_materials = 'SELECT material,density,nComponents,receipt FROM Materials'
 query_box_solid = (
-    'SELECT detectorGroupName,max(z0+deltaZ)-min(z0+deltaZ),max(x0+deltaX)-min(x0+deltaX)+planeWidth,'
-    'max(y0+deltaY)-min(y0+deltaY)+planeHeight FROM Planes,Alignments WHERE Planes.detectorID=Alignments.detectorID '
-    'GROUP BY detectorGroupName '
+    'SELECT detectorGroupName,if(max(z0+deltaZ)-min(z0+deltaZ)<1.,1.,max(z0+deltaZ)-min(z0+deltaZ)), '
+    '1.05*(max(x0+deltaX)-min(x0+deltaX)+planeWidth),1.05*(max(y0+deltaY)-min(y0+deltaY)+planeHeight) '
+    'FROM Planes,Alignments WHERE Planes.detectorID=Alignments.detectorID GROUP BY detectorGroupName '
     'UNION '
     'SELECT volumeName,zLength,xLength,yLength FROM Nondetectors')
 query_tube_solid = (
@@ -62,12 +62,7 @@ def parseMaterial(mother, info):
     return node
 
 def parseSolidBox(mother, info):
-    x = info[2]*1.05
-    y = info[3]*1.05
-    z = info[1]*1.05
-    if z < 1.:
-        z = 1.
-    node = addnode(mother, 'box', ['lunit', 'name', 'x', 'y', 'z'], ['cm', info[0]+'Solid', x, y, z])
+    node = addnode(mother, 'box', ['lunit', 'name', 'x', 'y', 'z'], ['cm', info[0]+'Solid', info[2], info[3], info[1]])
     return node
 
 def parseSolidTube(mother, info):
