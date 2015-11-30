@@ -34,6 +34,7 @@ public:
     double nucIntLen;        //nuclear interaction length in cm
     double density;          //density in g/cm3
     double Z, A, N;          //number of protons, necleons, neutrons
+    double protonPerc;       //percentage of protons = Z/A;
 
     //intialized by its neighbours
     double attenuationSelf;  //beam attenuation percentage by itself
@@ -55,7 +56,7 @@ public:
     TVector3 generateVertex();
 
     //get the proton/neutron ratio of the piece, must be called after generateVertex
-    double getPNRatio() { return 1; }
+    double getPARatio() { return interactables[index].protonPerc; }
 
     //get the reference to the chosen objects
     const DPBeamLineObject& getInteractable() { return interactables[index]; }

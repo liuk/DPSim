@@ -42,8 +42,8 @@ DPBeamLineObject::DPBeamLineObject(const G4Material* pMaterial)
         std::cout << i << " " << fracArr[i] << "  " << abdArr[i] << std::endl;
     }
 
-    double pRatio = Z/N;  //N here for now stands for total nucleons
-    Z = A*pRatio;
+    protonPerc = Z/N;  //N here for now stands for total nucleons
+    Z = A*protonPerc;
     N = A - Z;
 }
 
