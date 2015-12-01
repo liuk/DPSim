@@ -132,7 +132,7 @@ DPDigitizer::DPDigitizer()
     sprintf(query, "SELECT Planes.detectorName,spacing,cellWidth,overlap,numElements,angleFromVert,"
                    "xPrimeOffset,x0+deltaX,y0+deltaY,z0+deltaZ,planeWidth,planeHeight,theta_x+rotX,"
                    "theta_y+rotY,theta_z+rotZ,Planes.detectorID,Planes.detectorGroupName FROM %s.Planes,%s.Alignments WHERE "
-                   "Planes.detectorName=Alignments.detectorName and Planes.detectorGroupName LIKE 'H%%'",
+                   "Planes.detectorName=Alignments.detectorName",
                    p_config->geometrySchema.Data(), p_config->geometrySchema.Data());
     TSQLServer* server = TSQLServer::Connect(Form("mysql://%s:%d", p_config->mysqlServer.Data(), p_config->mysqlPort), p_config->login, p_config->password);
     TSQLResult* res = server->Query(query);

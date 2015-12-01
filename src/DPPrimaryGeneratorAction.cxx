@@ -45,7 +45,7 @@ namespace DPGEN
     const double bjpsi = 2.*sigmajpsi*sigmajpsi;
 
     const double psipscale = 0.019;     //psip relative to jpsi
-};
+}
 
 DPPrimaryGeneratorAction::DPPrimaryGeneratorAction()
 {
@@ -352,7 +352,7 @@ void DPPrimaryGeneratorAction::generateDarkPhoton()
 
 void DPPrimaryGeneratorAction::generatePythiaDY()
 {
-    DPMCDimuon dimuon;
+
 }
 
 void DPPrimaryGeneratorAction::generatePythiaCharmonium()
