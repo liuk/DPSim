@@ -66,7 +66,7 @@ std::ostream& operator << (std::ostream& os, const DPBeamLineObject& obj)
 
 double DPBeamLineObject::getZ()
 {
-    return z_up - nucIntLen*TMath::Log(1. - G4UniformRand());
+    return z_up - nucIntLen*TMath::Log(1. - attenuationSelf*G4UniformRand());
 }
 
 DPVertexGenerator* DPVertexGenerator::p_vertexGen = NULL;
@@ -194,6 +194,7 @@ void DPVertexGenerator::init()
         accumulatedProbs[i] = interactables[i].accumulatedProb;
     }
     accumulatedProbs[nPieces] = accumulatedProbs[nPieces-1] + interactables.back().prob;
+    probSum = accumulatedProbs[nPieces];
 
     //Normalize the probs
     for(unsigned int i = 0; i < nPieces+1; ++i)

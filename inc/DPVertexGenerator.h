@@ -59,7 +59,7 @@ public:
     double getPARatio() { return interactables[index].protonPerc; }
 
     //get the relative luminosity on this target
-    double getLuminosity() { return interactables[index].prob; }
+    double getLuminosity() { return probSum; }
 
     //get the reference to the chosen objects
     const DPBeamLineObject& getInteractable() { return interactables[index]; }
