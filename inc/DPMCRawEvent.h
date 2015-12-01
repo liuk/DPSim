@@ -90,6 +90,7 @@ public:
     TVector3 fVertex;
     TLorentzVector fPosMomentum;
     TLorentzVector fNegMomentum;
+    TString originVol;
 
     bool fAccepted;
 

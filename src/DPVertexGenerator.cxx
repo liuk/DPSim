@@ -211,14 +211,23 @@ void DPVertexGenerator::init()
 #endif
 }
 
-TVector3 DPVertexGenerator::generateVertex()
+double DPVertexGenerator::generateVertex()
 {
-    TVector3 vtx;
-    vtx.SetX(G4RandGauss::shoot(0., 1.5));
-    vtx.SetY(G4RandGauss::shoot(0., 1.5));
+    findInteractingPiece();
+    return interactables[index].getZ();
+}
 
+void DPVertexGenerator::generateVertex(DPMCDimuon& dimuon)
+{
+    findInteractingPiece();
+
+    dimuon.fVertex.SetX(G4RandGauss::shoot(0., 1.5));
+    dimuon.fVertex.SetY(G4RandGauss::shoot(0., 1.5));
+    dimuon.fVertex.SetZ(interactables[index].getZ());
+    dimuon.originVol = interactables[index].name;
+}
+
+void DPVertexGenerator::findInteractingPiece()
+{
     index = TMath::BinarySearch(nPieces+1, accumulatedProbs, G4UniformRand());
-    vtx.SetZ(interactables[index].getZ());
-
-    return vtx;
 }

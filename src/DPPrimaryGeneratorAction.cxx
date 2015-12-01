@@ -213,7 +213,7 @@ void DPPrimaryGeneratorAction::generateDrellYan()
     double mass = G4UniformRand()*(p_config->massMax - p_config->massMin) + p_config->massMin;
     double xF = G4UniformRand()*(p_config->xfMax - p_config->xfMin) + p_config->xfMin;
     if(!generateDimuon(mass, xF, dimuon)) return;
-    dimuon.fVertex = p_vertexGen->generateVertex();
+    p_vertexGen->generateVertex(dimuon);
 
     p_config->nEventsPhysics++;
 
@@ -284,7 +284,7 @@ void DPPrimaryGeneratorAction::generateJPsi()
     DPMCDimuon dimuon;
     double xF = G4UniformRand()*(p_config->xfMax - p_config->xfMin) + p_config->xfMin;
     if(!generateDimuon(DPGEN::mjpsi, xF, dimuon)) return;
-    dimuon.fVertex = p_vertexGen->generateVertex();
+    p_vertexGen->generateVertex(dimuon);
 
     p_config->nEventsPhysics++;
 
@@ -317,7 +317,7 @@ void DPPrimaryGeneratorAction::generatePsip()
     DPMCDimuon dimuon;
     double xF = G4UniformRand()*(p_config->xfMax - p_config->xfMin) + p_config->xfMin;
     if(!generateDimuon(DPGEN::mpsip, xF, dimuon)) return;
-    dimuon.fVertex = p_vertexGen->generateVertex();
+    p_vertexGen->generateVertex(dimuon);
 
     p_config->nEventsPhysics++;
 
@@ -364,7 +364,7 @@ void DPPrimaryGeneratorAction::generatePythiaSingle()
 {
     p_config->nEventsPhysics++;
 
-    TVector3 vtx = p_vertexGen->generateVertex();
+    double zvtx = p_vertexGen->generateVertex();
     double pARatio = p_vertexGen->getPARatio();
 
     Pythia8::Pythia* p_pythia = G4UniformRand() < pARatio ? &ppGen : &pnGen;
@@ -376,7 +376,7 @@ void DPPrimaryGeneratorAction::generatePythiaSingle()
         if(par.status() > 0 && par.id() != 22)
         {
             particleGun->SetParticleDefinition(particleDict->FindParticle(par.id()));
-            particleGun->SetParticlePosition(G4ThreeVector(par.xProd()*mm, par.yProd()*mm, par.zProd()*mm + vtx.Z()*cm));
+            particleGun->SetParticlePosition(G4ThreeVector(par.xProd()*mm, par.yProd()*mm, par.zProd()*mm + zvtx*cm));
             particleGun->SetParticleMomentum(G4ThreeVector(par.px()*GeV, par.py()*GeV, par.pz()*GeV));
             particleGun->GeneratePrimaryVertex(theEvent);
         }
@@ -397,7 +397,7 @@ void DPPrimaryGeneratorAction::generatePhaseSpace()
     double mass = G4UniformRand()*(p_config->massMax - p_config->massMin) + p_config->massMin;
     double xF = G4UniformRand()*(p_config->xfMax - p_config->xfMin) + p_config->xfMin;
     if(!generateDimuon(mass, xF, dimuon)) return;
-    dimuon.fVertex = p_vertexGen->generateVertex();
+    p_vertexGen->generateVertex(dimuon);
 
     p_config->nEventsPhysics++;
 

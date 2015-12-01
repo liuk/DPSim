@@ -10,6 +10,7 @@
 #include <TVector3.h>
 
 #include "DPSimConfig.h"
+#include "DPMCRawEvent.h"
 
 class DPBeamLineObject
 {
@@ -53,7 +54,11 @@ public:
     void init();
 
     //get the vertex generated
-    TVector3 generateVertex();
+    void generateVertex(DPMCDimuon& dimuon);
+    double generateVertex();
+
+    //do the actual sampling
+    void findInteractingPiece();
 
     //get the proton/neutron ratio of the piece, must be called after generateVertex
     double getPARatio() { return interactables[index].protonPerc; }
