@@ -65,25 +65,25 @@ DPPrimaryGeneratorAction::DPPrimaryGeneratorAction()
     dimuonMode = false;
     if(p_config->generator == "DrellYan")
     {
-        std::cout << " Using Drell-Yan generator ..." << endl;
+        std::cout << " Using Drell-Yan generator ..." << std::endl;
         p_generator = &DPPrimaryGeneratorAction::generateDrellYan;
         dimuonMode = true;
     }
     else if(p_config->generator == "JPsi")
     {
-        std::cout << " Using JPsi generator ..." << endl;
+        std::cout << " Using JPsi generator ..." << std::endl;
         p_generator = &DPPrimaryGeneratorAction::generateJPsi;
         dimuonMode = true;
     }
     else if(p_config->generator == "Psip")
     {
-        std::cout << " Using Psip generator ..." << endl;
+        std::cout << " Using Psip generator ..." << std::endl;
         p_generator = &DPPrimaryGeneratorAction::generatePsip;
         dimuonMode = true;
     }
     else if(p_config->generator == "DarkPhoton")
     {
-        std::cout << " Using dark photon generator ..." << endl;
+        std::cout << " Using dark photon generator ..." << std::endl;
         p_generator = &DPPrimaryGeneratorAction::generateDarkPhoton;
         dimuonMode = true;
     }
@@ -137,7 +137,7 @@ DPPrimaryGeneratorAction::DPPrimaryGeneratorAction()
     }
     else if(p_config->generator == "PythiaSingle")
     {
-        std::cout << " Using pythia single generator ..." << endl;
+        std::cout << " Using pythia single generator ..." << std::endl;
         p_generator = &DPPrimaryGeneratorAction::generatePythiaSingle;
 
         //Pythia8::RndmEngine* randomEng = new GeantRandom();
@@ -162,18 +162,18 @@ DPPrimaryGeneratorAction::DPPrimaryGeneratorAction()
     }
     else if(p_config->generator == "Geant4Single")
     {
-        std::cout << " Using geant4 single generator ..." << endl;
+        std::cout << " Using geant4 single generator ..." << std::endl;
         p_generator = &DPPrimaryGeneratorAction::generateGeant4Single;
     }
     else if(p_config->generator == "PhaseSpace")
     {
-        std::cout << " Using phase space generator ..." << endl;
+        std::cout << " Using phase space generator ..." << std::endl;
         p_generator = &DPPrimaryGeneratorAction::generatePhaseSpace;
         dimuonMode = true;
     }
     else if(p_config->generator == "Custom")
     {
-        std::cout << " Using external custom generator ..." << endl;
+        std::cout << " Using external custom generator ..." << std::endl;
         p_generator = &DPPrimaryGeneratorAction::generateCustom;
 
         customInputFile = new TFile(p_config->customInput.Data(), "READ");
@@ -188,7 +188,7 @@ DPPrimaryGeneratorAction::DPPrimaryGeneratorAction()
     }
     else if(p_config->generator == "Debug")
     {
-        std::cout << " Using simple debug generator ..." << endl;
+        std::cout << " Using simple debug generator ..." << std::endl;
         p_generator = &DPPrimaryGeneratorAction::generateDebug;
     }
 }
