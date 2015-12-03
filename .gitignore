@@ -26,3 +26,5 @@
 
 # python byte code
 *.pyc
+
+# generated geometry files

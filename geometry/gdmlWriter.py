@@ -17,7 +17,7 @@ parser.add_option('-p', '--port', type = 'int', dest = 'port', help = 'MySQL por
 (options, args) = parser.parse_args()
 
 ## connect the database
-con = MySQLdb.connect(host = options.server, port = options.port, user = 'seaguest', passwd = 'qqbar2mu+mu-', db = options.input)
+con = MySQLdb.connect(host = options.server, port = options.port, user = 'seaguest', passwd = 'qqbar2mu+mu-', db = options.input, sql_mode=' ')
 cur = con.cursor()
 
 ## initialize the GDML head node
