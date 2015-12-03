@@ -47,7 +47,11 @@ void DPSimConfig::init(TString configFile)
     fMagMultiplier = pDouble("fMagMultiplier", 1.);
     kMagMultiplier = pDouble("kMagMultiplier", 1.);
 
-    generator = pString("generator");
+    generatorType = pString("generatorType");
+    generatorEng = pString("generatorEng");
+    externalInput = pString("externalInput");
+    pythiaConfig = pString("pythiaConfig");
+
     targetInBeam = pBool("targetInBeam", true);
     dumpInBeam = pBool("dumpInBeam", false);
     instruInBeam = pBool("instruInBeam", false);
@@ -55,7 +59,6 @@ void DPSimConfig::init(TString configFile)
 
     configFileName = configFile;
     outputFileName = pString("outputFileName");
-    customInput = pString("customInput");
     outputMode = pString("outputMode");
 
     x1Min = pDouble("x1Min", 0.);
@@ -72,6 +75,67 @@ void DPSimConfig::init(TString configFile)
     nEventsThrown = 0;
     nEventsPhysics = 0;
     nEventsAccepted = 0;
+
+    if(!checkConsistency()) exit(EXIT_FAILURE);
+}
+
+bool DPSimConfig::sanityCheck()
+{
+    if(generatorType == "external" && (!checkFile(externalInput)))
+    {
+        std::cout << "ERROR: External input file not found!" << std::endl;
+        return false;
+    }
+
+    if(generatorType == "pythia" && (!checkFile(pythiaConfig)))
+    {
+        std::cout << "ERROR: Pythia configuration not found!" << std::endl;
+        return false;
+    }
+
+    if(!(checkFile(fMagMap) && checkFile(kMagMap)))
+    {
+        std::cout << "ERROR: Field map not found!" << std::endl;
+        return false;
+    }
+
+    if(!(targetInBeam || dumpInBeam || instruInBeam))
+    {
+        std::cout << "ERROR: There is nothing in upstream to interact with beam!" << std::endl;
+        return false;
+    }
+
+    if(x1Min > x1Max || x2Min > x2Max || xfMin > xfMax || massMin > massMax || cosThetaMin > cosThetaMax)
+    {
+        std::cout << "ERROR: Phase space limit is wrong." << std::endl;
+        return false;
+    }
+
+    if(!checkFile(geometryGDMLInput))
+    {
+        std::cout << "ERROR: Geometry GDML not found!" << std::endl;
+        return false;
+    }
+
+    if(x1Min < 0. || x1Max > 1. || x2Min < 0. || x2Max > 1. || xfMin < -1. || xfMax > 1. || massMin < 0. || massMax > 20. || cosThetaMin < -1. || cosThetaMax > 1.)
+    {
+        std::cout << "WARNING: Phase space limit is not realistic." << std::endl;
+    }
+
+    if(checkFile(outputFileName))
+    {
+        std::cout << "WARNING: Output file exists, will be overwritten. " << std::endl;
+    }
+
+    return true;
+}
+
+bool DPSimConfig::checkFile(TString filename)
+{
+    if(filename == "N/A") return false;
+
+    ifstream fin(filename.Data());
+    return fin;
 }
 
 void DPSimConfig::parseConfig(TString configFile)
@@ -117,7 +181,7 @@ TString DPSimConfig::expandEnv(const TString& input) const
 TString DPSimConfig::pString(TString name)
 {
     if(symbols.find(name) != symbols.end()) return symbols[name];
-    return TString("");
+    return TString("N/A");
 }
 
 bool DPSimConfig::pBool(TString name, bool default_val)
@@ -134,13 +198,13 @@ bool DPSimConfig::pBool(TString name, bool default_val)
 Double_t DPSimConfig::pDouble(TString name, Double_t default_val)
 {
     TString val = pString(name);
-    if(val.Length() != 0) return atof(val.Data());
+    if(val != "N/A") return atof(val.Data());
     return default_val;
 }
 
 Int_t DPSimConfig::pInt(TString name, Int_t default_val)
 {
     TString val = pString(name);
-    if(val.Length() != 0) return atoi(val.Data());
+    if(val != "N/A") return atoi(val.Data());
     return default_val;
 }

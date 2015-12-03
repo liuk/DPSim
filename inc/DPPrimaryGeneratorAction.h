@@ -35,12 +35,11 @@ public:
     void generateJPsi();
     void generatePsip();
     void generateDarkPhoton();
-    void generatePythiaDY();
-    void generatePythiaCharmonium();
+    void generatePythiaDimuon();
     void generatePythiaSingle();
     void generateGeant4Single();
     void generatePhaseSpace();
-    void generateCustom();
+    void generateExternal();
     void generateDebug();
 
     //Dimuon phase space generator
@@ -83,12 +82,12 @@ private:
     GenPtr p_generator;
     bool dimuonMode;
 
-    //Used for custom input
-    TFile* customInputFile;
-    TTree* customInputTree;
-    int customParticlePDGs[10000];
-    TClonesArray* customPositions;
-    TClonesArray* customMomentums;
+    //Used for external input
+    TFile* externalInputFile;
+    TTree* externalInputTree;
+    int externalParticlePDGs[10000];
+    TClonesArray* externalPositions;
+    TClonesArray* externalMomentums;
 
     //Common particles to save time
     G4ParticleDefinition* proton;

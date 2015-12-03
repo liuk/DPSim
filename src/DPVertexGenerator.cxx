@@ -36,10 +36,6 @@ DPBeamLineObject::DPBeamLineObject(const G4Material* pMaterial)
         A += (fracArr[i]*elemArr[i]->GetA()/(g/mole));
         Z += (abdArr[i]*elemArr[i]->GetZ());
         N += (abdArr[i]*elemArr[i]->GetN());
-
-        std::cout << pMaterial->GetName() << std::endl;
-        std::cout << i << " " << elemArr[i]->GetName() << " " << elemArr[i]->GetA() << "  " << elemArr[i]->GetZ() << "  " << elemArr[i]->GetN() << std::endl;
-        std::cout << i << " " << fracArr[i] << "  " << abdArr[i] << std::endl;
     }
 
     protonPerc = Z/N;  //N here for now stands for total nucleons

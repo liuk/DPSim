@@ -84,8 +84,8 @@ class DPMCDimuon: public TObject
 {
 public:
     UInt_t fDimuonID;
-    UInt_t fPosTrackID;
-    UInt_t fNegTrackID;
+    Int_t fPosTrackID;
+    Int_t fNegTrackID;
 
     TVector3 fVertex;
     TLorentzVector fPosMomentum;

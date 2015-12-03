@@ -17,6 +17,9 @@ public:
     //parse the config file and set the config
     void init(TString configFile);
 
+    //check if there are any inconsistencies
+    bool sanityCheck();
+
 public:
     //Random seed
     Int_t seed;
@@ -29,7 +32,7 @@ public:
     TString version;
 
     //beam setup
-    Int_t    bucket_size;        // How many protons per event in gun generator
+    Int_t    bucket_size;     // How many protons per event in gun generator
     Double_t beamMomentum;
     Double_t beamCurrent;
 
@@ -48,8 +51,10 @@ public:
     Double_t kMagMultiplier;  // Multiplies the strength of KMAG's field
 
     //Event generation setup
-    TString generator;        // The type of event generator running, i.e. gun or dimuon
-    TString customInput;      // Input ROOT file containing the generator info
+    TString generatorType;    // The type of event generator running, i.e. single/dimuon/external
+    TString generatorEng;     // The generator engine, legacyDY/legacyJPsi/legacyPsip/pythia/geant
+    TString externalInput;    // Input ROOT file containing the generator info
+    TString pythiaConfig;     // pythia configuration file
 
     //Beam line objects setup
     bool targetInBeam;
@@ -89,6 +94,9 @@ private: //used only for parsing
     bool     pBool(TString name, bool default_val);
     Double_t pDouble(TString name, Double_t default_val);
     Int_t    pInt(TString name, Int_t default_val);
+
+    //check file status
+    bool checkFile(TString filename);
 
     // config group symbol map
     std::map<TString, TString> symbols;

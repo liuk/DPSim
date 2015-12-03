@@ -62,134 +62,93 @@ DPPrimaryGeneratorAction::DPPrimaryGeneratorAction()
     pdf = LHAPDF::mkPDF("CT10nlo", 0);
 
     //initilize all kinds of generators
-    dimuonMode = false;
-    if(p_config->generator == "DrellYan")
+    if(p_config->generatorType == "dimuon")
     {
-        std::cout << " Using Drell-Yan generator ..." << std::endl;
-        p_generator = &DPPrimaryGeneratorAction::generateDrellYan;
-        dimuonMode = true;
+        if(p_config->generatorEng == "legacyDY")
+        {
+            std::cout << " Using legacy Drell-Yan generator ..." << std::endl;
+            p_generator = &DPPrimaryGeneratorAction::generateDrellYan;
+        }
+        else if(p_config->generatorEng == "legacyJPsi")
+        {
+            std::cout << " Using legacy JPsi generator ..." << std::endl;
+            p_generator = &DPPrimaryGeneratorAction::generateJPsi;
+        }
+        else if(p_config->generatorEng == "legacyPsip")
+        {
+            std::cout << " Using Psip generator ..." << std::endl;
+            p_generator = &DPPrimaryGeneratorAction::generatePsip;
+        }
+        else if(p_config->generatorEng == "geant")
+        {
+            std::cout << " Using phase space generator ..." << std::endl;
+            p_generator = &DPPrimaryGeneratorAction::generatePhaseSpace;
+        }
+        else if(p_config->generatorEng == "pythia")
+        {
+            std::cout << " Using pythia pythia generator ..." << std::endl;
+            p_generator = &DPPrimaryGeneratorAction::generatePythiaDimuon;
+
+            ppGen.readFile(p_config->pythiaConfig.Data());
+            pnGen.readFile(p_config->pythiaConfig.Data());
+
+            ppGen.init(2212, 2212, 120., 0.);
+            pnGen.init(2212, 2112, 120., 0.);
+        }
+        else
+        {
+            std::cout << "ERROR: Generator engine is not set or not supported in dimuon mode" << std::endl;
+            exit(EXIT_FAILURE);
+        }
     }
-    else if(p_config->generator == "JPsi")
+    else if(p_config->generatorType == "single")
     {
-        std::cout << " Using JPsi generator ..." << std::endl;
-        p_generator = &DPPrimaryGeneratorAction::generateJPsi;
-        dimuonMode = true;
+        if(p_config->generatorEng == "pythia")
+        {
+            std::cout << " Using pythia single generator ..." << std::endl;
+            p_generator = &DPPrimaryGeneratorAction::generatePythiaSingle;
+
+            ppGen.readFile(p_config->pythiaConfig.Data());
+            pnGen.readFile(p_config->pythiaConfig.Data());
+
+            ppGen.init(2212, 2212, 120., 0.);
+            pnGen.init(2212, 2112, 120., 0.);
+        }
+        else if(p_config->generatorEng == "geant")
+        {
+            std::cout << " Using geant4 single generator ..." << std::endl;
+            p_generator = &DPPrimaryGeneratorAction::generateGeant4Single;
+        }
+        else
+        {
+            std::cout << "ERROR: Generator engine is not set or not supported in single mode" << std::endl;
+            exit(EXIT_FAILURE);
+        }
     }
-    else if(p_config->generator == "Psip")
+    else if(p_config->generatorType == "external")
     {
-        std::cout << " Using Psip generator ..." << std::endl;
-        p_generator = &DPPrimaryGeneratorAction::generatePsip;
-        dimuonMode = true;
+        std::cout << " Using external generator ..." << std::endl;
+        p_generator = &DPPrimaryGeneratorAction::generateExternal;
+
+        externalInputFile = new TFile(p_config->externalInput.Data(), "READ");
+        externalInputTree = (TTree*)externalInputFile->Get("save");
+
+        externalPositions = new TClonesArray("TVector3");
+        externalMomentums = new TClonesArray("TVector3");
+
+        externalInputTree->SetBranchAddress("pdg", externalParticlePDGs);
+        externalInputTree->SetBranchAddress("pos", externalPositions);
+        externalInputTree->SetBranchAddress("mom", externalMomentums);
     }
-    else if(p_config->generator == "DarkPhoton")
-    {
-        std::cout << " Using dark photon generator ..." << std::endl;
-        p_generator = &DPPrimaryGeneratorAction::generateDarkPhoton;
-        dimuonMode = true;
-    }
-    else if(p_config->generator == "PythiaDY")
-    {
-        std::cout << " Using pythia Drell-Yan generator ..." << std::endl;
-        p_generator = &DPPrimaryGeneratorAction::generatePythiaDY;
-        dimuonMode = true;
-
-        //init pythia
-        ppGen.readString("PDF:pSet = 7");
-        ppGen.readString("WeakSingleBoson::ffbar2ffbar(s:gm) = on");
-        ppGen.readString("ParticleDecays:limitTau = on");
-        ppGen.readString("ParticleDecays:limitTau0 = on");
-        ppGen.readString(Form("PhaseSpace:mHatMin = %f", p_config->massMin));
-        ppGen.readString(Form("PhaseSpace:mHatMax = %f", p_config->massMax));
-
-        pnGen.readString("PDF:pSet = 7");
-        pnGen.readString("WeakSingleBoson::ffbar2ffbar(s:gm) = on");
-        pnGen.readString("ParticleDecays:limitTau = on");
-        pnGen.readString("ParticleDecays:limitTau0 = on");
-        pnGen.readString(Form("PhaseSpace:mHatMin = %f", p_config->massMin));
-        pnGen.readString(Form("PhaseSpace:mHatMax = %f", p_config->massMax));
-
-        ppGen.init(2212, 2212, 120., 0.);
-        pnGen.init(2212, 2112, 120., 0.);
-    }
-    else if(p_config->generator == "PythiaCharmonium")
-    {
-        std::cout << " Using pythia charmonium generator ..." << std::endl;
-        p_generator = &DPPrimaryGeneratorAction::generatePythiaCharmonium;
-        dimuonMode = true;
-
-        //init pythia
-        ppGen.readString("PDF:pSet = 7");
-        ppGen.readString("WeakSingleBoson::ffbar2ffbar(s:gm) = on");
-        ppGen.readString("ParticleDecays:limitTau = on");
-        ppGen.readString("ParticleDecays:limitTau0 = on");
-        ppGen.readString(Form("PhaseSpace:mHatMin = %f", p_config->massMin));
-        ppGen.readString(Form("PhaseSpace:mHatMax = %f", p_config->massMax));
-
-        pnGen.readString("PDF:pSet = 7");
-        pnGen.readString("WeakSingleBoson::ffbar2ffbar(s:gm) = on");
-        pnGen.readString("ParticleDecays:limitTau = on");
-        pnGen.readString("ParticleDecays:limitTau0 = on");
-        pnGen.readString(Form("PhaseSpace:mHatMin = %f", p_config->massMin));
-        pnGen.readString(Form("PhaseSpace:mHatMax = %f", p_config->massMax));
-
-        ppGen.init(2212, 2212, 120., 0.);
-        pnGen.init(2212, 2112, 120., 0.);
-    }
-    else if(p_config->generator == "PythiaSingle")
-    {
-        std::cout << " Using pythia single generator ..." << std::endl;
-        p_generator = &DPPrimaryGeneratorAction::generatePythiaSingle;
-
-        //Pythia8::RndmEngine* randomEng = new GeantRandom();
-        //ppGen.setRndmEnginPtr(randomEng);
-        ppGen.readString("PDF:pSet = 7");
-        ppGen.readString("PhaseSpace:mHatMin = 0");
-        ppGen.readString("ParticleDecays:limitTau = on");
-        ppGen.readString("ParticleDecays:limitTau0 = on");
-        ppGen.readString("SoftQCD:all = on");
-        ppGen.readString("HardQCD:hardccbar = on");
-
-        //pnGen.setRndmEnginPtr(randomEng);
-        //pnGen.readString("PDF:pSet = 7");
-        pnGen.readString("PhaseSpace:mHatMin = 0");
-        pnGen.readString("ParticleDecays:limitTau = on");
-        pnGen.readString("ParticleDecays:limitTau0 = on");
-        pnGen.readString("SoftQCD:all = on");
-        pnGen.readString("HardQCD:hardccbar = on");
-
-        ppGen.init(2212, 2212, 120., 0.);
-        pnGen.init(2212, 2112, 120., 0.);
-    }
-    else if(p_config->generator == "Geant4Single")
-    {
-        std::cout << " Using geant4 single generator ..." << std::endl;
-        p_generator = &DPPrimaryGeneratorAction::generateGeant4Single;
-    }
-    else if(p_config->generator == "PhaseSpace")
-    {
-        std::cout << " Using phase space generator ..." << std::endl;
-        p_generator = &DPPrimaryGeneratorAction::generatePhaseSpace;
-        dimuonMode = true;
-    }
-    else if(p_config->generator == "Custom")
-    {
-        std::cout << " Using external custom generator ..." << std::endl;
-        p_generator = &DPPrimaryGeneratorAction::generateCustom;
-
-        customInputFile = new TFile(p_config->customInput.Data(), "READ");
-        customInputTree = (TTree*)customInputFile->Get("save");
-
-        customPositions = new TClonesArray("TVector3");
-        customMomentums = new TClonesArray("TVector3");
-
-        customInputTree->SetBranchAddress("pdg", customParticlePDGs);
-        customInputTree->SetBranchAddress("pos", customPositions);
-        customInputTree->SetBranchAddress("mom", customMomentums);
-    }
-    else if(p_config->generator == "Debug")
+    else if(p_config->generatorType == "Debug")
     {
         std::cout << " Using simple debug generator ..." << std::endl;
         p_generator = &DPPrimaryGeneratorAction::generateDebug;
+    }
+    else
+    {
+        std::cout << "ERROR: Generator type not recognized! Will exit.";
+        exit(EXIT_FAILURE);
     }
 }
 
@@ -275,7 +234,7 @@ void DPPrimaryGeneratorAction::generateDrellYan()
     double xsec = xsec_pdf*xsec_kfactor*xsec_phsp*xsec_limit*p_vertexGen->getLuminosity();
 
     dimuon.fPosTrackID = 1;
-    dimuon.fNegTrackID = -1;
+    dimuon.fNegTrackID = 2;
     p_IOmamnger->fillOneDimuon(xsec, dimuon);
 }
 
@@ -308,7 +267,7 @@ void DPPrimaryGeneratorAction::generateJPsi()
     double xsec = DPGEN::brjpsi*xsec_xf*xsec_limit*p_vertexGen->getLuminosity();
 
     dimuon.fPosTrackID = 1;
-    dimuon.fNegTrackID = -1;
+    dimuon.fNegTrackID = 2;
     p_IOmamnger->fillOneDimuon(xsec, dimuon);
 }
 
@@ -341,7 +300,7 @@ void DPPrimaryGeneratorAction::generatePsip()
     double xsec = DPGEN::psipscale*DPGEN::brjpsi*xsec_xf*xsec_limit*p_vertexGen->getLuminosity();
 
     dimuon.fPosTrackID = 1;
-    dimuon.fNegTrackID = -1;
+    dimuon.fNegTrackID = 2;
     p_IOmamnger->fillOneDimuon(xsec, dimuon);
 }
 
@@ -350,14 +309,45 @@ void DPPrimaryGeneratorAction::generateDarkPhoton()
 
 }
 
-void DPPrimaryGeneratorAction::generatePythiaDY()
+void DPPrimaryGeneratorAction::generatePythiaDimuon()
 {
+    p_config->nEventsPhysics++;
 
-}
+    DPMCDimuon dimuon;
+    double zvtx = p_vertexGen->generateVertex();
+    double pARatio = p_vertexGen->getPARatio();
 
-void DPPrimaryGeneratorAction::generatePythiaCharmonium()
-{
+    Pythia8::Pythia* p_pythia = G4UniformRand() < pARatio ? &ppGen : &pnGen;
+    while(!p_pythia->next()) {}
 
+    int pParID = 0;
+    for(int i = 1; i < p_pythia->event.size(); ++i)
+    {
+        Pythia8::Particle par = p_pythia->event[i];
+        if(par.status() > 0 && par.id() != 22)
+        {
+            particleGun->SetParticleDefinition(particleDict->FindParticle(par.id()));
+            particleGun->SetParticlePosition(G4ThreeVector(par.xProd()*mm, par.yProd()*mm, par.zProd()*mm + zvtx*cm));
+            particleGun->SetParticleMomentum(G4ThreeVector(par.px()*GeV, par.py()*GeV, par.pz()*GeV));
+            particleGun->GeneratePrimaryVertex(theEvent);
+
+            ++pParID;
+            if(par.id() == -13)
+            {
+                dimuon.fPosTrackID = pParID;
+                dimuon.fPosMomentum.SetXYZM(par.px(), par.py(), par.pz(), DPGEN::mmu);
+                dimuon.fVertex.SetXYZ(par.xProd()/10., par.yProd()/10., par.zProd()/10. + zvtx);
+            }
+            else if(par.id() == 13)
+            {
+                dimuon.fNegTrackID = pParID;
+                dimuon.fNegMomentum.SetXYZM(par.px(), par.py(), par.pz(), DPGEN::mmu);
+                dimuon.fVertex.SetXYZ(par.xProd()/10., par.yProd()/10., par.zProd()/10. + zvtx);
+            }
+        }
+    }
+
+    p_IOmamnger->fillOneDimuon(1., dimuon);
 }
 
 void DPPrimaryGeneratorAction::generatePythiaSingle()
@@ -412,21 +402,21 @@ void DPPrimaryGeneratorAction::generatePhaseSpace()
     particleGun->GeneratePrimaryVertex(theEvent);
 
     dimuon.fPosTrackID = 1;
-    dimuon.fNegTrackID = -1;
+    dimuon.fNegTrackID = 2;
     p_IOmamnger->fillOneDimuon(1., dimuon);
 }
 
-void DPPrimaryGeneratorAction::generateCustom()
+void DPPrimaryGeneratorAction::generateExternal()
 {
     int eventID = theEvent->GetEventID();
-    customInputTree->GetEntry(eventID);
+    externalInputTree->GetEntry(eventID);
 
-    for(int i = 0; i < customPositions->GetEntries(); ++i)
+    for(int i = 0; i < externalPositions->GetEntries(); ++i)
     {
-        TVector3 pos = *((TVector3*)customPositions->At(i));
-        TVector3 mom = *((TVector3*)customMomentums->At(i));
+        TVector3 pos = *((TVector3*)externalPositions->At(i));
+        TVector3 mom = *((TVector3*)externalMomentums->At(i));
 
-        particleGun->SetParticleDefinition(particleDict->FindParticle(customParticlePDGs[i]));
+        particleGun->SetParticleDefinition(particleDict->FindParticle(externalParticlePDGs[i]));
         particleGun->SetParticlePosition(G4ThreeVector(pos.X()*cm, pos.Y()*cm, pos.Z()*cm));
         particleGun->SetParticleMomentum(G4ThreeVector(mom.X()*GeV, mom.Y()*GeV, mom.Z()*GeV));
         particleGun->GeneratePrimaryVertex(theEvent);
