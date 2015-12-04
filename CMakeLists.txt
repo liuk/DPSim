@@ -39,7 +39,7 @@ add_custom_command (
   ARGS -f ${PROJECT_SOURCE_DIR}/src/DPSimConfigDict.cxx -c ${PROJECT_SOURCE_DIR}/inc/DPSimConfig.h ${PROJECT_SOURCE_DIR}/inc/DPSimConfigLinkDef.h
   )
 
-# GMC source code
+# DPSim source code
 include_directories(${PROJECT_SOURCE_DIR}/inc)
 file(GLOB sources ${PROJECT_SOURCE_DIR}/src/*.cxx)
 file(GLOB headers ${PROJECT_SOURCE_DIR}/include/*.h)
