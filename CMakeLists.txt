@@ -47,43 +47,32 @@ add_executable(DPSim DPSim.cxx ${sources} ${headers} ${PROJECT_SOURCE_DIR}/src/D
 
 # Geant4 and ROOT
 find_package(Geant4 REQUIRED gdml vis_all)
-execute_process(COMMAND geant4-config --prefix OUTPUT_VARIABLE GEANT4_PREFIX OUTPUT_STRIP_TRAILING_WHITESPACE)
-execute_process(COMMAND geant4-config --libs OUTPUT_VARIABLE GEANT4_LINK OUTPUT_STRIP_TRAILING_WHITESPACE)
-include_directories(${GEANT4_PREFIX}/include/Geant4)
-target_link_libraries(DPSim ${GEANT4_LINK})
-target_link_libraries(DPSim ${Geant4_LIBRARIES})
+execute_process(COMMAND geant4-config --cflags OUTPUT_VARIABLE GEANT4_CFLAGS OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND geant4-config --libs   OUTPUT_VARIABLE GEANT4_LINK   OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-execute_process(COMMAND root-config --prefix OUTPUT_VARIABLE ROOT_PREFIX OUTPUT_STRIP_TRAILING_WHITESPACE)
-execute_process(COMMAND root-config --libs   OUTPUT_VARIABLE ROOT_LINK   OUTPUT_STRIP_TRAILING_WHITESPACE)
-include_directories(${ROOT_PREFIX}/include)
-target_link_libraries(DPSim ${ROOT_LINK})
-
-# BOOST
-include_directories($ENV{BOOST_ROOT})
+execute_process(COMMAND root-config --cflags OUTPUT_VARIABLE ROOT_CFLAGS  OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND root-config --libs   OUTPUT_VARIABLE ROOT_LINK    OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 # LHAPDF
-execute_process(COMMAND lhapdf-config --libs OUTPUT_VARIABLE LHAPDF_LINK OUTPUT_STRIP_TRAILING_WHITESPACE)
-execute_process(COMMAND lhapdf-config --incdir OUTPUT_VARIABLE LHAPDF_INCLUDE OUTPUT_STRIP_TRAILING_WHITESPACE)
-execute_process(COMMAND lhapdf-config --libdir OUTPUT_VARIABLE LHAPDF_RLINK OUTPUT_STRIP_TRAILING_WHITESPACE)
-include_directories(${LHAPDF_INCLUDE})
-target_link_libraries(DPSim ${LHAPDF_LINK})
+execute_process(COMMAND lhapdf-config --cflags OUTPUT_VARIABLE LHAPDF_CFLAGS  OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND lhapdf-config --libs   OUTPUT_VARIABLE LHAPDF_LINK    OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 # Pythia
-execute_process(COMMAND pythia8-config --includedir OUTPUT_VARIABLE PYTHIA_INCLUDE OUTPUT_STRIP_TRAILING_WHITESPACE)
-execute_process(COMMAND pythia8-config --libs OUTPUT_VARIABLE PYTHIA_LINK OUTPUT_STRIP_TRAILING_WHITESPACE)
-
-# include_directories command does not like -I prefix
-string(REPLACE "-I" "" PYTHIA_INCLUDE ${PYTHIA_INCLUDE})
-include_directories(${PYTHIA_INCLUDE})
-target_link_libraries(DPSim ${PYTHIA_LINK})
+execute_process(COMMAND pythia8-config --cxxflags OUTPUT_VARIABLE PYTHIA_CFLAGS  OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND pythia8-config --libs     OUTPUT_VARIABLE PYTHIA_LINK    OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 # MySQL
-execute_process(COMMAND mysql_config --include OUTPUT_VARIABLE MYSQL_INCLUDE OUTPUT_STRIP_TRAILING_WHITESPACE)
-execute_process(COMMAND mysql_config --libs OUTPUT_VARIABLE MYSQL_LINK OUTPUT_STRIP_TRAILING_WHITESPACE)
-string(REPLACE "-I" "" MYSQL_INCLUDE ${MYSQL_INCLUDE})
-include_directories(${MYSQL_INCLUDE})
-target_link_libraries(DPSim ${MYSQL_LINK})
+execute_process(COMMAND mysql_config --cflags   OUTPUT_VARIABLE MYSQL_CFLAGS  OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND mysql_config --libs     OUTPUT_VARIABLE MYSQL_LINK    OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+# Warning suppression
+string(REGEX REPLACE "-W[a-z-]*" "" GEANT4_CFLAGS ${GEANT4_CFLAGS})
+string(REPLACE "-pedantic" "" GEANT4_CFLAGS ${GEANT4_CFLAGS})
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GEANT4_CFLAGS} ${ROOT_CFLAGS} ${PYTHIA_CFLAGS} ${LHAPDF_CFLAGS} ${MYSQL_CFLAGS}")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${GEANT4_LINK} ${ROOT_LINK} ${PYTHIA_LINK} ${LHAPDF_LINK} ${MYSQL_LINK}")
+target_link_libraries(DPSim ${Geant4_LIBRARIES})
 
 # test stuff
 #add_executable(test_debug test/test.cxx ${sources} ${headers} ${PROJECT_SOURCE_DIR}/src/DPMCRawEventDict.cxx ${PROJECT_SOURCE_DIR}/src/DPSimConfigDict.cxx)
-#target_link_libraries(test_debug ${GEANT4_LINK} ${Geant4_LIBRARIES} ${ROOT_LINK} ${LHAPDF_LINK} ${PYTHIA_LINK} ${MYSQL_LINK})
+#target_link_libraries(test_debug ${GEANT4_LINK} ${Geant4_LIBRARIES} ${ROOT_LINK} ${PYTHIA_LINK} ${LHAPDF_LINK} ${MYSQL_LINK})

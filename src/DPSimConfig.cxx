@@ -76,7 +76,7 @@ void DPSimConfig::init(TString configFile)
     nEventsPhysics = 0;
     nEventsAccepted = 0;
 
-    if(!checkConsistency()) exit(EXIT_FAILURE);
+    if(!sanityCheck()) exit(EXIT_FAILURE);
 }
 
 bool DPSimConfig::sanityCheck()
@@ -192,7 +192,7 @@ bool DPSimConfig::pBool(TString name, bool default_val)
         return true;
     }
 
-    return false;
+    return default_val;
 }
 
 Double_t DPSimConfig::pDouble(TString name, Double_t default_val)

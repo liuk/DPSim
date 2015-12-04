@@ -44,8 +44,8 @@ int main(int argc, char* argv[])
 
     runManager->Initialize();
 
-    G4UImanager* UImanager = G4UImanager::GetUIpointer();
 #ifdef DEBUG_TR
+    G4UImanager* UImanager = G4UImanager::GetUIpointer();
     UImanager->ApplyCommand("/tracking/verbose 1");
 #endif
 

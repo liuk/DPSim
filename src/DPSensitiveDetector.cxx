@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-DPSensitiveDetector::DPSensitiveDetector(const G4String& name, const G4String& hitCollectionName): G4VSensitiveDetector(name), theHC(NULL), hcID(-1)
+DPSensitiveDetector::DPSensitiveDetector(const G4String& name, const G4String& hitCollectionName): G4VSensitiveDetector(name), hcID(-1), theHC(NULL)
 {
     collectionName.insert(hitCollectionName);
 }

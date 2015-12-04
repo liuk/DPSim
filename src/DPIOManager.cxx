@@ -100,7 +100,7 @@ void DPIOManager::fillOneEvent(const G4Event* theEvent)
     bool dimuonAccepted = false;
     if(rawEvent->getNDimuons() > 0)
     {
-        for(int i = 0; i < rawEvent->getNDimuons(); ++i)
+        for(unsigned int i = 0; i < rawEvent->getNDimuons(); ++i)
         {
             DPMCDimuon* dimuon = (DPMCDimuon*)rawEvent->getDimuons()->At(i);
             dimuon->fAccepted = tracks[trackIDs[dimuon->fPosTrackID]].first.isAccepted() && tracks[trackIDs[dimuon->fNegTrackID]].first.isAccepted();

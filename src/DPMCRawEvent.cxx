@@ -164,19 +164,19 @@ void DPMCRawEvent::print()
 
     cout << "---------- Run: " << fEvtHeader.fRunID << " Spill " << fEvtHeader.fSpillID << " Event " << fEvtHeader.fEventID << " weight " << fEvtHeader.fSigWeight << "----------" << endl;
     cout << "---------- has " << fNDimuons << " dimuons." << endl;
-    for(int i = 0; i < fNDimuons; ++i)
+    for(UInt_t i = 0; i < fNDimuons; ++i)
     {
         cout << *(DPMCDimuon*)(fDimuons->At(i)) << endl;
     }
 
     cout << "---------- has " << fNTracks << " tracks." << endl;
-    for(int i = 0; i < fNTracks; ++i)
+    for(UInt_t i = 0; i < fNTracks; ++i)
     {
         cout << *(DPMCTrack*)(fTracks->At(i)) << endl;
     }
 
     cout << "---------- has " << fNHits << " hits." << endl;
-    for(int i = 0; i < fNHits; ++i)
+    for(UInt_t i = 0; i < fNHits; ++i)
     {
         cout << *(DPMCHit*)(fHits->At(i)) << endl;
     }
