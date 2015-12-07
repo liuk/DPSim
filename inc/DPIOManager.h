@@ -15,6 +15,7 @@
 
 #include "DPSimConfig.h"
 #include "DPDigitizer.h"
+#include "DPTriggerAnalyzer.h"
 #include "DPMCRawEvent.h"
 #include "DPVirtualHit.h"
 
@@ -61,6 +62,9 @@ private:
 
     //Pointer to the digitizer
     DPDigitizer* p_digitizer;
+
+    //Pointer to the trigger analyzer
+    DPTriggerAnalyzer* p_triggerAna;
 
     //save mode
     enum SaveMode {EVERYTHING, HITSONLY, INACCONLY};

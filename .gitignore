@@ -28,3 +28,6 @@
 *.pyc
 
 # generated geometry files
+
+# build folder
+build

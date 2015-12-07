@@ -11,6 +11,8 @@
 #include <TClonesArray.h>
 #include <TString.h>
 
+#define NDETPLANES 48
+
 class DPMCHeader: public TObject
 {
 public:
@@ -20,11 +22,20 @@ public:
 
     Double_t fSigWeight;
 
+    Int_t fTriggerBit;
+    std::vector<Int_t> fPosRoadIDs;
+    std::vector<Int_t> fNegRoadIDs;
+
     ClassDef(DPMCHeader, 1)
 };
 
 class DPMCHit: public TObject
 {
+public:
+    int uniqueID() { return fDetectorID*1000 + fElementID; }
+
+    friend std::ostream& operator << (std::ostream& os, const DPMCHit& hit);
+
 public:
     //digitized info
     UInt_t fHitID;
@@ -37,9 +48,6 @@ public:
     TVector3 fMomentum;
     TVector3 fPosition;
     //Double_t fDepEnergy;
-
-public:
-    friend std::ostream& operator << (std::ostream& os, const DPMCHit& hit);
 
     ClassDef(DPMCHit, 1)
 };
@@ -123,7 +131,7 @@ public:
     TClonesArray* getTracks() { return fTracks; }
     DPMCTrack getTrack(Int_t i) { return *(DPMCTrack*)fTracks->At(i); }
 
-    UInt_t getNHits() { return fNHits; }
+    UInt_t getNHits(Int_t i = 0) { return fNHits[i]; }
     TClonesArray* getHits() { return fHits; }
     DPMCHit getHit(Int_t i) { return *(DPMCHit*)fHits->At(i); }
 
@@ -143,7 +151,7 @@ private:
     UInt_t fNTracks;
     TClonesArray* fTracks;
 
-    UInt_t fNHits;
+    UInt_t fNHits[NDETPLANES+1];
     TClonesArray* fHits;
 
     ClassDef(DPMCRawEvent, 1)

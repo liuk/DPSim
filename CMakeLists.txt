@@ -75,4 +75,4 @@ target_link_libraries(DPSim ${Geant4_LIBRARIES})
 
 # test stuff
 #add_executable(test_debug test/test.cxx ${sources} ${headers} ${PROJECT_SOURCE_DIR}/src/DPMCRawEventDict.cxx ${PROJECT_SOURCE_DIR}/src/DPSimConfigDict.cxx)
-#target_link_libraries(test_debug ${GEANT4_LINK} ${Geant4_LIBRARIES} ${ROOT_LINK} ${PYTHIA_LINK} ${LHAPDF_LINK} ${MYSQL_LINK})
+#target_link_libraries(test_debug ${Geant4_LIBRARIES})

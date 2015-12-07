@@ -14,6 +14,7 @@ DPIOManager::DPIOManager(): saveFile(NULL), saveTree(NULL), rawEvent(NULL)
 {
     p_config = DPSimConfig::instance();
     p_digitizer = DPDigitizer::instance();
+    p_triggerAna = DPTriggerAnalyzer::instance();
     sensHitColID = -1;
 
     saveMode = HITSONLY;
@@ -36,9 +37,11 @@ DPIOManager::DPIOManager(): saveFile(NULL), saveTree(NULL), rawEvent(NULL)
 
 DPIOManager::~DPIOManager()
 {
-    if(rawEvent) delete rawEvent;
-    if(saveTree) delete saveTree;
-    if(saveFile) delete saveFile;
+    if(rawEvent != NULL) delete rawEvent;
+    if(saveTree != NULL) delete saveTree;
+    if(saveFile != NULL) delete saveFile;
+
+    if(p_triggerAna != NULL) delete p_triggerAna;
 }
 
 void DPIOManager::initialize(int runID)
@@ -133,6 +136,9 @@ void DPIOManager::fillOneEvent(const G4Event* theEvent)
             rawEvent->addHit(*jter);
         }
     }
+
+    //Pass the event through trigger simulation
+    p_triggerAna->analyzeTrigger(rawEvent);
 
     //save the event
 #ifdef DEBUG_IO
@@ -242,7 +248,6 @@ void DPIOManager::reIndex()
         }
     }
 
-
     //set the trackID to all the tracks that should be kept
     unsigned int trackID = 0;
     for(std::vector<std::pair<DPMCTrack, bool> >::iterator iter = tracks.begin(); iter != tracks.end(); ++iter)
@@ -269,8 +274,6 @@ void DPIOManager::reIndex()
             jter->fTrackID = tracks[trackIDs[iter->particleID]].first.fTrackID;
         }
     }
-
-    //set the trackID to the
 }
 
 void DPIOManager::finalize()

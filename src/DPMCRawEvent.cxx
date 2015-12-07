@@ -96,7 +96,7 @@ DPMCRawEvent::DPMCRawEvent()
     fNTracks = 0;
 
     fHits = new TClonesArray("DPMCHit");
-    fNHits = 0;
+    for(int i = 0; i <= NDETPLANES; ++i) fNHits[i] = 0;
 
     fEvtHeader.fRunID = -1;
     fEvtHeader.fSpillID = -1;
@@ -115,11 +115,15 @@ void DPMCRawEvent::clear()
 {
     fNDimuons = 0;
     fNTracks = 0;
-    fNHits = 0;
+    for(int i = 0; i <= NDETPLANES; ++i) fNHits[i] = 0;
 
     fDimuons->Clear();
     fTracks->Clear();
     fHits->Clear();
+
+    fEvtHeader.fTriggerBit = 0;
+    fEvtHeader.fPosRoadIDs.clear();
+    fEvtHeader.fNegRoadIDs.clear();
 }
 
 UInt_t DPMCRawEvent::addDimuon(DPMCDimuon dimuon, Int_t index)
@@ -144,10 +148,11 @@ UInt_t DPMCRawEvent::addTrack(DPMCTrack track, Int_t index)
 
 UInt_t DPMCRawEvent::addHit(DPMCHit hit, Int_t trackID, Int_t index)
 {
-    hit.fHitID = index > 0 ? index : fNHits;
+    hit.fHitID = index > 0 ? index : fNHits[0];
 
     TClonesArray& Hits = *fHits;
-    new(Hits[fNHits++]) DPMCHit(hit);
+    new(Hits[fNHits[0]++]) DPMCHit(hit);
+    ++fNHits[hit.fDetectorID];
 
     if(trackID >= 0 && trackID < fNTracks)
     {
@@ -175,8 +180,8 @@ void DPMCRawEvent::print()
         cout << *(DPMCTrack*)(fTracks->At(i)) << endl;
     }
 
-    cout << "---------- has " << fNHits << " hits." << endl;
-    for(UInt_t i = 0; i < fNHits; ++i)
+    cout << "---------- has " << fNHits[0] << " hits." << endl;
+    for(UInt_t i = 0; i < fNHits[0]; ++i)
     {
         cout << *(DPMCHit*)(fHits->At(i)) << endl;
     }

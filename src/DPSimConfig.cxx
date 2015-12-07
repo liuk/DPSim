@@ -42,6 +42,8 @@ void DPSimConfig::init(TString configFile)
     login = pString("login");
     password = pString("password");
 
+    triggerMatrix = pString("triggerMatrix");
+
     fMagMap = pString("fMagMap");
     kMagMap = pString("kMagMap");
     fMagMultiplier = pDouble("fMagMultiplier", 1.);
@@ -125,6 +127,11 @@ bool DPSimConfig::sanityCheck()
     if(checkFile(outputFileName))
     {
         std::cout << "WARNING: Output file exists, will be overwritten. " << std::endl;
+    }
+
+    if(!checkFile(triggerMatrix))
+    {
+        std::cout << "WARNING: Trigger matrix input is not found, will only perform NIM trigger simulation. " << std::endl;
     }
 
     return true;

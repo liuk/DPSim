@@ -20,6 +20,9 @@ public:
     //check if there are any inconsistencies
     bool sanityCheck();
 
+    //check file status
+    bool checkFile(TString filename);
+
 public:
     //Random seed
     Int_t seed;
@@ -40,9 +43,12 @@ public:
     TString geometryGDMLInput;// The GDML file for geometry
     TString geometrySchema;   // The sql schema that GMC pulls the geometry information from
     TString mysqlServer;      // Address of the SQL Server, shouldn't need to modify
-    Int_t   mysqlPort;          // The port number for MySQL
+    Int_t   mysqlPort;        // The port number for MySQL
     TString login;            // The login for the SQL server
     TString password;         // The password for the SQL server
+
+    //Trigger matrix input
+    TString triggerMatrix;    // Input table file of the trigger matrix
 
     //Magnetic field setup
     TString fMagMap;          // Name of the ascii text file that contains the fmag map
@@ -94,9 +100,6 @@ private: //used only for parsing
     bool     pBool(TString name, bool default_val);
     Double_t pDouble(TString name, Double_t default_val);
     Int_t    pInt(TString name, Int_t default_val);
-
-    //check file status
-    bool checkFile(TString filename);
 
     // config group symbol map
     std::map<TString, TString> symbols;
