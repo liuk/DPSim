@@ -5,6 +5,7 @@
 #include <cmath>
 
 #include "G4SystemOfUnits.hh"
+#include "Randomize.hh"
 
 #include <TMath.h>
 #include <TSQLServer.h>
@@ -169,6 +170,10 @@ DPDigitizer::DPDigitizer()
         digiPlanes[index].triggerLv = boost::lexical_cast<int>(row->GetField(15));
         digiPlanes[index].preCalculation();
 
+        //TODO: implement RT/eff/resolution here
+        digiPlanes[index].efficiency.resize(digiPlanes[index].nElements+1, 1.);
+        digiPlanes[index].resolution.resize(digiPlanes[index].nElements+1, 0.);
+
         map_groupID[digiPlanes[index].detectorGroupName].push_back(index);
         map_detectorID[digiPlanes[index].detectorName] = digiPlanes[index].detectorID;
 
@@ -211,7 +216,7 @@ void DPDigitizer::digitize(DPVirtualHit& vHit)
         digiHit.fMomentum.SetXYZ(vHit.mom[0]/GeV, vHit.mom[1]/GeV, vHit.mom[2]/GeV);
         digiHit.fPosition.SetXYZ(pos[0], pos[1], pos[2]);
 
-        vHit.digiHits.push_back(digiHit);
+        if(realize(digiHit)) vHit.digiHits.push_back(digiHit);
 
         //see if it also hits the next elements in the overlap region
         if(fabs(driftDistance) > 0.5*digiPlanes[*dpid].cellWidth - digiPlanes[*dpid].overlap)
@@ -220,14 +225,20 @@ void DPDigitizer::digitize(DPVirtualHit& vHit)
             {
                 digiHit.fElementID = elementID + 1;
                 digiHit.fDriftDistance = driftDistance - digiPlanes[*dpid].spacing;
-                vHit.digiHits.push_back(digiHit);
+                if(realize(digiHit)) vHit.digiHits.push_back(digiHit);
             }
             else if(driftDistance < 0. && elementID != 1)
             {
                 digiHit.fElementID = elementID - 1;
                 digiHit.fDriftDistance = driftDistance + digiPlanes[*dpid].spacing;
-                vHit.digiHits.push_back(digiHit);
+                if(realize(digiHit)) vHit.digiHits.push_back(digiHit);
             }
         }
     }
+}
+
+bool DPDigitizer::realize(DPMCHit& dHit)
+{
+    dHit.fDriftDistance += (G4RandGauss::shoot(0., digiPlanes[dHit.fDetectorID].resolution[dHit.fElementID]));
+    return G4UniformRand() < digiPlanes[dHit.fDetectorID].efficiency[dHit.fElementID];
 }

@@ -151,6 +151,7 @@ private:
     UInt_t fNTracks;
     TClonesArray* fTracks;
 
+    //id = 0 for all, and the rest is for each plane
     UInt_t fNHits[NDETPLANES+1];
     TClonesArray* fHits;
 

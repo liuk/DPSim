@@ -5,6 +5,8 @@
 #include <map>
 #include <boost/array.hpp>
 
+#include <TSpline.h>
+
 #include "G4String.hh"
 
 #include "DPMCRawEvent.h"
@@ -66,6 +68,9 @@ public:
     double rotM[3][3]; //rotation matrix
 
     //TODO: will implement resolution/efficiency/RT
+    std::vector<double> efficiency;
+    std::vector<double> resolution;
+    TSpline3 RT;
 };
 
 class DPDigitizer
@@ -76,6 +81,9 @@ public:
 
     //main external call, fill the digi hit vector
     void digitize(DPVirtualHit& vHit);
+
+    //realization process
+    bool realize(DPMCHit& dHit);
 
     //get the detectorID by detectorName
     int getDetectorID(G4String detectorName) { return map_detectorID[detectorName]; }
