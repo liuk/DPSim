@@ -167,7 +167,7 @@ DPDigitizer::DPDigitizer()
         digiPlanes[index].rX = boost::lexical_cast<double>(row->GetField(12));
         digiPlanes[index].rY = boost::lexical_cast<double>(row->GetField(13));
         digiPlanes[index].rZ = boost::lexical_cast<double>(row->GetField(14));
-        digiPlanes[index].triggerLv = boost::lexical_cast<int>(row->GetField(15));
+        digiPlanes[index].triggerLv = boost::lexical_cast<int>(row->GetField(17));
         digiPlanes[index].preCalculation();
 
         //TODO: implement RT/eff/resolution here

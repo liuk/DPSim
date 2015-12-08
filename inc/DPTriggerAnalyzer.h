@@ -50,7 +50,7 @@ public:
     double getSigWeight() const { return sigWeight; }
     double getBkgRate() const { return bkgRate; }
     double getPxMin() const { return pXmin; }
-    int getTrID(unsigned int i) const { return i > -1 && i < uniqueTrIDs.size() ? uniqueTrIDs[i] : 0; }
+    int getTrID(unsigned int i) const { return i < NTRPLANES ? uniqueTrIDs[i] : 0; }
     int getTrDetectorID(unsigned int i) const { return getTrID(i)/1000; }
     int getTrElementID(unsigned int i) const { return getTrID(i) % 1000; }
 
@@ -65,7 +65,7 @@ public:
     bool operator <  (const DPTriggerRoad& elem) const;
 
     //printer
-    friend std::ostream& operator << (std::ostream& os, DPTriggerRoad& road);
+    friend std::ostream& operator << (std::ostream& os, const DPTriggerRoad& road);
 
 private:
     //unique road ID
@@ -102,8 +102,8 @@ public:
     //Test the trigger pattern
     void analyzeTrigger(DPMCRawEvent* rawEvent);
 
-    //create the trigger stations hit pattern
-    void buildHitPattern(int nTrHits, int uniqueTrIDs[]);
+    //create the trigger stations hit pattern, return false if one or more plane is missing
+    bool buildHitPattern(int nTrHits, int uniqueTrIDs[]);
 
     //search for possible roads
     void searchMatrix(MatrixNode* node, int level, int index);

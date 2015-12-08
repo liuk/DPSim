@@ -24,7 +24,7 @@ public:
     bool operator < (const DPVirtualHit& elem) const;
     bool operator == (const DPVirtualHit& elem) const;
 
-    friend ostream& operator << (std::ostream& os, const DPVirtualHit& hit);
+    friend std::ostream& operator << (std::ostream& os, const DPVirtualHit& hit);
 
 public:
     //general virtual hit information

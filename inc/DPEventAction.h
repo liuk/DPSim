@@ -24,6 +24,12 @@ private:
     //print frequency
     int printFreq;
 
+    //Total number of events to process
+    int nEventsAll;
+
+    //Total time so far
+    double timeElapsed;
+
     //Timer for performance benchmark
     TStopwatch timer;
 };

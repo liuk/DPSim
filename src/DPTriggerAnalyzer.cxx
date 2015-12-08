@@ -64,10 +64,10 @@ bool DPTriggerRoad::operator < (const DPTriggerRoad& elem) const
 
 std::ostream& operator << (std::ostream& os, const DPTriggerRoad& road)
 {
-    os << "Trigger Road ID = " << road.getRoadID() << ", signal = " << road.getSigWeight() << ", bkg = " << road.getBkgRate() << "\n   ";
+    os << "Trigger Road ID = " << road.roadID << ", signal = " << road.sigWeight << ", bkg = " << road.bkgRate << "\n   ";
     for(unsigned int i = 0; i < NTRPLANES; ++i)
     {
-        os << road.getTrID(i) << " == ";
+        os << road.uniqueTrIDs[i] << " == ";
     }
 
     return os;
@@ -132,22 +132,18 @@ DPTriggerAnalyzer::~DPTriggerAnalyzer()
 void DPTriggerAnalyzer::analyzeTrigger(DPMCRawEvent* rawEvent)
 {
     //analyze the roads found and set the trigger bit
-    int triggerBit = 0;
+    rawEvent->eventHeader().fTriggerBit = 0;
 
     //NIM trigger first
     bool HXT = rawEvent->getNHits(26) > 0 && rawEvent->getNHits(32) > 0 && rawEvent->getNHits(34) > 0 && rawEvent->getNHits(40) > 0;
     bool HXB = rawEvent->getNHits(25) > 0 && rawEvent->getNHits(31) > 0 && rawEvent->getNHits(33) > 0 && rawEvent->getNHits(39) > 0;
     bool HYL = rawEvent->getNHits(27) > 0 && rawEvent->getNHits(29) > 0 && rawEvent->getNHits(35) > 0 && rawEvent->getNHits(37) > 0;
     bool HYR = rawEvent->getNHits(28) > 0 && rawEvent->getNHits(30) > 0 && rawEvent->getNHits(36) > 0 && rawEvent->getNHits(38) > 0;
-    if(HYL || HYR) triggerBit |= NIM1;
-    if(HXT || HXB) triggerBit |= NIM2;
+    if(HYL || HYR) rawEvent->eventHeader().fTriggerBit |= NIM1;
+    if(HXT || HXB) rawEvent->eventHeader().fTriggerBit |= NIM2;
 
     //if matrix is not inited, return
-    if(NIMONLY)
-    {
-        rawEvent->eventHeader().fTriggerBit = triggerBit;
-        return;
-    }
+    if(NIMONLY) return;
 
     //For FPGA trigger, build the internal hit pattern first
     int nHits = 0;
@@ -162,7 +158,7 @@ void DPTriggerAnalyzer::analyzeTrigger(DPMCRawEvent* rawEvent)
 
         uniqueIDs[nHits++] = hit->uniqueID();
     }
-    buildHitPattern(nHits, uniqueIDs);
+    if(!buildHitPattern(nHits, uniqueIDs)) return;
 
     //do the tree DFS search
     for(int i = 0; i < 2; ++i)
@@ -212,14 +208,11 @@ void DPTriggerAnalyzer::analyzeTrigger(DPMCRawEvent* rawEvent)
         }
     }
 
-    if((nPlusTop > 0 && nMinusBot > 0) || (nPlusBot > 0 && nMinusTop > 0)) triggerBit |= MATRIX1;
-    if((nPlusTop > 0 && nMinusTop > 0) || (nPlusBot > 0 && nMinusBot > 0)) triggerBit |= MATRIX2;
-    if((nPlusTop > 0 && nPlusBot > 0) || (nMinusTop > 0 && nMinusBot > 0)) triggerBit |= MATRIX3;
-    if(nPlusTop > 0 || nMinusTop > 0 || nPlusBot > 0 || nMinusBot > 0) triggerBit |= MATRIX4;
-    if(nHiPxPlusTop > 0 || nHiPxMinusTop > 0 || nHiPxPlusBot > 0 || nHiPxMinusBot > 0) triggerBit |= MATRIX5;
-
-    //fill the info to event
-    rawEvent->eventHeader().fTriggerBit = triggerBit;
+    if((nPlusTop > 0 && nMinusBot > 0) || (nPlusBot > 0 && nMinusTop > 0)) rawEvent->eventHeader().fTriggerBit |= MATRIX1;
+    if((nPlusTop > 0 && nMinusTop > 0) || (nPlusBot > 0 && nMinusBot > 0)) rawEvent->eventHeader().fTriggerBit |= MATRIX2;
+    if((nPlusTop > 0 && nPlusBot > 0) || (nMinusTop > 0 && nMinusBot > 0)) rawEvent->eventHeader().fTriggerBit |= MATRIX3;
+    if(nPlusTop > 0 || nMinusTop > 0 || nPlusBot > 0 || nMinusBot > 0) rawEvent->eventHeader().fTriggerBit |= MATRIX4;
+    if(nHiPxPlusTop > 0 || nHiPxMinusTop > 0 || nHiPxPlusBot > 0 || nHiPxMinusBot > 0) rawEvent->eventHeader().fTriggerBit |= MATRIX5;
 }
 
 void DPTriggerAnalyzer::buildTriggerMatrix()
@@ -257,7 +250,7 @@ void DPTriggerAnalyzer::buildTriggerMatrix()
     }
 }
 
-void DPTriggerAnalyzer::buildHitPattern(int nTrHits, int uniqueTrIDs[])
+bool DPTriggerAnalyzer::buildHitPattern(int nTrHits, int uniqueTrIDs[])
 {
     data.clear();
 
@@ -277,8 +270,11 @@ void DPTriggerAnalyzer::buildHitPattern(int nTrHits, int uniqueTrIDs[])
 
     for(int i = 0; i < NTRPLANES; ++i)
     {
+        if(trHits[i].empty()) return false;
         data.push_back(trHits[i]);
     }
+
+    return true;
 }
 
 void DPTriggerAnalyzer::searchMatrix(MatrixNode* node, int level, int index)
@@ -286,6 +282,7 @@ void DPTriggerAnalyzer::searchMatrix(MatrixNode* node, int level, int index)
     path.push_back(node->uniqueID);
     if(node->children.empty())
     {
+        //printPath();
         roads_found[index].push_back(DPTriggerRoad(path));
         path.pop_back();
 
