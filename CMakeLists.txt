@@ -3,26 +3,26 @@ cmake_minimum_required(VERSION 2.6 FATAL_ERROR)
 project(DPSim CXX C)
 
 # Put executables into a bin
-SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 
 # Command line options
-OPTION(DEBUG_IN "Output massive initializing debugging info" OFF)
-OPTION(DEBUG_TR "Output massive tracking debugging info" OFF)
-OPTION(DEBUG_IO "Output massive I/O debugging info" OFF)
-OPTION(DEBUG "General debug flag for non-production compiles" ON)
+option(DEBUG_IN "Output massive initializing debugging info" OFF)
+option(DEBUG_TR "Output massive tracking debugging info" OFF)
+option(DEBUG_IO "Output massive I/O debugging info" OFF)
+option(DEBUG "General debug flag for non-production compiles" ON)
 
-IF(DEBUG_IN)
-  ADD_DEFINITIONS(-DDEBUG_IN)
-ENDIF(DEBUG_IN)
-IF(DEBUG_TR)
-  ADD_DEFINITIONS(-DDEBUG_TR)
-ENDIF(DEBUG_TR)
-IF(DEBUG_IO)
-  ADD_DEFINITIONS(-DDEBUG_IO)
-ENDIF(DEBUG_IO)
-IF(NOT(DEBUG_IN OR DEBUG_TR OR DEBUG_IO OR DEBUG))
-  ADD_DEFINITIONS(-DNDEBUG)
-ENDIF(NOT(DEBUG_IN OR DEBUG_TR OR DEBUG_IO OR DEBUG))
+if(DEBUG_IN)
+  add_definitions(-DDEBUG_IN)
+endif()
+if(DEBUG_TR)
+  add_definitions(-DDEBUG_TR)
+endif()
+if(DEBUG_IO)
+  add_definitions(-DDEBUG_IO)
+endif()
+if(NOT(DEBUG_IN OR DEBUG_TR OR DEBUG_IO OR DEBUG))
+  add_definitions(-DNDEBUG)
+endif()
 
 # ROOT dict generation
 add_custom_command (
@@ -62,8 +62,8 @@ execute_process(COMMAND pythia8-config --cxxflags OUTPUT_VARIABLE PYTHIA_CFLAGS 
 execute_process(COMMAND pythia8-config --libs     OUTPUT_VARIABLE PYTHIA_LINK    OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 # MySQL
-execute_process(COMMAND mysql_config --cflags   OUTPUT_VARIABLE MYSQL_CFLAGS  OUTPUT_STRIP_TRAILING_WHITESPACE)
-execute_process(COMMAND mysql_config --libs     OUTPUT_VARIABLE MYSQL_LINK    OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND mysql_config --cflags OUTPUT_VARIABLE MYSQL_CFLAGS  OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND mysql_config --libs   OUTPUT_VARIABLE MYSQL_LINK    OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 # Warning suppression
 string(REGEX REPLACE "-W[a-z-]*" "" GEANT4_CFLAGS ${GEANT4_CFLAGS})

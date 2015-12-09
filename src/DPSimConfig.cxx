@@ -83,6 +83,8 @@ void DPSimConfig::init(TString configFile)
 
 bool DPSimConfig::sanityCheck()
 {
+    bool ignoreWarnings = pBool("ignoreWarnings", false);
+
     if(generatorType == "external" && (!checkFile(externalInput)))
     {
         std::cout << "ERROR: External input file not found!" << std::endl;
@@ -122,16 +124,19 @@ bool DPSimConfig::sanityCheck()
     if(x1Min < 0. || x1Max > 1. || x2Min < 0. || x2Max > 1. || xfMin < -1. || xfMax > 1. || massMin < 0. || massMax > 20. || cosThetaMin < -1. || cosThetaMax > 1.)
     {
         std::cout << "WARNING: Phase space limit is not realistic." << std::endl;
+        if(!ignoreWarnings) return false;
     }
 
     if(checkFile(outputFileName))
     {
         std::cout << "WARNING: Output file exists, will be overwritten. " << std::endl;
+        if(!ignoreWarnings) return false;
     }
 
     if(!checkFile(triggerMatrix))
     {
         std::cout << "WARNING: Trigger matrix input is not found, will only perform NIM trigger simulation. " << std::endl;
+        if(!ignoreWarnings) return false;
     }
 
     return true;
