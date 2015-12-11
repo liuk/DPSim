@@ -92,11 +92,11 @@ DPMagField::DPMagField()
 
     //Load KMag
     DPFieldMap* kMagMap = new DPFieldMap("KMag", p_config->kMagMap.Data(), p_config->kMagMultiplier, 1064.26*cm);
-    fieldMaps.insert(std::map<TString, DPFieldMap*>::value_type("KMag", kMagMap));
+    fieldMaps.insert(std::map<G4String, DPFieldMap*>::value_type("KMag", kMagMap));
 
     //Load FMag
     DPFieldMap* fMagMap = new DPFieldMap("FMag", p_config->fMagMap.Data(), p_config->fMagMultiplier, 0.*cm);
-    fieldMaps.insert(std::map<TString, DPFieldMap*>::value_type("FMag", fMagMap));
+    fieldMaps.insert(std::map<G4String, DPFieldMap*>::value_type("FMag", fMagMap));
 }
 
 DPMagField::~DPMagField()

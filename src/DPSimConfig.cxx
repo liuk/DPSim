@@ -147,7 +147,7 @@ bool DPSimConfig::checkFile(TString filename)
     if(filename == "N/A") return false;
 
     ifstream fin(filename.Data());
-    return fin;
+    return fin.good();
 }
 
 void DPSimConfig::parseConfig(TString configFile)
