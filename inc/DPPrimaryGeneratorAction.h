@@ -34,7 +34,7 @@ public:
     void generateDrellYan();
     void generateJPsi();
     void generatePsip();
-    void generateDarkPhoton();
+    void generateDarkPhotonFromEta();
     void generatePythiaDimuon();
     void generatePythiaSingle();
     void generateGeant4Single();

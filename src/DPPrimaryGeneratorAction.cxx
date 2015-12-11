@@ -61,6 +61,8 @@ DPPrimaryGeneratorAction::DPPrimaryGeneratorAction()
 
     pdf = LHAPDF::mkPDF("CT10nlo", 0);
 
+    //TODO: need to find a way to pass the random number seed to pythia as well
+
     //initilize all kinds of generators
     if(p_config->generatorType == "dimuon")
     {
@@ -88,6 +90,17 @@ DPPrimaryGeneratorAction::DPPrimaryGeneratorAction()
         {
             std::cout << " Using pythia pythia generator ..." << std::endl;
             p_generator = &DPPrimaryGeneratorAction::generatePythiaDimuon;
+
+            ppGen.readFile(p_config->pythiaConfig.Data());
+            pnGen.readFile(p_config->pythiaConfig.Data());
+
+            ppGen.init(2212, 2212, 120., 0.);
+            pnGen.init(2212, 2112, 120., 0.);
+        }
+        else if(p_config->generatorEng == "DarkPhotonFromEta")
+        {
+            std::cout << " Using dark photon generator ..." << std::endl;
+            p_generator = &DPPrimaryGeneratorAction::generateDarkPhotonFromEta;
 
             ppGen.readFile(p_config->pythiaConfig.Data());
             pnGen.readFile(p_config->pythiaConfig.Data());
@@ -305,9 +318,58 @@ void DPPrimaryGeneratorAction::generatePsip()
     p_IOmamnger->fillOneDimuon(xsec, dimuon);
 }
 
-void DPPrimaryGeneratorAction::generateDarkPhoton()
+void DPPrimaryGeneratorAction::generateDarkPhotonFromEta()
 {
+    p_vertexGen->generateVertex();
+    double pARatio = p_vertexGen->getPARatio();
 
+    Pythia8::Pythia* p_pythia = G4UniformRand() < pARatio ? &ppGen : &pnGen;
+    while(!p_pythia->next()) {}
+
+    int nEtas = 0;
+    Pythia8::Event& particles = p_pythia->event;
+    for(int i = 1; i < particles.size(); ++i)
+    {
+        if(particles[i].id() == 221)
+        {
+            DPMCDimuon dimuon;
+            dimuon.fVertex.SetXYZ(G4RandGauss::shoot(0., 1.5), G4RandGauss::shoot(0., 1.5), G4UniformRand()*(620. - 300.) + 300.);
+
+            //eta -> gamma A'
+            TLorentzVector p_eta(particles[i].px(), particles[i].py(), particles[i].pz(), particles[i].e());
+
+            double mass_eta_decays[2] = {G4UniformRand()*(p_eta.M() - 2.*DPGEN::mmu) + 2.*DPGEN::mmu, 0.};
+            phaseGen.SetDecay(p_eta, 2, mass_eta_decays);
+            phaseGen.Generate();
+            TLorentzVector p_AP = *(phaseGen.GetDecay(0));
+
+            //A' -> mumu
+            double mass_AP_decays[2] = {DPGEN::mmu, DPGEN::mmu};
+            phaseGen.SetDecay(p_AP, 2, mass_AP_decays);
+
+            phaseGen.Generate();
+            dimuon.fPosMomentum = *(phaseGen.GetDecay(0));
+            dimuon.fNegMomentum = *(phaseGen.GetDecay(1));
+            dimuon.calcVariables();
+
+            particleGun->SetParticleDefinition(mup);
+            particleGun->SetParticlePosition(G4ThreeVector(dimuon.fVertex.X()*cm, dimuon.fVertex.Y()*cm, dimuon.fVertex.Z()*cm));
+            particleGun->SetParticleMomentum(G4ThreeVector(dimuon.fPosMomentum.X()*GeV, dimuon.fPosMomentum.Y()*GeV, dimuon.fPosMomentum.Z()*GeV));
+            particleGun->GeneratePrimaryVertex(theEvent);
+
+            particleGun->SetParticleDefinition(mum);
+            particleGun->SetParticlePosition(G4ThreeVector(dimuon.fVertex.X()*cm, dimuon.fVertex.Y()*cm, dimuon.fVertex.Z()*cm));
+            particleGun->SetParticleMomentum(G4ThreeVector(dimuon.fNegMomentum.X()*GeV, dimuon.fNegMomentum.Y()*GeV, dimuon.fNegMomentum.Z()*GeV));
+            particleGun->GeneratePrimaryVertex(theEvent);
+
+            //add to the IO stream
+            dimuon.fPosTrackID = nEtas*2 - 1;
+            dimuon.fNegTrackID = nEtas*2;
+            p_IOmamnger->fillOneDimuon(1., dimuon);
+
+            ++nEtas;
+        }
+    }
 }
 
 void DPPrimaryGeneratorAction::generatePythiaDimuon()

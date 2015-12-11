@@ -42,6 +42,7 @@ int main(int argc, char* argv[])
     runManager->SetUserAction(new DPTrackingAction);
     runManager->SetUserAction(new DPSteppingAction);
 
+    runManager->SetRunIDCounter(p_config->seed);   //use seed as the runID
     runManager->Initialize();
 
 #ifdef DEBUG_TR
