@@ -203,6 +203,10 @@ bool DPSimConfig::pBool(TString name, bool default_val)
     {
         return true;
     }
+    else if((val == "no") || (val == "No") || (val == "NO") || (val == "false") || (val == "False") || (val == "FALSE"))
+    {
+        return false;
+    }
 
     return default_val;
 }

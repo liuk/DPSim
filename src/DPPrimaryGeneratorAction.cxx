@@ -136,6 +136,7 @@ DPPrimaryGeneratorAction::DPPrimaryGeneratorAction()
         externalPositions = new TClonesArray("TVector3");
         externalMomentums = new TClonesArray("TVector3");
 
+        externalInputTree->SetBranchAddress("n", &nExternalParticles);
         externalInputTree->SetBranchAddress("pdg", externalParticlePDGs);
         externalInputTree->SetBranchAddress("pos", externalPositions);
         externalInputTree->SetBranchAddress("mom", externalMomentums);
@@ -411,7 +412,7 @@ void DPPrimaryGeneratorAction::generateExternal()
     int eventID = theEvent->GetEventID();
     externalInputTree->GetEntry(eventID);
 
-    for(int i = 0; i < externalPositions->GetEntries(); ++i)
+    for(int i = 0; i < nExternalParticles; ++i)
     {
         TVector3 pos = *((TVector3*)externalPositions->At(i));
         TVector3 mom = *((TVector3*)externalMomentums->At(i));

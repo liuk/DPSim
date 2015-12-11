@@ -71,7 +71,7 @@ private:
     TGenPhaseSpace phaseGen;
 
     //PDFs
-    LHAPDF::PDF*pdf;
+    LHAPDF::PDF* pdf;
 
     //Pythia generator
     Pythia8::Pythia ppGen;
@@ -85,6 +85,7 @@ private:
     //Used for external input
     TFile* externalInputFile;
     TTree* externalInputTree;
+    int nExternalParticles;
     int externalParticlePDGs[10000];
     TClonesArray* externalPositions;
     TClonesArray* externalMomentums;
