@@ -45,23 +45,54 @@ file(GLOB sources ${PROJECT_SOURCE_DIR}/src/*.cxx)
 file(GLOB headers ${PROJECT_SOURCE_DIR}/include/*.h)
 add_executable(DPSim DPSim.cxx ${sources} ${headers} ${PROJECT_SOURCE_DIR}/src/DPMCRawEventDict.cxx ${PROJECT_SOURCE_DIR}/src/DPSimConfigDict.cxx)
 
-# Geant4 and ROOT
+# Geant4
+find_program(G4CONF "geant4-config")
+if(G4CONF)
+  message("-- Detecting Geant4:  found at ${G4CONF}")
+else()
+  message(FATAL_ERROR "-- Detecting Geant4:  not found")
+endif()
 find_package(Geant4 REQUIRED gdml vis_all)
 execute_process(COMMAND geant4-config --cflags OUTPUT_VARIABLE GEANT4_CFLAGS OUTPUT_STRIP_TRAILING_WHITESPACE)
 execute_process(COMMAND geant4-config --libs   OUTPUT_VARIABLE GEANT4_LINK   OUTPUT_STRIP_TRAILING_WHITESPACE)
 
+# ROOT
+find_program(ROOTCONF "root-config")
+if(ROOTCONF)
+  message("-- Detecting ROOT:    found at ${ROOTCONF}")
+else()
+  message(FATAL_ERROR "-- Detecting ROOT:    not found")
+endif()
 execute_process(COMMAND root-config --cflags OUTPUT_VARIABLE ROOT_CFLAGS  OUTPUT_STRIP_TRAILING_WHITESPACE)
 execute_process(COMMAND root-config --libs   OUTPUT_VARIABLE ROOT_LINK    OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 # LHAPDF
+find_program(LHAPDFCONF "lhapdf-config")
+if(LHAPDFCONF)
+  message("-- Detecting LHAPDF:  found at ${LHAPDFCONF}")
+else()
+  message(FATAL_ERROR "-- Detecting LHAPDF:  not found")
+endif()
 execute_process(COMMAND lhapdf-config --cflags OUTPUT_VARIABLE LHAPDF_CFLAGS  OUTPUT_STRIP_TRAILING_WHITESPACE)
 execute_process(COMMAND lhapdf-config --libs   OUTPUT_VARIABLE LHAPDF_LINK    OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 # Pythia
+find_program(PYTHIACONF "pythia8-config")
+if(PYTHIACONF)
+  message("-- Detecting Pythia8: found at ${PYTHIACONF}")
+else()
+  message(FATAL_ERROR "-- Detecting Pythia8: not found")
+endif()
 execute_process(COMMAND pythia8-config --cxxflags OUTPUT_VARIABLE PYTHIA_CFLAGS  OUTPUT_STRIP_TRAILING_WHITESPACE)
 execute_process(COMMAND pythia8-config --libs     OUTPUT_VARIABLE PYTHIA_LINK    OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 # MySQL
+find_program(MYSQLCONF "mysql_config")
+if(MYSQLCONF)
+  message("-- Detecting MySQL:   found at ${MYSQLCONF}")
+else()
+  message(FATAL_ERROR "-- Detecting MySQL:   not found")
+endif()
 execute_process(COMMAND mysql_config --cflags OUTPUT_VARIABLE MYSQL_CFLAGS  OUTPUT_STRIP_TRAILING_WHITESPACE)
 execute_process(COMMAND mysql_config --libs   OUTPUT_VARIABLE MYSQL_LINK    OUTPUT_STRIP_TRAILING_WHITESPACE)
 
