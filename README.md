@@ -1,7 +1,7 @@
 # DPSim - Dark Photon Simulation Package
 This package is developed based on the existing Geant4 Monte Carlo simulation software of E906/SeaQuest experiment. It's intended for the Polarized Target (E1039) and dark photon search. The major changes are:
 
-  - the output is in ROOT structure, no more MySQLs!
+  - the output is in ROOT structure, no more MySQLs, yay!
   - more generators (including dark photon generators) are/will be included;
   - GDML is used as geometry description, so that the persistent geometry could be shared between simulation and reconstruction efforts
 
@@ -23,4 +23,12 @@ With all the packages above provided, DPSim uses cmake to build. A typical insta
   - `cd DPSim; mkdir build; cd build`
   - `cmake ..; make`
 
-After that, the executable file `DPSim` will be produced under `build/bin`, and can be used like `./bin/DPSim run_configuration`, an exmaple configuration file is provided under `DPSim/conf/example.conf`, with self-explainary options. 
+Following arguments can be specified in cmake:
+
+  - `-DLIBONLY=ON (default: OFF)`: this will skip the simulation and only build the ROOT event structure, and thus only requires ROOT, for users who only want to analyze the output of DPSim
+  - `-DDEBUG=ON (default: OFF)`: this will enable massive debugging output
+  - `-DDEBUG_IN=ON (default: OFF)`: this will enable debugging output during initialization process
+  - `-DDEBUG_TR=ON (default: OFF)`: this will enable debugging output during tracking process
+  - `-DDEBUG_IO=ON (default: OFF)`: this will enable debugging output during I/O process
+
+After that, the executable file `DPSim` will be produced under `build/bin`, and can be used like `./bin/DPSim run_configuration`, an exmaple configuration file is provided under `DPSim/conf/example.conf`, with self-explainary options. A shared library `libRawMCEvent` will be produced under `build/lib`, optionally one can use `make install` to install the header and shared library to ROOT header and library places, as specified by `root-config --prefix`.
