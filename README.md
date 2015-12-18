@@ -26,7 +26,7 @@ With all the packages above provided, DPSim uses cmake to build. A typical insta
 Following arguments can be specified in cmake:
 
   - `-DLIBONLY=ON (default: OFF)`: this will skip the simulation and only build the ROOT event structure, and thus only requires ROOT, for users who only want to analyze the output of DPSim
-  - `-DDEBUG=ON (default: OFF)`: this will enable massive debugging output
+  - `-DDEBUG=ON (default: OFF)`: this will remove the `-DNDEBUG` in cflags, and thus enable all the assertions, which are disabled in the Release mode
   - `-DDEBUG_IN=ON (default: OFF)`: this will enable debugging output during initialization process
   - `-DDEBUG_TR=ON (default: OFF)`: this will enable debugging output during tracking process
   - `-DDEBUG_IO=ON (default: OFF)`: this will enable debugging output during I/O process

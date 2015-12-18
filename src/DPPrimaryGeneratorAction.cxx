@@ -427,7 +427,7 @@ void DPPrimaryGeneratorAction::generatePythiaSingle()
 
         for(int j = 1; j < p_pythia->event.size(); ++j)
         {
-            Pythia8::Particle par = p_pythia->event[i];
+            Pythia8::Particle par = p_pythia->event[j];
             if(par.status() > 0 && par.id() != 22)
             {
                 particleGun->SetParticleDefinition(particleDict->FindParticle(par.id()));
