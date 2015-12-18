@@ -417,31 +417,39 @@ void DPPrimaryGeneratorAction::generatePythiaSingle()
 {
     p_config->nEventsPhysics++;
 
-    double zvtx = p_vertexGen->generateVertex();
-    double pARatio = p_vertexGen->getPARatio();
-
-    Pythia8::Pythia* p_pythia = G4UniformRand() < pARatio ? &ppGen : &pnGen;
-    while(!p_pythia->next()) {}
-
-    for(int i = 1; i < p_pythia->event.size(); ++i)
+    for(int i = 0; i < p_config->bucket_size; ++i)
     {
-        Pythia8::Particle par = p_pythia->event[i];
-        if(par.status() > 0 && par.id() != 22)
+        double zvtx = p_vertexGen->generateVertex();
+        double pARatio = p_vertexGen->getPARatio();
+
+        Pythia8::Pythia* p_pythia = G4UniformRand() < pARatio ? &ppGen : &pnGen;
+        while(!p_pythia->next()) {}
+
+        for(int j = 1; j < p_pythia->event.size(); ++j)
         {
-            particleGun->SetParticleDefinition(particleDict->FindParticle(par.id()));
-            particleGun->SetParticlePosition(G4ThreeVector(par.xProd()*mm, par.yProd()*mm, par.zProd()*mm + zvtx*cm));
-            particleGun->SetParticleMomentum(G4ThreeVector(par.px()*GeV, par.py()*GeV, par.pz()*GeV));
-            particleGun->GeneratePrimaryVertex(theEvent);
+            Pythia8::Particle par = p_pythia->event[i];
+            if(par.status() > 0 && par.id() != 22)
+            {
+                particleGun->SetParticleDefinition(particleDict->FindParticle(par.id()));
+                particleGun->SetParticlePosition(G4ThreeVector(par.xProd()*mm, par.yProd()*mm, par.zProd()*mm + zvtx*cm));
+                particleGun->SetParticleMomentum(G4ThreeVector(par.px()*GeV, par.py()*GeV, par.pz()*GeV));
+                particleGun->GeneratePrimaryVertex(theEvent);
+            }
         }
     }
 }
 
 void DPPrimaryGeneratorAction::generateGeant4Single()
 {
-    particleGun->SetParticleDefinition(proton);
-    particleGun->SetParticlePosition(G4ThreeVector(0., 0., -600*cm));
-    particleGun->SetParticleMomentum(G4ThreeVector(0., 0., p_config->beamMomentum*GeV));
-    particleGun->GeneratePrimaryVertex(theEvent);
+    p_config->nEventsPhysics++;
+
+    for(int i = 0; i < p_config->bucket_size; ++i)
+    {
+        particleGun->SetParticleDefinition(proton);
+        particleGun->SetParticlePosition(G4ThreeVector(0., 0., -600*cm));
+        particleGun->SetParticleMomentum(G4ThreeVector(0., 0., p_config->beamMomentum*GeV));
+        particleGun->GeneratePrimaryVertex(theEvent);
+    }
 }
 
 void DPPrimaryGeneratorAction::generatePhaseSpace()
