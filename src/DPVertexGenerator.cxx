@@ -220,7 +220,7 @@ void DPVertexGenerator::generateVertex(DPMCDimuon& dimuon)
     dimuon.fVertex.SetX(G4RandGauss::shoot(0., 1.5));
     dimuon.fVertex.SetY(G4RandGauss::shoot(0., 1.5));
     dimuon.fVertex.SetZ(interactables[index].getZ());
-    dimuon.originVol = interactables[index].name;
+    dimuon.fOriginVol = interactables[index].name;
 }
 
 void DPVertexGenerator::findInteractingPiece()

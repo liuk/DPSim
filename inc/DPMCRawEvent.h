@@ -82,6 +82,7 @@ public:
     UInt_t fParentID;
     Int_t fParentPDGCode;
     TString fProcess;
+    TString fOriginVol;
 
     std::vector<UInt_t> fHitIDs;
 
@@ -98,7 +99,7 @@ public:
     TVector3 fVertex;
     TLorentzVector fPosMomentum;
     TLorentzVector fNegMomentum;
-    TString originVol;
+    TString fOriginVol;
 
     bool fAccepted;
 

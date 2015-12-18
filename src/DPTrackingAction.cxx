@@ -24,6 +24,7 @@ void DPTrackingAction::PreUserTrackingAction(const G4Track* theTrack)
     mcTrack.fParentID = theTrack->GetParentID();
     mcTrack.fCharge = theTrack->GetDefinition()->GetPDGCharge();
     mcTrack.fPDGCode = theTrack->GetDefinition()->GetPDGEncoding();
+    mcTrack.fOriginVol = theTrack->GetVolume()->GetName();
 
     G4ThreeVector pos_i = theTrack->GetPosition();
     G4ThreeVector mom_i = theTrack->GetMomentum();
