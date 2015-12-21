@@ -121,6 +121,7 @@ void DPMCRawEvent::clear()
     fTracks->Clear();
     fHits->Clear();
 
+    fEvtHeader.fEventID = -1;
     fEvtHeader.fTriggerBit = 0;
     fEvtHeader.fPosRoadIDs.clear();
     fEvtHeader.fNegRoadIDs.clear();
@@ -163,7 +164,71 @@ UInt_t DPMCRawEvent::addHit(DPMCHit hit, Int_t trackID, Int_t index)
     return hit.fHitID;
 }
 
-void DPMCRawEvent::print()
+DPMCRawEvent& DPMCRawEvent::operator += (const DPMCRawEvent& event)
+{
+    Int_t nTracks = fNTracks;
+    Int_t nHits = fNHits[0];
+
+    for(UInt_t i = 0; i < event.fNDimuons; ++i)
+    {
+        DPMCDimuon* dimuon = (DPMCDimuon*)event.fDimuons->At(i);
+        dimuon->fPosTrackID = dimuon->fPosTrackID == -1 ? dimuon->fPosTrackID + nTracks : -1;
+        dimuon->fNegTrackID = dimuon->fNegTrackID == -1 ? dimuon->fNegTrackID + nTracks : -1;
+
+        addDimuon(*dimuon);
+    }
+
+    for(UInt_t i = 0; i < event.fNTracks; ++i)
+    {
+        DPMCTrack* track = (DPMCTrack*)event.fTracks->At(i);
+        track->fParentID += nTracks;
+        for(UInt_t j = 0; j < track->fHitIDs.size(); ++j)
+        {
+            track->fHitIDs[j] += nHits;
+        }
+
+        addTrack(*track);
+    }
+
+    for(UInt_t i = 0; i < event.fNHits[0]; ++i)
+    {
+        DPMCHit* hit = (DPMCHit*)event.fHits->At(i);
+        hit->fTrackID += nTracks;
+
+        addHit(*hit);
+    }
+
+    fEvtHeader.fSigWeight += event.fEvtHeader.fSigWeight;
+    return *this;
+}
+
+DPMCRawEvent& DPMCRawEvent::operator = (const DPMCRawEvent& event)
+{
+    clear();
+    fEvtHeader = event.fEvtHeader;
+
+    for(UInt_t i = 0; i < event.fNDimuons; ++i)
+    {
+        DPMCDimuon* dimuon = (DPMCDimuon*)event.fDimuons->At(i);
+        addDimuon(*dimuon);
+    }
+
+    for(UInt_t i = 0; i < event.fNTracks; ++i)
+    {
+        DPMCTrack* track = (DPMCTrack*)event.fTracks->At(i);
+        addTrack(*track);
+    }
+
+    for(UInt_t i = 0; i < event.fNHits[0]; ++i)
+    {
+        DPMCHit* hit = (DPMCHit*)event.fHits->At(i);
+        addHit(*hit);
+    }
+
+    return *this;
+}
+
+void DPMCRawEvent::print() const
 {
     using namespace std;
 

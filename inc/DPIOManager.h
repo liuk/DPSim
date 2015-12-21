@@ -76,6 +76,9 @@ private:
     TTree* configTree;
     DPMCRawEvent* rawEvent;
 
+    //temporary buffer of the single event
+    DPMCRawEvent* singleEvent;
+
     //container of tracks
     std::map<unsigned int, unsigned int> trackIDs; //maps real trackID to index in tracks vector
     std::list<DPVirtualHit> hits;

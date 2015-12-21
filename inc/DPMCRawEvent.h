@@ -140,8 +140,14 @@ public:
     UInt_t addTrack(DPMCTrack track, Int_t index = -1);
     UInt_t addHit(DPMCHit hit, Int_t trackID = -1, Int_t index = -1);
 
+    //combine multiple events
+    DPMCRawEvent& operator = (const DPMCRawEvent& event);
+
+    //copy one event
+    DPMCRawEvent& operator += (const DPMCRawEvent& event);
+
     //debugging output
-    void print();
+    void print() const;
 
 private:
     DPMCHeader fEvtHeader;

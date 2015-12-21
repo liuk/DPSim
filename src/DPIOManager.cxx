@@ -55,11 +55,23 @@ void DPIOManager::initialize(int runID)
     saveFile = new TFile(p_config->outputFileName.Data(), "recreate");
     saveTree = new TTree("save", "save");
 
-    saveTree->Branch("rawEvent", &rawEvent, 256000, 99);
-
     //Configuration tree
     configTree = new TTree("config", "config");
     configTree->Branch("config", &p_config, 256000, 99);
+
+    //event buffer for the singles mode only
+    if(p_config->dimuonMode)
+    {
+        saveTree->Branch("rawEvent", &rawEvent, 256000, 99);
+    }
+    else
+    {
+        singleEvent = new DPMCRawEvent();
+        singleEvent->eventHeader().fRunID = runID;
+        singleEvent->eventHeader().fSpillID = 0;
+
+        saveTree->Branch("rawEvent", &singleEvent, 256000, 99);
+    }
 
     //in case there is an external input for the custom input, need to attach the raw input tree as well
 }
@@ -137,14 +149,55 @@ void DPIOManager::fillOneEvent(const G4Event* theEvent)
         }
     }
 
-    //Pass the event through trigger simulation
-    p_triggerAna->analyzeTrigger(rawEvent);
+    //In dimuon mode, fill the raw event once per event
+    if(p_config->dimuonMode)
+    {
+        //Pass the event through trigger simulation
+        p_triggerAna->analyzeTrigger(rawEvent);
 
-    //save the event
+        //save the event
 #ifdef DEBUG_IO
-    rawEvent->print();
+        rawEvent->print();
 #endif
-    saveTree->Fill();
+        saveTree->Fill();
+    }
+    else //in singles mode, merge the events before fill
+    {
+        //special case of bucket_size == 1
+        if(p_config->bucket_size == 1)
+        {
+            saveTree->Fill();
+        }
+        else
+        {
+            int eventID = theEvent->GetEventID();
+            if(eventID % p_config->bucket_size == 0)
+            {
+#ifdef DEBUG_IO
+                std::cout << __FILE__ << " " << __FUNCTION__ << " singles mode, eventID = " << eventID
+                          << ", at the BOB" << std::endl;
+#endif
+                singleEvent->clear();
+                singleEvent->eventHeader().fEventID = eventID/p_config->bucket_size;
+                singleEvent->eventHeader().fSigWeight = 0.;
+            }
+
+            *singleEvent += (*rawEvent);
+
+            if((eventID + 1) % p_config->bucket_size == 0)
+            {
+#ifdef DEBUG_IO
+                std::cout << __FILE__ << " " << __FUNCTION__ << " singles mode, eventID = " << eventID
+                          << ", at the EOB" << std::endl;
+                singleEvent->print();
+#endif
+                p_triggerAna->analyzeTrigger(singleEvent);
+                saveTree->Fill();
+            }
+        }
+    }
+
+    //flush the buffer of TTree every 1000 entries
     if(saveTree->GetEntries() % 1000 == 0) saveTree->AutoSave("SaveSelf");
 }
 

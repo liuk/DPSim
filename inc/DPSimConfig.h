@@ -90,6 +90,10 @@ public:
     Int_t nEventsPhysics;
     Int_t nEventsAccepted;
 
+    //boolean flags used only internally
+    bool dimuonMode;
+    bool drellyanMode;
+
 private: //used only for parsing
     //general parser
     void parseConfig(TString configFile);

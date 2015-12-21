@@ -78,6 +78,9 @@ void DPSimConfig::init(TString configFile)
     nEventsPhysics = 0;
     nEventsAccepted = 0;
 
+    dimuonMode = (generatorType == "dimuon");
+    drellyanMode = (generatorEng == "legacyDY" || generatorEng == "PHSP");
+
     if(!sanityCheck()) exit(EXIT_FAILURE);
 }
 
@@ -118,6 +121,12 @@ bool DPSimConfig::sanityCheck()
     if(!checkFile(geometryGDMLInput))
     {
         std::cout << "ERROR: Geometry GDML not found!" << std::endl;
+        return false;
+    }
+
+    if(outputMode == "dimuon" && generatorType != "dimuon")
+    {
+        std::cout << "Output mode is not compatible with the generator type!" << std::endl;
         return false;
     }
 

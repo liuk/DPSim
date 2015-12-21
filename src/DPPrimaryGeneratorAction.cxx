@@ -81,7 +81,7 @@ DPPrimaryGeneratorAction::DPPrimaryGeneratorAction()
             std::cout << " Using Psip generator ..." << std::endl;
             p_generator = &DPPrimaryGeneratorAction::generatePsip;
         }
-        else if(p_config->generatorEng == "geant")
+        else if(p_config->generatorEng == "PHSP")
         {
             std::cout << " Using phase space generator ..." << std::endl;
             p_generator = &DPPrimaryGeneratorAction::generatePhaseSpace;
@@ -417,24 +417,21 @@ void DPPrimaryGeneratorAction::generatePythiaSingle()
 {
     p_config->nEventsPhysics++;
 
-    for(int i = 0; i < p_config->bucket_size; ++i)
+    double zvtx = p_vertexGen->generateVertex();
+    double pARatio = p_vertexGen->getPARatio();
+
+    Pythia8::Pythia* p_pythia = G4UniformRand() < pARatio ? &ppGen : &pnGen;
+    while(!p_pythia->next()) {}
+
+    for(int j = 1; j < p_pythia->event.size(); ++j)
     {
-        double zvtx = p_vertexGen->generateVertex();
-        double pARatio = p_vertexGen->getPARatio();
-
-        Pythia8::Pythia* p_pythia = G4UniformRand() < pARatio ? &ppGen : &pnGen;
-        while(!p_pythia->next()) {}
-
-        for(int j = 1; j < p_pythia->event.size(); ++j)
+        Pythia8::Particle par = p_pythia->event[j];
+        if(par.status() > 0 && par.id() != 22)
         {
-            Pythia8::Particle par = p_pythia->event[j];
-            if(par.status() > 0 && par.id() != 22)
-            {
-                particleGun->SetParticleDefinition(particleDict->FindParticle(par.id()));
-                particleGun->SetParticlePosition(G4ThreeVector(par.xProd()*mm, par.yProd()*mm, par.zProd()*mm + zvtx*cm));
-                particleGun->SetParticleMomentum(G4ThreeVector(par.px()*GeV, par.py()*GeV, par.pz()*GeV));
-                particleGun->GeneratePrimaryVertex(theEvent);
-            }
+            particleGun->SetParticleDefinition(particleDict->FindParticle(par.id()));
+            particleGun->SetParticlePosition(G4ThreeVector(par.xProd()*mm, par.yProd()*mm, par.zProd()*mm + zvtx*cm));
+            particleGun->SetParticleMomentum(G4ThreeVector(par.px()*GeV, par.py()*GeV, par.pz()*GeV));
+            particleGun->GeneratePrimaryVertex(theEvent);
         }
     }
 }
@@ -443,13 +440,10 @@ void DPPrimaryGeneratorAction::generateGeant4Single()
 {
     p_config->nEventsPhysics++;
 
-    for(int i = 0; i < p_config->bucket_size; ++i)
-    {
-        particleGun->SetParticleDefinition(proton);
-        particleGun->SetParticlePosition(G4ThreeVector(0., 0., -600*cm));
-        particleGun->SetParticleMomentum(G4ThreeVector(0., 0., p_config->beamMomentum*GeV));
-        particleGun->GeneratePrimaryVertex(theEvent);
-    }
+    particleGun->SetParticleDefinition(proton);
+    particleGun->SetParticlePosition(G4ThreeVector(0., 0., -600*cm));
+    particleGun->SetParticleMomentum(G4ThreeVector(0., 0., p_config->beamMomentum*GeV));
+    particleGun->GeneratePrimaryVertex(theEvent);
 }
 
 void DPPrimaryGeneratorAction::generatePhaseSpace()
@@ -515,7 +509,7 @@ bool DPPrimaryGeneratorAction::generateDimuon(double mass, double xF, DPMCDimuon
     {
         pT = pTmax*sqrt(G4UniformRand());
     }
-    else if(p_generator == &DPPrimaryGeneratorAction::generateDrellYan || p_generator == &DPPrimaryGeneratorAction::generatePhaseSpace)
+    else if(p_config->drellyanMode)
     {
         while(pT > pTmax) pT = DPGEN::pT0DY*sqrt(1./pow(G4UniformRand(), DPGEN::pTpowDY) - 1.);
     }

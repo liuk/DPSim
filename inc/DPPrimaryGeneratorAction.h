@@ -45,9 +45,6 @@ public:
     //Dimuon phase space generator
     bool generateDimuon(double mass, double xF, DPMCDimuon& dimuon);
 
-    //test if in dimuon mode
-    bool isInDimuonMode() { return dimuonMode; }
-
 private:
     //pointer to the configuration
     DPSimConfig* p_config;
@@ -80,7 +77,6 @@ private:
     //pointer to the real generator
     typedef void (DPPrimaryGeneratorAction::*GenPtr)();
     GenPtr p_generator;
-    bool dimuonMode;
 
     //Used for external input
     TFile* externalInputFile;
