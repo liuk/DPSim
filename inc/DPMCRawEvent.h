@@ -141,10 +141,10 @@ public:
     UInt_t addHit(DPMCHit hit, Int_t trackID = -1, Int_t index = -1);
 
     //combine multiple events
-    DPMCRawEvent& operator = (const DPMCRawEvent& event);
+    DPMCRawEvent& operator += (const DPMCRawEvent& event);
 
     //copy one event
-    DPMCRawEvent& operator += (const DPMCRawEvent& event);
+    DPMCRawEvent& operator = (const DPMCRawEvent& event);
 
     //debugging output
     void print() const;

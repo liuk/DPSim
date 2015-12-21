@@ -90,12 +90,15 @@ void DPMCTrack::addHit(DPMCHit& hit)
 DPMCRawEvent::DPMCRawEvent()
 {
     fDimuons = new TClonesArray("DPMCDimuon");
+    fDimuons->BypassStreamer();
     fNDimuons = 0;
 
     fTracks = new TClonesArray("DPMCTrack");
+    fTracks->BypassStreamer();
     fNTracks = 0;
 
     fHits = new TClonesArray("DPMCHit");
+    fHits->BypassStreamer();
     for(int i = 0; i <= NDETPLANES; ++i) fNHits[i] = 0;
 
     fEvtHeader.fRunID = -1;
