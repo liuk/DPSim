@@ -166,6 +166,7 @@ void DPIOManager::fillOneEvent(const G4Event* theEvent)
         //special case of bucket_size == 1
         if(p_config->bucket_size == 1)
         {
+            p_triggerAna->analyzeTrigger(rawEvent);
             saveTree->Fill();
         }
         else
