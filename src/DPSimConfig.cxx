@@ -41,6 +41,7 @@ void DPSimConfig::init(TString configFile)
     mysqlPort = pInt("mysqlPort", 3306);
     login = pString("login");
     password = pString("password");
+    if(password == "N/A") password = "";
 
     triggerMatrix = pString("triggerMatrix");
 

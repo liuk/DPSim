@@ -28,6 +28,7 @@
 *.pyc
 
 # generated geometry files
+*.gdml
 
 # build folder
 build
