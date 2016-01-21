@@ -67,7 +67,7 @@ private:
     DPTriggerAnalyzer* p_triggerAna;
 
     //save mode
-    enum SaveMode {EVERYTHING, HITSONLY, INACCONLY};
+    enum SaveMode {EVERYTHING, PRIMARY, HITSONLY, INACCONLY};
     SaveMode saveMode;
 
     //Output file

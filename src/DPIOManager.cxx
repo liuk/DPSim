@@ -22,6 +22,10 @@ DPIOManager::DPIOManager(): saveFile(NULL), saveTree(NULL), rawEvent(NULL)
     {
         saveMode = EVERYTHING;
     }
+    else if(p_config->outputMode == "primary")
+    {
+        saveMode = PRIMARY;
+    }
     else if(p_config->outputMode == "hits")
     {
         saveMode = HITSONLY;
@@ -287,6 +291,11 @@ void DPIOManager::reIndex()
         if(saveMode == EVERYTHING)
         {
             iter->second = true;
+            continue;
+        }
+        else if(saveMode == PRIMARY)
+        {
+            iter->second = (iter->first.fParentID == 0);
             continue;
         }
 
