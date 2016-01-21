@@ -143,7 +143,7 @@ void DPIOManager::fillOneEvent(const G4Event* theEvent)
 #endif
         if(iter->second) rawEvent->addTrack(iter->first);
     }
-    if(saveMode == HITSONLY && rawEvent->getNTracks() < 1) return;
+    if((saveMode == HITSONLY || saveMode == PRIMARY) && rawEvent->getNTracks() < 1) return;
 
     for(std::list<DPVirtualHit>::iterator iter = hits.begin(); iter != hits.end(); ++iter)
     {
