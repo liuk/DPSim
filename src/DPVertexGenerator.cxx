@@ -79,39 +79,6 @@ DPVertexGenerator::DPVertexGenerator()
 
 void DPVertexGenerator::init()
 {
-    //set the z range according to the config
-    double z_up = -1000;
-    double z_down = 500.;
-    if(p_config->instruInBeam)
-    {
-        z_up = -1000.;
-    }
-    else if(p_config->targetInBeam)
-    {
-        z_up = -170.;
-    }
-    else if(p_config->dumpInBeam)
-    {
-        z_up = 0.;
-    }
-
-    if(p_config->dumpInBeam)
-    {
-        z_down = 500.;
-    }
-    else if(p_config->targetInBeam)
-    {
-        z_down = 0.;
-    }
-    else if(p_config->instruInBeam)
-    {
-        z_down = -170.;
-    }
-
-#ifdef DEBUG_IN
-    std::cout << "Upstream objects between " << z_up << "cm and " << z_down << "cm will be seen by beam." << std::endl;
-#endif
-
     //Traverse the geometry tree to get all the volumes and hence their materials
     const G4VPhysicalVolume* world = ((DPDetectorConstruction*)G4RunManager::GetRunManager()->GetUserDetectorConstruction())->GetWorldPtr();
     const G4LogicalVolume* worldLogical = world->GetLogicalVolume();
@@ -121,10 +88,15 @@ void DPVertexGenerator::init()
     {
         const G4VPhysicalVolume* pv = worldLogical->GetDaughter(i);
         G4ThreeVector pos = pv->GetObjectTranslation();
-        if(fabs(pos.x()/cm) > 1. || fabs(pos.y()/cm) > 1. || pos.z()/cm < z_up || pos.z()/cm > z_down) continue;
+        if(fabs(pos.x()/cm) > 1. || fabs(pos.y()/cm) > 1.) continue;    //interactables must be in the beam line
+
+        TString name = pv->GetName();
+        if(p_config->targetInBeam && !name.Contains("T_")) continue;
+        if(p_config->dumpInBeam && !name.Contains("D_")) continue;
+        if(p_config->instruInBeam && !name.Contains("I_")) continue;
 
         DPBeamLineObject newObj(pv->GetLogicalVolume()->GetMaterial());
-        newObj.name = pv->GetName();
+        newObj.name = name;
         newObj.z0 = pos.z()/cm;
         if(newObj.z0 < 0.)
         {

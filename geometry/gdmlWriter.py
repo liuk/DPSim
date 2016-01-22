@@ -16,6 +16,9 @@ parser.add_option('-s', '--server', type = 'string', dest = 'server', help = 'My
 parser.add_option('-p', '--port', type = 'int', dest = 'port', help = 'MySQL port', default = 3306)
 (options, args) = parser.parse_args()
 
+## process target name to make sure the type prefix is added
+options.target = 'T_' + options.target.replace('T_', '') 
+
 ## connect the database
 con = MySQLdb.connect(host = options.server, port = options.port, user = 'seaguest', passwd = 'qqbar2mu+mu-', db = options.input, sql_mode=' ')
 cur = con.cursor()
