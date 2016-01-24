@@ -15,6 +15,7 @@ DPIOManager::DPIOManager(): saveFile(NULL), saveTree(NULL), rawEvent(NULL)
     p_config = DPSimConfig::instance();
     p_digitizer = DPDigitizer::instance();
     p_triggerAna = DPTriggerAnalyzer::instance();
+    p_dummyRecon = p_config->enableDummyRecon ? new DPDummyRecon() : NULL;
     sensHitColID = -1;
 
     saveMode = HITSONLY;
@@ -46,6 +47,7 @@ DPIOManager::~DPIOManager()
     if(saveFile != NULL) delete saveFile;
 
     if(p_triggerAna != NULL) delete p_triggerAna;
+    if(p_dummyRecon != NULL) delete p_dummyRecon;
 }
 
 void DPIOManager::initialize(int runID)
@@ -156,22 +158,17 @@ void DPIOManager::fillOneEvent(const G4Event* theEvent)
     //In dimuon mode, fill the raw event once per event
     if(p_config->dimuonMode)
     {
-        //Pass the event through trigger simulation
-        p_triggerAna->analyzeTrigger(rawEvent);
-
-        //save the event
 #ifdef DEBUG_IO
         rawEvent->print();
 #endif
-        saveTree->Fill();
+        finalizeEvent();
     }
     else //in singles mode, merge the events before fill
     {
         //special case of bucket_size == 1
         if(p_config->bucket_size == 1)
         {
-            p_triggerAna->analyzeTrigger(rawEvent);
-            saveTree->Fill();
+            finalizeEvent();
         }
         else
         {
@@ -196,11 +193,23 @@ void DPIOManager::fillOneEvent(const G4Event* theEvent)
                           << ", at the EOB" << std::endl;
                 singleEvent->print();
 #endif
-                p_triggerAna->analyzeTrigger(singleEvent);
-                saveTree->Fill();
+                finalizeEvent();
             }
         }
     }
+
+    //flush the buffer of TTree every 1000 entries
+    if(saveTree->GetEntries() % 1000 == 0) saveTree->AutoSave("SaveSelf");
+}
+
+void DPIOManager::finalizeEvent()
+{
+    //Pass the event through post-simulation analysis
+    p_triggerAna->analyzeTrigger(rawEvent);
+    if(p_config->enableDummyRecon) p_dummyRecon->reconstruct(rawEvent);
+
+    //save the event
+    saveTree->Fill();
 
     //flush the buffer of TTree every 1000 entries
     if(saveTree->GetEntries() % 1000 == 0) saveTree->AutoSave("SaveSelf");

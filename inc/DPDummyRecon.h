@@ -1,8 +1,6 @@
 #ifndef DPDummyRecon_H
 #define DPDummyRecon_H
 
-#include <vector>
-
 #include "G4ErrorPropagator.hh"
 #include "G4ErrorPropagatorData.hh"
 #include "G4ErrorPropagatorManager.hh"
@@ -20,7 +18,7 @@ public:
     DPDummyRecon();
 
     //Reconstruct one event
-    std::vector<DPMCDimuon> reconstruct(DPMCRawEvent* rawEvent);
+    void reconstruct(DPMCRawEvent* rawEvent);
 
     //Set the initial particle and pos/mom
     void setParticle(int pdgCode, G4ThreeVector pos, G4ThreeVector mom);

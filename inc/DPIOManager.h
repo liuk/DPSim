@@ -16,6 +16,7 @@
 #include "DPSimConfig.h"
 #include "DPDigitizer.h"
 #include "DPTriggerAnalyzer.h"
+#include "DPDummyRecon.h"
 #include "DPMCRawEvent.h"
 #include "DPVirtualHit.h"
 
@@ -38,6 +39,9 @@ public:
 
     //Fill one event, called at the end of each event
     void fillOneEvent(const G4Event*);
+
+    //apply all the analysis module enabled, then push the event to tree
+    void finalizeEvent();
 
     //Fill one track, called at the beginning of each track
     void fillOneTrack(const DPMCTrack& mcTrack, bool keep = false);
@@ -65,6 +69,9 @@ private:
 
     //Pointer to the trigger analyzer
     DPTriggerAnalyzer* p_triggerAna;
+
+    //Pointer to dummy reconstruction
+    DPDummyRecon* p_dummyRecon;
 
     //save mode
     enum SaveMode {EVERYTHING, PRIMARY, HITSONLY, INACCONLY};

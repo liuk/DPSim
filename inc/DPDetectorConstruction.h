@@ -18,8 +18,8 @@ public:
     virtual G4VPhysicalVolume* Construct();
     virtual void ConstructSDandField();
 
-    //helper function to extract world volume pointer and access geometry 
-    const G4VPhysicalVolume* GetWorldPtr() { return physicalWorld; }
+    //helper function to extract world volume pointer and access geometry
+    G4VPhysicalVolume* GetWorldPtr() { return physicalWorld; }
 
 private:
     //pointer to the physical volume

@@ -117,7 +117,7 @@ DPMCRawEvent::~DPMCRawEvent()
 void DPMCRawEvent::clear(bool partial)
 {
     fHits->Clear();
-    if(particle) return;
+    if(partial) return;
 
     fNDimuons = 0;
     fNTracks = 0;
@@ -125,6 +125,8 @@ void DPMCRawEvent::clear(bool partial)
 
     fDimuons->Clear();
     fTracks->Clear();
+
+    fRecDimuons->Clear();
 
     fEvtHeader.fEventID = -1;
     fEvtHeader.fTriggerBit = 0;
@@ -167,6 +169,16 @@ UInt_t DPMCRawEvent::addHit(DPMCHit hit, Int_t trackID, Int_t index)
     }
 
     return hit.fHitID;
+}
+
+UInt_t DPMCRawEvent::addRecDimuon(DPMCDimuon dimuon, Int_t index)
+{
+    dimuon.fDimuonID = index > 0 ? index : fNRecDimuons;
+
+    TClonesArray& Dimuons = *fRecDimuons;
+    new(Dimuons[fNRecDimuons++]) DPMCDimuon(dimuon);
+
+    return dimuon.fDimuonID;
 }
 
 DPMCRawEvent& DPMCRawEvent::operator += (const DPMCRawEvent& event)

@@ -73,6 +73,9 @@ public:
     TString outputFileName;   // The database name that output goes to
     TString outputMode;       // save what kind of events to disk
 
+    //Optional analysis component enable flag
+    bool enableDummyRecon;    // enable the dummy reconstruction
+
     //phase space constrain
     Double_t x1Min;
     Double_t x1Max;

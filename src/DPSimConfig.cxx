@@ -64,6 +64,8 @@ void DPSimConfig::init(TString configFile)
     outputFileName = pString("outputFileName");
     outputMode = pString("outputMode");
 
+    enableDummyRecon = pBool("enableDummyRecon", false);
+
     x1Min = pDouble("x1Min", 0.);
     x1Max = pDouble("x1Max", 1.);
     x2Min = pDouble("x2Min", 0.);

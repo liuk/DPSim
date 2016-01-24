@@ -32,3 +32,5 @@ Following arguments can be specified in cmake:
   - `-DDEBUG_IO=ON (default: OFF)`: this will enable debugging output during I/O process
 
 After that, the executable file `DPSim` will be produced under `build/bin`, and can be used like `./bin/DPSim run_configuration`, an exmaple configuration file is provided under `DPSim/conf/example.conf`, with self-explainary options. A shared library `libRawMCEvent` will be produced under `build/lib`, optionally one can use `make install` to install the header and shared library to ROOT header and library places, as specified by `root-config --prefix`.
+
+### Generating GDML files 

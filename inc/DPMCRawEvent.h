@@ -140,6 +140,13 @@ public:
     UInt_t addTrack(DPMCTrack track, Int_t index = -1);
     UInt_t addHit(DPMCHit hit, Int_t trackID = -1, Int_t index = -1);
 
+    //Dummy recon part
+    UInt_t getNRecDimuons() { return fNRecDimuons; }
+    TClonesArray* getRecDimuons() { return fRecDimuons; }
+    DPMCDimuon getRecDimuon(Int_t i) { return *(DPMCDimuon*)fRecDimuons->At(i); }
+
+    UInt_t addRecDimuon(DPMCDimuon dimuon, Int_t index = -1);
+
     //combine multiple events
     DPMCRawEvent& operator += (const DPMCRawEvent& event);
 
@@ -154,6 +161,9 @@ private:
 
     UInt_t fNDimuons;
     TClonesArray* fDimuons;
+
+    UInt_t fNRecDimuons;
+    TClonesArray* fRecDimuons;
 
     UInt_t fNTracks;
     TClonesArray* fTracks;
