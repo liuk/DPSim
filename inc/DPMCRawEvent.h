@@ -120,7 +120,7 @@ public:
     virtual ~DPMCRawEvent();
 
     //re-initialize all the IDs and container
-    void clear();
+    void clear(bool partial = false);
 
     DPMCHeader& eventHeader() { return fEvtHeader; }
 

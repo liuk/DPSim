@@ -114,15 +114,17 @@ DPMCRawEvent::~DPMCRawEvent()
     delete fHits;
 }
 
-void DPMCRawEvent::clear()
+void DPMCRawEvent::clear(bool partial)
 {
+    fHits->Clear();
+    if(particle) return;
+
     fNDimuons = 0;
     fNTracks = 0;
     for(int i = 0; i <= NDETPLANES; ++i) fNHits[i] = 0;
 
     fDimuons->Clear();
     fTracks->Clear();
-    fHits->Clear();
 
     fEvtHeader.fEventID = -1;
     fEvtHeader.fTriggerBit = 0;
