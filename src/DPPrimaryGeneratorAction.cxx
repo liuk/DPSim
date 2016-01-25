@@ -111,7 +111,7 @@ DPPrimaryGeneratorAction::DPPrimaryGeneratorAction()
             ppGen.init(2212, 2212, 120., 0.);
             pnGen.init(2212, 2112, 120., 0.);
         }
-        else if(p_config->generatorType == "custom")
+        else if(p_config->generatorEng == "custom")
         {
             std::cout << " Using custom LUT dimuon generator ..." << std::endl;
             p_generator = &DPPrimaryGeneratorAction::generateCustomDimuon;
