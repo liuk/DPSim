@@ -101,6 +101,10 @@ DPMCRawEvent::DPMCRawEvent()
     fHits->BypassStreamer();
     for(int i = 0; i <= NDETPLANES; ++i) fNHits[i] = 0;
 
+    fRecDimuons = new TClonesArray("DPMCDimuon");
+    fRecDimuons->BypassStreamer();
+    fNRecDimuons = 0;
+
     fEvtHeader.fRunID = -1;
     fEvtHeader.fSpillID = -1;
     fEvtHeader.fEventID = -1;

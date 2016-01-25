@@ -91,9 +91,9 @@ void DPVertexGenerator::init()
         if(fabs(pos.x()/cm) > 1. || fabs(pos.y()/cm) > 1.) continue;    //interactables must be in the beam line
 
         TString name = pv->GetName();
-        if(p_config->targetInBeam && !name.Contains("T_")) continue;
-        if(p_config->dumpInBeam && !name.Contains("D_")) continue;
-        if(p_config->instruInBeam && !name.Contains("I_")) continue;
+        if(!((p_config->targetInBeam && name.Contains("T_")) ||
+             (p_config->dumpInBeam   && name.Contains("D_"))  ||
+             (p_config->instruInBeam && name.Contains("I_")))) continue;
 
         DPBeamLineObject newObj(pv->GetLogicalVolume()->GetMaterial());
         newObj.name = name;
