@@ -40,8 +40,7 @@ void DPSimConfig::init(TString configFile)
     mysqlServer = pString("mysqlServer");
     mysqlPort = pInt("mysqlPort", 3306);
     login = pString("login");
-    password = pString("password");
-    if(password == "N/A") password = "";
+    password = pString("password", "");
 
     triggerMatrix = pString("triggerMatrix");
 
@@ -54,6 +53,7 @@ void DPSimConfig::init(TString configFile)
     generatorEng = pString("generatorEng");
     externalInput = pString("externalInput");
     pythiaConfig = pString("pythiaConfig");
+    customLUT = pString("customLUT");
 
     targetInBeam = pBool("targetInBeam", true);
     dumpInBeam = pBool("dumpInBeam", false);
@@ -76,6 +76,8 @@ void DPSimConfig::init(TString configFile)
     massMax = pDouble("massMax", 10.);
     cosThetaMin = pDouble("cosThetaMin", -1.);
     cosThetaMax = pDouble("cosThetaMax", 1.);
+    zOffsetMin = pDouble("zOffsetMin", 1.);
+    zOffsetMax = pDouble("zOffsetMax", -1.);
 
     nEventsThrown = 0;
     nEventsPhysics = 0;
@@ -100,6 +102,12 @@ bool DPSimConfig::sanityCheck()
     if(generatorType == "pythia" && (!checkFile(pythiaConfig)))
     {
         std::cout << "ERROR: Pythia configuration not found!" << std::endl;
+        return false;
+    }
+
+    if(generatorType == "dimuon" && generatorEng == "custom" && (!checkFile(customLUT)))
+    {
+        std::cout << "ERROR: Custom dimuon cross section lookup table not found!" << std::endl;
         return false;
     }
 
@@ -202,10 +210,10 @@ TString DPSimConfig::expandEnv(const TString& input) const
     return output;
 }
 
-TString DPSimConfig::pString(TString name)
+TString DPSimConfig::pString(TString name, TString default_val)
 {
     if(symbols.find(name) != symbols.end()) return symbols[name];
-    return TString("N/A");
+    return default_val;
 }
 
 bool DPSimConfig::pBool(TString name, bool default_val)

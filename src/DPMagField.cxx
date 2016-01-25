@@ -55,6 +55,7 @@ DPFieldMap::DPFieldMap(G4String name, G4String fieldMapFile, double strength, do
                            ny, ymin - 0.5*(ymax - ymin)/(ny-1), ymax + 0.5*(ymax - ymin)/(ny-1),
                            nz, zmin - 0.5*(zmax - zmin)/(nz-1), zmax + 0.5*(zmax - zmin)/(nz-1));
     }
+
     while(getline(fin, line))
     {
         double x, y, z, bx, by, bz;

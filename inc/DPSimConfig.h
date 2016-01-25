@@ -61,6 +61,7 @@ public:
     TString generatorEng;     // The generator engine, legacyDY/legacyJPsi/legacyPsip/pythia/geant
     TString externalInput;    // Input ROOT file containing the generator info
     TString pythiaConfig;     // pythia configuration file
+    TString customLUT;        // custom dimuon cross section look-up table, used in custom mode
 
     //Beam line objects setup
     bool targetInBeam;
@@ -87,6 +88,8 @@ public:
     Double_t massMax;
     Double_t cosThetaMin;
     Double_t cosThetaMax;
+    Double_t zOffsetMin;
+    Double_t zOffsetMax;
 
     //Run-accumulated variables
     Int_t nEventsThrown;
@@ -103,7 +106,7 @@ private: //used only for parsing
     TString expandEnv(const TString& input) const;
 
     // get string/bool/float/int config entry
-    TString  pString(TString name);
+    TString  pString(TString name, TString default_val = "N/A");
     bool     pBool(TString name, bool default_val);
     Double_t pDouble(TString name, Double_t default_val);
     Int_t    pInt(TString name, Int_t default_val);

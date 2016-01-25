@@ -1,5 +1,8 @@
 #include "DPPrimaryGeneratorAction.h"
 
+#include <fstream>
+#include <string>
+
 #include "Randomize.hh"
 #include "G4SystemOfUnits.hh"
 #include "G4PhysicalConstants.hh"
@@ -108,9 +111,48 @@ DPPrimaryGeneratorAction::DPPrimaryGeneratorAction()
             ppGen.init(2212, 2212, 120., 0.);
             pnGen.init(2212, 2112, 120., 0.);
         }
+        else if(p_config->generatorType == "custom")
+        {
+            std::cout << " Using custom LUT dimuon generator ..." << std::endl;
+            p_generator = &DPPrimaryGeneratorAction::generateCustomDimuon;
+
+            //read and parse the lookup table
+            std::ifstream fin(p_config->customLUT.Data());
+            std::cout << " Initializing custom dimuon cross section from LUT " << p_config->customLUT << std::endl;
+
+            //Load the range and number of bins in each dimension
+            std::string line;
+            int n;
+            double m_min, m_max, xF_min, xF_max;
+            double m_bin, xF_bin;
+
+            getline(fin, line);
+            stringstream ss(line);
+            ss >> n >> m_min >> m_max >> m_bin >> xF_min >> xF_max >> xF_bin;
+
+            //test if the range is acceptable
+            if(p_config->massMin < m_min || p_config->massMax > m_max || p_config->xfMin < xF_min || p_config->xfMax > xF_max)
+            {
+                std::cout << " ERROR: the specified phase space limits are larger than LUT limits!" << std::endl;
+                exit(EXIT_FAILURE);
+            }
+
+            lut = new TGraph2D(n);
+            int nPoints = 0;
+            while(getline(fin, line))
+            {
+                double mass, xF, xsec;
+
+                stringstream ss(line);
+                ss >> mass >> xF >> xsec;
+                xsec *= (m_bin*xF_bin);
+
+                lut->SetPoint(nPoints++, mass, xF, xsec);
+            }
+        }
         else
         {
-            std::cout << "ERROR: Generator engine is not set or not supported in dimuon mode" << std::endl;
+            std::cout << "ERROR: Generator engine is not set or ncd /seaot supported in dimuon mode" << std::endl;
             exit(EXIT_FAILURE);
         }
     }
@@ -170,6 +212,7 @@ DPPrimaryGeneratorAction::~DPPrimaryGeneratorAction()
 {
     delete pdf;
     delete particleGun;
+    if(p_config->generatorType == "custom") delete lut;
 }
 
 void DPPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
@@ -370,6 +413,34 @@ void DPPrimaryGeneratorAction::generateDarkPhotonFromEta()
             ++nEtas;
         }
     }
+}
+
+void DPPrimaryGeneratorAction::generateCustomDimuon()
+{
+    DPMCDimuon dimuon;
+    double mass = G4UniformRand()*(p_config->massMax - p_config->massMin) + p_config->massMin;
+    double xF = G4UniformRand()*(p_config->xfMax - p_config->xfMin) + p_config->xfMin;
+    if(!generateDimuon(mass, xF, dimuon)) return;
+    p_vertexGen->generateVertex(dimuon);
+
+    p_config->nEventsPhysics++;
+
+    particleGun->SetParticleDefinition(mup);
+    particleGun->SetParticlePosition(G4ThreeVector(dimuon.fVertex.X()*cm, dimuon.fVertex.Y()*cm, dimuon.fVertex.Z()*cm));
+    particleGun->SetParticleMomentum(G4ThreeVector(dimuon.fPosMomentum.X()*GeV, dimuon.fPosMomentum.Y()*GeV, dimuon.fPosMomentum.Z()*GeV));
+    particleGun->GeneratePrimaryVertex(theEvent);
+
+    particleGun->SetParticleDefinition(mum);
+    particleGun->SetParticlePosition(G4ThreeVector(dimuon.fVertex.X()*cm, dimuon.fVertex.Y()*cm, dimuon.fVertex.Z()*cm));
+    particleGun->SetParticleMomentum(G4ThreeVector(dimuon.fNegMomentum.X()*GeV, dimuon.fNegMomentum.Y()*GeV, dimuon.fNegMomentum.Z()*GeV));
+    particleGun->GeneratePrimaryVertex(theEvent);
+
+    //calculate the cross section
+    double xsec = lut->Interpolate(mass, xF)*p_vertexGen->getLuminosity();
+
+    dimuon.fPosTrackID = 1;
+    dimuon.fNegTrackID = 2;
+    p_IOmamnger->fillOneDimuon(xsec, dimuon);
 }
 
 void DPPrimaryGeneratorAction::generatePythiaDimuon()

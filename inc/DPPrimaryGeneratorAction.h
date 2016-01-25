@@ -16,6 +16,7 @@
 #include <TClonesArray.h>
 #include <TGenPhaseSpace.h>
 #include <TVector3.h>
+#include <TGraph2D.h>
 
 #include "DPSimConfig.h"
 #include "DPIOManager.h"
@@ -36,6 +37,7 @@ public:
     void generatePsip();
     void generateDarkPhotonFromEta();
     void generatePythiaDimuon();
+    void generateCustomDimuon();
     void generatePythiaSingle();
     void generateGeant4Single();
     void generatePhaseSpace();
@@ -66,6 +68,9 @@ private:
 
     //ROOT phase space generator
     TGenPhaseSpace phaseGen;
+
+    //ROOT TGraph2D based 2-D interpolation
+    TGraph2D* lut;
 
     //PDFs
     LHAPDF::PDF* pdf;

@@ -182,7 +182,8 @@ void DPVertexGenerator::init()
 double DPVertexGenerator::generateVertex()
 {
     findInteractingPiece();
-    return interactables[index].getZ();
+    double zOffset = p_config->zOffsetMin < p_config->zOffsetMax ? p_config->zOffsetMin + G4UniformRand()*(p_config->zOffsetMax - p_config->zOffsetMin) : 0.;
+    return interactables[index].getZ() + zOffset;
 }
 
 void DPVertexGenerator::generateVertex(DPMCDimuon& dimuon)
@@ -193,6 +194,12 @@ void DPVertexGenerator::generateVertex(DPMCDimuon& dimuon)
     dimuon.fVertex.SetY(G4RandGauss::shoot(0., 1.5));
     dimuon.fVertex.SetZ(interactables[index].getZ());
     dimuon.fOriginVol = interactables[index].name;
+
+    if(p_config->zOffsetMin < p_config->zOffsetMax)
+    {
+        double zOffset = p_config->zOffsetMin + G4UniformRand()*(p_config->zOffsetMax - p_config->zOffsetMin);
+        dimuon.fVertex.SetZ(interactables[index].getZ() + zOffset);
+    }
 }
 
 void DPVertexGenerator::findInteractingPiece()

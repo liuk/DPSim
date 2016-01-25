@@ -22,7 +22,7 @@ void DPTrackingAction::PreUserTrackingAction(const G4Track* theTrack)
     DPMCTrack mcTrack;
     mcTrack.fTrackID = theTrack->GetTrackID();
     mcTrack.fParentID = theTrack->GetParentID();
-    mcTrack.fCharge = theTrack->GetDefinition()->GetPDGCharge();
+    mcTrack.fCharge = int(theTrack->GetDefinition()->GetPDGCharge());
     mcTrack.fPDGCode = theTrack->GetDefinition()->GetPDGEncoding();
     mcTrack.fOriginVol = theTrack->GetVolume()->GetName();
 
