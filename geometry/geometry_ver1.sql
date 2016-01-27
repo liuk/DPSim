@@ -178,6 +178,7 @@ DROP TABLE IF EXISTS `Targets`;
 CREATE TABLE `Targets` (
   `targetID` int(11) NOT NULL,
   `targetName` varchar(10) NOT NULL,
+  `material` varchar(8) NOT NULL,
   `nPieces` int(11) NOT NULL,
   `length` float NOT NULL,
   `spacing` float NOT NULL,
@@ -192,7 +193,7 @@ CREATE TABLE `Targets` (
 
 LOCK TABLES `Targets` WRITE;
 /*!40000 ALTER TABLE `Targets` DISABLE KEYS */;
-INSERT INTO `Targets` VALUES (1,'T_LH2',1,50.8,0,3.81,-129.54),(3,'T_LD2',1,50.8,0,3.81,-129.54),(5,'T_Iron',3,0.635,17.018,2.54,-129.54),(6,'T_Carbon',3,1.10744,17.018,2.54,-129.54),(7,'T_Tungsten',3,0.3175,17.018,2.54,-129.54),(8,'T_Ammonia',1,8,0,2,-330);
+INSERT INTO `Targets` VALUES (1,'T_LH2','LH2',1,50.8,0,3.81,-129.54),(3,'T_LD2','LD2',1,50.8,0,3.81,-129.54),(5,'T_Iron','Iron',3,0.635,17.018,2.54,-129.54),(6,'T_Carbon','Carbon',3,1.10744,17.018,2.54,-129.54),(7,'T_Tungsten','Tungsten',3,0.3175,17.018,2.54,-129.54),(8,'T_Ammonia','Ammonia',1,8,0,2,-330);
 /*!40000 ALTER TABLE `Targets` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -205,4 +206,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-01-26 20:45:23
+-- Dump completed on 2016-01-27  3:08:13

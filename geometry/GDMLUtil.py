@@ -19,7 +19,7 @@ query_logic = (
     'UNION '
     'SELECT volumeName,material,0,"Red" FROM Nondetectors '
     'UNION '
-    'SELECT targetName,targetName,0,"Black" FROM Targets '
+    'SELECT targetName,material,0,"Black" FROM Targets '
     'UNION '
     'SELECT instruName,material,0,"Green" FROM Instrumentation')
 query_phys = (
