@@ -52,7 +52,7 @@ DROP TABLE IF EXISTS `Instrumentation`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `Instrumentation` (
-  `instruName` varchar(12) NOT NULL,
+  `instruName` varchar(14) NOT NULL,
   `radius` float NOT NULL,
   `length` float NOT NULL,
   `xPos` int(11) NOT NULL,
@@ -68,7 +68,7 @@ CREATE TABLE `Instrumentation` (
 
 LOCK TABLES `Instrumentation` WRITE;
 /*!40000 ALTER TABLE `Instrumentation` DISABLE KEYS */;
-INSERT INTO `Instrumentation` VALUES ('CerenkovBody',6.625,31.7,0,0,-855.03,'ArCO2'),('CerenkovWinF',6.625,0.0254,0,0,-870.884,'Titanium'),('CerenkovWinB',6.625,0.00762,0,0,-839.177,'Titanium'),('SWIC',6.625,0.0065,0,0,-836.517,'Tungsten'),('HeliumBag1',6.625,486.5,0,0,-577.25,'Helium'),('HeliumBag2',6.625,115.1,0,0,-268.45,'Helium'),('HeliumWinF',6.625,0.0254,0,0,-820.513,'Titanium'),('HeliumWinB',6.625,0.0254,0,0,-210.887,'Titanium');
+INSERT INTO `Instrumentation` VALUES ('I_CerenkovBody',6.625,31.7,0,0,-855.03,'ArCO2'),('I_CerenkovWinF',6.625,0.0254,0,0,-870.884,'Titanium'),('I_CerenkovWinB',6.625,0.00762,0,0,-839.177,'Titanium'),('I_SWIC',6.625,0.0065,0,0,-836.517,'Tungsten'),('I_HeliumBag1',6.625,486.5,0,0,-577.25,'Helium'),('I_HeliumBag2',6.625,115.1,0,0,-268.45,'Helium'),('I_HeliumWinF',6.625,0.0254,0,0,-820.513,'Titanium'),('I_HeliumWinB',6.625,0.0254,0,0,-210.887,'Titanium');
 /*!40000 ALTER TABLE `Instrumentation` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -124,7 +124,7 @@ CREATE TABLE `Nondetectors` (
 
 LOCK TABLES `Nondetectors` WRITE;
 /*!40000 ALTER TABLE `Nondetectors` DISABLE KEYS */;
-INSERT INTO `Nondetectors` VALUES ('Absorber','Absorber',320.04,345.44,99.568,0,0,2028.19,'Iron'),('Fmag','FMagCore',160.02,129.54,502.92,0,0,251.46,'Iron'),('FMag','FMagLeft',160.02,129.54,490.22,-233.68,0,251.46,'Iron'),('FMag','FMagRight',160.02,129.54,490.22,233.68,0,251.46,'Iron'),('FMag','FMagTop',502.92,86.36,480.06,0,107.95,251.46,'Iron'),('FMag','FMagBottom',502.92,86.36,480.06,0,-107.95,251.46,'Iron'),('FMag','FMagCoilLeft',73.66,129.54,490.22,-116.84,0,251.46,'Aluminium'),('FMag','FMagCoilRight',73.66,129.54,490.22,116.84,0,251.46,'Aluminium');
+INSERT INTO `Nondetectors` VALUES ('Absorber','Absorber',320.04,345.44,99.568,0,0,2028.19,'Iron'),('Fmag','D_FMagCore',160.02,129.54,502.92,0,0,251.46,'Iron'),('FMag','FMagLeft',160.02,129.54,490.22,-233.68,0,251.46,'Iron'),('FMag','FMagRight',160.02,129.54,490.22,233.68,0,251.46,'Iron'),('FMag','FMagTop',502.92,86.36,480.06,0,107.95,251.46,'Iron'),('FMag','FMagBottom',502.92,86.36,480.06,0,-107.95,251.46,'Iron'),('FMag','FMagCoilLeft',73.66,129.54,490.22,-116.84,0,251.46,'Aluminium'),('FMag','FMagCoilRight',73.66,129.54,490.22,116.84,0,251.46,'Aluminium');
 /*!40000 ALTER TABLE `Nondetectors` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -177,7 +177,7 @@ DROP TABLE IF EXISTS `Targets`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `Targets` (
   `targetID` int(11) NOT NULL,
-  `targetName` varchar(8) NOT NULL,
+  `targetName` varchar(10) NOT NULL,
   `nPieces` int(11) NOT NULL,
   `length` float NOT NULL,
   `spacing` float NOT NULL,
@@ -192,7 +192,7 @@ CREATE TABLE `Targets` (
 
 LOCK TABLES `Targets` WRITE;
 /*!40000 ALTER TABLE `Targets` DISABLE KEYS */;
-INSERT INTO `Targets` VALUES (1,'LH2',1,50.8,0,3.81,-129.54),(3,'LD2',1,50.8,0,3.81,-129.54),(5,'Iron',3,0.635,17.018,2.54,-129.54),(6,'Carbon',3,1.10744,17.018,2.54,-129.54),(7,'Tungsten',3,0.3175,17.018,2.54,-129.54),(8,'Ammonia',1,8,0,2,-330);
+INSERT INTO `Targets` VALUES (1,'T_LH2',1,50.8,0,3.81,-129.54),(3,'T_LD2',1,50.8,0,3.81,-129.54),(5,'T_Iron',3,0.635,17.018,2.54,-129.54),(6,'T_Carbon',3,1.10744,17.018,2.54,-129.54),(7,'T_Tungsten',3,0.3175,17.018,2.54,-129.54),(8,'T_Ammonia',1,8,0,2,-330);
 /*!40000 ALTER TABLE `Targets` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -205,4 +205,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-01-21  2:12:10
+-- Dump completed on 2016-01-26 20:45:23

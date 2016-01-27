@@ -32,3 +32,5 @@
 
 # build folder
 build
+
+.clang_complete
