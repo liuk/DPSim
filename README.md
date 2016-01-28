@@ -19,9 +19,11 @@ DPSim relies on following packages:
 
 With all the packages above provided, DPSim uses cmake to build. A typical installation process goes like this:
 
-  - `git clone https://github.com/liuk/DPSim.git DPSim`
-  - `cd DPSim; mkdir build; cd build`
-  - `cmake ..; make`
+  ```
+  git clone https://github.com/liuk/DPSim.git DPSim
+  cd DPSim; mkdir build; cd build
+  cmake ..; make
+  ```
 
 Following arguments can be specified in cmake:
 
@@ -33,4 +35,24 @@ Following arguments can be specified in cmake:
 
 After that, the executable file `DPSim` will be produced under `build/bin`, and can be used like `./bin/DPSim run_configuration`, an exmaple configuration file is provided under `DPSim/conf/example.conf`, with self-explainary options. A shared library `libRawMCEvent` will be produced under `build/lib`, optionally one can use `make install` to install the header and shared library to ROOT header and library places, as specified by `root-config --prefix`.
 
-### Generating GDML files 
+### Generating GDML files and set target type
+
+Currently there are two sources of geometry needed for DPSim to run:
+  
+  1. mysql schema from MySQL database (this part will be replaced by sqlite3 in future, so that we do not rely on any kind of external server to run), this schema contains all the details of the spectrometer setup;
+  2. GDML file, generated from the MySQL-based geometry setup. This file only contains one target, and is used as the input for DetectorConstruction;
+  
+#### Making MySQL schema
+
+A `.sql` file comes with the DPSim package under `geometry` directory, one can run `mysql -u user -p -h host geometry_schema_name < geometry_file_name.sql` to generate the MySQL-based geometry schema.
+
+#### Making GDML file
+
+A GDML file is needed in the configuration file to start `DPSim` simulation job (in this way the target type is implicitly specified). A python script `gdmlWriter.py` is provided to read the MySQL geometry schema and make the GDML file. This script requires Python package `MySQLdb` and `xml` to work properly.
+
+For instance, if one would like to generate the GDML file with LD2 target from the geometry schema `geometry_v1` on `localhost`, the command looks like this: 
+  
+  ```
+  ./gdmlWriter --input=geometry_v1 --output=geom_LD2.gdml --target=LD2 --server=localhost --port=3306`
+  ```
+  
