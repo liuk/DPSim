@@ -130,6 +130,7 @@ void DPMCRawEvent::clear(bool partial)
     fDimuons->Clear();
     fTracks->Clear();
 
+    fNRecDimuons = 0;
     fRecDimuons->Clear();
 
     fEvtHeader.fEventID = -1;
@@ -219,6 +220,15 @@ DPMCRawEvent& DPMCRawEvent::operator += (const DPMCRawEvent& event)
         addHit(*hit);
     }
 
+    for(UInt_t i = 0; i < event.fNRecDimuons; ++i)
+    {
+        DPMCDimuon* dimuon = (DPMCDimuon*)event.fRecDimuons->At(i);
+        dimuon->fPosTrackID = dimuon->fPosTrackID == -1 ? dimuon->fPosTrackID + nTracks : -1;
+        dimuon->fNegTrackID = dimuon->fNegTrackID == -1 ? dimuon->fNegTrackID + nTracks : -1;
+
+        addRecDimuon(*dimuon);
+    }
+
     fEvtHeader.fSigWeight += event.fEvtHeader.fSigWeight;
     return *this;
 }
@@ -244,6 +254,12 @@ DPMCRawEvent& DPMCRawEvent::operator = (const DPMCRawEvent& event)
     {
         DPMCHit* hit = (DPMCHit*)event.fHits->At(i);
         addHit(*hit);
+    }
+
+    for(UInt_t i = 0; i < event.fNRecDimuons; ++i)
+    {
+        DPMCDimuon* dimuon = (DPMCDimuon*)event.fRecDimuons->At(i);
+        addRecDimuon(*dimuon);
     }
 
     return *this;

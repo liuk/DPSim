@@ -26,17 +26,26 @@ public:
     //Swim the track
     bool swimTo(double z);
 
+    //energy loss for muons
+    double dedx(double e);
+
     //Get the tracks after swimming
     G4ThreeVector getFinalPos() { return finalPos; }
     G4ThreeVector getFinalMom() { return finalMom; }
 
 private:
+    /*
+    //This part is not used as of now --- need furture study to make geant and geant4e co-exist
     //Geant4e
     G4ErrorPropagatorManager* g4eManager;
     G4ErrorPropagatorData* g4eData;
     G4ErrorPlaneSurfaceTarget* g4eTarget;
     G4ErrorFreeTrajState* g4eState;
     G4ErrorMode g4eMode;
+    */
+
+    //value of pt kick depending on magnet multiplier
+    double ptkick;
 
     //Pointer to the particle table
     G4ParticleTable* particleDict;
