@@ -38,10 +38,10 @@ After that, the executable file `DPSim` will be produced under `build/bin`, and 
 ### Generating GDML files and set target type
 
 Currently there are two sources of geometry needed for DPSim to run:
-  
+
   1. mysql schema from MySQL database (this part will be replaced by sqlite3 in future, so that we do not rely on any kind of external server to run), this schema contains all the details of the spectrometer setup;
   2. GDML file, generated from the MySQL-based geometry setup. This file only contains one target, and is used as the input for DetectorConstruction;
-  
+
 #### Making MySQL schema
 
 A `.sql` file comes with the DPSim package under `geometry` directory, one can run `mysql -u user -p -h host geometry_schema_name < geometry_file_name.sql` to generate the MySQL-based geometry schema.
@@ -50,9 +50,8 @@ A `.sql` file comes with the DPSim package under `geometry` directory, one can r
 
 A GDML file is needed in the configuration file to start `DPSim` simulation job (in this way the target type is implicitly specified). A python script `gdmlWriter.py` is provided to read the MySQL geometry schema and make the GDML file. This script requires Python package `MySQLdb` and `xml` to work properly.
 
-For instance, if one would like to generate the GDML file with LD2 target from the geometry schema `geometry_v1` on `localhost`, the command looks like this: 
-  
+For instance, if one would like to generate the GDML file with LD2 target from the geometry schema `geometry_v1` on `localhost`, the command looks like this:
+
   ```
-  ./gdmlWriter --input=geometry_v1 --output=geom_LD2.gdml --target=LD2 --server=localhost --port=3306`
+  ./gdmlWriter --input=geometry_v1 --output=geom_LD2.gdml --target=LD2 --server=localhost --port=3306
   ```
-  
