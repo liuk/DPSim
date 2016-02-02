@@ -13,7 +13,7 @@ DPSim relies on following packages:
 
   - Geant4.10, please note that GDML support needs to be turned on when installing Geant4, cmake will search for `geant4-config`;
   - xerces-c, this is the XML parser, it's also needed by Geant4;
-  - ROOT v5.34, DPSim has not been tested under ROOT6, cmake will search for `root-config`;
+  - ROOT v5.34, although there shouldn't be a problem, DPSim has not been tested under ROOT6. cmake will search for `root-config`;
   - Pythia8.1xx, DPSim for now uses deprecated functions of Pythia8 and thus does not work under Pythia8.2 yet, cmake will search for `pythia8-config`;
   - LHAPDF, need to have at least CT10nlo PDF set installed, cmake will search for `lhapdf-config`;
   - MySQL5, no particular requirement, need to have MySQL python interface (MySQLdb) installed if user want to generate GDML file, cmake will search for `mysql_config`;
@@ -66,8 +66,8 @@ For instance, if one would like to generate the GDML file with LD2 target from t
 
 DPSim is designed for R&D of dark photon instrumentation. It is very straightforward to add detectors into the spectrometer and even include it in the trigger. For instance, if one wants to add an addition layer of Y-measuring hodoscopes in front of KMag, one can follow the steps below:
 
-  - in geometry schema: add one entry in the `Planes` and `Alignments` table, with incrementing detectorID, if the new detector is intended for trigger, an appropriate triggerLv field needs to be assigned, otherwise it should be set to -1;
-  - in `inc/DPMCRawEvent.h`: change line 14 to the new total number of detector planes (default is 48);
-  - in `inc/DPTriggerAnalyzer.h`: change line 14 to the new total number of trigger planes (default is 4);
+  - in geometry schema, add one entry in the `Planes` and `Alignments` table, with incrementing detectorID, if the new detector is intended for trigger, an appropriate triggerLv field needs to be assigned, otherwise it should be set to -1;
+  - in `inc/DPMCRawEvent.h`, change line 14 to the new total number of detector planes (default is 48);
+  - optional: in `inc/DPTriggerAnalyzer.h`, change line 14 to the new total number of trigger planes (default is 4). The input trigger matrix table needs to include the new information as well;
 
-After the above steps, re-run the `gdmlWriter.py` to generate the new GDML file and specify it in the conf file. DPSim will take care of the simulation and digitization.
+After the above steps, re-compile and re-run the `gdmlWriter.py` to generate the new GDML file and specify it in the conf file. DPSim will take care of the simulation and digitization.
