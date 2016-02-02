@@ -135,8 +135,8 @@ bool DPDummyRecon::swimTo(double z)
         */
     }
 
-    double z_final = pos.Z() - z;
-    TVector3 trajVec(mom.Px()/mom.Pz()*z_final, ty*z_final, z);
+    double zstep_final = pos.Z() - z;
+    TVector3 trajVec(mom.Px()/mom.Pz()*zstep_final, ty*zstep_final, zstep_final);
     pos = pos - trajVec;
 
     //re-tracking correction

@@ -5,6 +5,8 @@ This package is developed based on the existing Geant4 Monte Carlo simulation so
   - more generators (including dark photon generators) are/will be included;
   - GDML is used as geometry description, so that the persistent geometry could be shared between simulation and reconstruction efforts
 
+***
+
 ### Compile and install
 
 DPSim relies on following packages:
@@ -35,6 +37,8 @@ Following arguments can be specified in cmake:
 
 After that, the executable file `DPSim` will be produced under `build/bin`, and can be used like `./bin/DPSim run_configuration`, an exmaple configuration file is provided under `DPSim/conf/example.conf`, with self-explainary options. A shared library `libRawMCEvent` will be produced under `build/lib`, optionally one can use `make install` to install the header and shared library to ROOT header and library places, as specified by `root-config --prefix`.
 
+***
+
 ### Generating GDML files and set target type
 
 Currently there are two sources of geometry needed for DPSim to run:
@@ -55,3 +59,15 @@ For instance, if one would like to generate the GDML file with LD2 target from t
   ```
   ./gdmlWriter --input=geometry_v1 --output=geom_LD2.gdml --target=LD2 --server=localhost --port=3306
   ```
+
+***
+
+### Adding additional (trigger) detector
+
+DPSim is designed for R&D of dark photon instrumentation. It is very straightforward to add detectors into the spectrometer and even include it in the trigger. For instance, if one wants to add an addition layer of Y-measuring hodoscopes in front of KMag, one can follow the steps below:
+
+  - in geometry schema: add one entry in the `Planes` and `Alignments` table, with incrementing detectorID, if the new detector is intended for trigger, an appropriate triggerLv field needs to be assigned, otherwise it should be set to -1;
+  - in `inc/DPMCRawEvent.h`: change line 14 to the new total number of detector planes (default is 48);
+  - in `inc/DPTriggerAnalyzer.h`: change line 14 to the new total number of trigger planes (default is 4);
+
+After the above steps, re-run the `gdmlWriter.py` to generate the new GDML file and specify it in the conf file. DPSim will take care of the simulation and digitization.
