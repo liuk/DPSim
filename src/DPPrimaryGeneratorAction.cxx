@@ -206,6 +206,25 @@ DPPrimaryGeneratorAction::DPPrimaryGeneratorAction()
         std::cout << "ERROR: Generator type not recognized! Will exit.";
         exit(EXIT_FAILURE);
     }
+
+    //force pion/kaon decay by changing the lifetime
+    if(p_config->forcePionDecay)
+    {
+        std::cout << " Forcing pion to decay immediately ..." << std::endl;
+        particleDict->FindParticle(211)->SetPDGStable(false);
+        particleDict->FindParticle(211)->SetPDGLifeTime(0.);
+        particleDict->FindParticle(-211)->SetPDGStable(false);
+        particleDict->FindParticle(-211)->SetPDGLifeTime(0.);
+    }
+
+    if(p_config->forceKaonDecay)
+    {
+        std::cout << " Forcing kaon to decay immediately ..." << std::endl;
+        particleDict->FindParticle(321)->SetPDGStable(false);
+        particleDict->FindParticle(321)->SetPDGLifeTime(0.);
+        particleDict->FindParticle(-321)->SetPDGStable(false);
+        particleDict->FindParticle(-321)->SetPDGLifeTime(0.);
+    }
 }
 
 DPPrimaryGeneratorAction::~DPPrimaryGeneratorAction()

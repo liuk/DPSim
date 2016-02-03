@@ -69,6 +69,10 @@ public:
     bool instruInBeam;
     bool airInBeam;
 
+    //Force pion and kaon decay by modifying particle lifetime
+    bool forcePionDecay;
+    bool forceKaonDecay;
+
     //I/O setup
     TString configFileName;   // name of configuration file
     TString outputFileName;   // The database name that output goes to

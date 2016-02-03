@@ -64,6 +64,9 @@ void DPSimConfig::init(TString configFile)
     instruInBeam = pBool("instruInBeam", false);
     airInBeam = pBool("airInBeam", false);
 
+    forcePionDecay = pBool("forcePionDecay", false);
+    forceKaonDecay = pBool("forceKaonDecay", false);
+
     configFileName = configFile;
     outputFileName = pString("outputFileName");
     outputMode = pString("outputMode");
