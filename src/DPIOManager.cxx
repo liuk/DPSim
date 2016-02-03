@@ -66,8 +66,9 @@ void DPIOManager::initialize(int runID)
     configTree->Branch("config", &p_config, 256000, 99);
 
     //event buffer for the singles mode only
-    if(p_config->dimuonMode)
+    if(p_config->dimuonMode || p_config->bucket_size == 1)
     {
+        singleEvent = NULL;
         saveTree->Branch("rawEvent", &rawEvent, 256000, 99);
     }
     else
@@ -158,9 +159,6 @@ void DPIOManager::fillOneEvent(const G4Event* theEvent)
     //In dimuon mode, fill the raw event once per event
     if(p_config->dimuonMode)
     {
-#ifdef DEBUG_IO
-        rawEvent->print();
-#endif
         finalizeEvent();
     }
     else //in singles mode, merge the events before fill
@@ -186,12 +184,11 @@ void DPIOManager::fillOneEvent(const G4Event* theEvent)
 
             *singleEvent += (*rawEvent);
 
-            if((eventID + 1) % p_config->bucket_size == 0)
+            if((eventID + 1) % p_config->bucket_size == 0 || eventID + 1 == p_config->nEvents)
             {
 #ifdef DEBUG_IO
                 std::cout << __FILE__ << " " << __FUNCTION__ << " singles mode, eventID = " << eventID
                           << ", at the EOB" << std::endl;
-                singleEvent->print();
 #endif
                 finalizeEvent();
             }
@@ -207,6 +204,17 @@ void DPIOManager::finalizeEvent()
     //Pass the event through post-simulation analysis
     p_triggerAna->analyzeTrigger(rawEvent);
     if(p_config->enableDummyRecon) p_dummyRecon->reconstruct(rawEvent);
+
+#ifdef DEBUG_IO
+    if(singleEvent == NULL)
+    {
+        rawEvent->print();
+    }
+    else
+    {
+        singleEvent->print();
+    }
+#endif
 
     //save the event
     saveTree->Fill();
