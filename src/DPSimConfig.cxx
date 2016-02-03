@@ -29,7 +29,11 @@ void DPSimConfig::init(TString configFile)
     seed = pInt("seed", 0);
     nEvents = pInt("nEvents", 100);
     printFreq = pInt("printFreq", 10);
+#ifdef GIT_VERSION
+    version = pString("version", GIT_VERSION);
+#else
     version = pString("version");
+#endif
 
     bucket_size = pInt("bucket_size", 40000);
     beamMomentum = pDouble("beamMomentum", 120.);

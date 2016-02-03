@@ -27,6 +27,15 @@ if(NOT(DEBUG_IN OR DEBUG_TR OR DEBUG_IO OR DEBUG))
   add_definitions(-DNDEBUG)
 endif()
 
+# Add version number from git if exists
+if(EXISTS "${PROJECT_SOURCE_DIR}/.git")
+  execute_process(COMMAND git rev-parse --abbrev-ref HEAD OUTPUT_VARIABLE GIT_BRANCH OUTPUT_STRIP_TRAILING_WHITESPACE)
+  execute_process(COMMAND git rev-parse --short HEAD      OUTPUT_VARIABLE GIT_HASH   OUTPUT_STRIP_TRAILING_WHITESPACE)
+  add_definitions("-DGIT_VERSION=\"${GIT_BRANCH}-${GIT_HASH}\"")
+else()
+  add_definitions("-DGIT_VERSION=\"1.0.0\"")
+endif()
+
 # ROOT dict generation
 add_custom_command (
   OUTPUT ${PROJECT_SOURCE_DIR}/src/DPMCRawEventDict.cxx ${PROJECT_SOURCE_DIR}/src/DPMCRawEventDict.h
