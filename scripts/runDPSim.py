@@ -21,6 +21,7 @@ parser.add_option('-o', '--output', type = 'string', dest = 'output', help = 'ou
 parser.add_option('-w', '--workdir', type = 'string', dest = 'workdir', help = 'Working dir of all temporary/permanent files', default = '')
 parser.add_option('-n', '--nJobs', type = 'int', dest = 'nJobs', help = 'Number of jobs to make', default = 8)
 parser.add_option('-s', '--seed', type = 'int', dest = 'seed', help = 'Seed offset of each job', default = 0)
+parser.add_option('-a', '--addition', type = 'string', dest = 'addition', help = 'additional scan instruction', default = '')
 parser.add_option('-l', '--local', action = 'store_true', dest = 'local', help = 'Start running the jobs locally', default = False)
 parser.add_option('-g', '--grid', action = 'store_true', dest = 'grid', help = 'Submit the jobs to grid', default = False)
 (options, args) = parser.parse_args()
@@ -39,8 +40,17 @@ if options.local and options.grid:
 if options.workdir == '':
     options.workdir = os.getcwd()
 
+## parse the addition instructions
+reservedKeys = []
+reservedValFormula = []
+if options.addition != '':
+    items = [item.strip() for item in options.addition.split(',')]
+    for item in items:
+        reservedKeys.append(item.split(':')[0].strip())
+        reservedValFormula.append(item.split(':')[1].strip())
+
 ## initialize the conf file generator, and the executable DPSim
-tconf = DPSimJobConf(options.template)
+tconf = DPSimJobConf(options.template, reservedKeys)
 DPSim = os.path.join(os.getenv('DPSIM_ROOT'), 'build', 'bin', 'DPSim')
 
 ## set up the working directories
@@ -61,7 +71,8 @@ outputs = [os.path.join(outputdir, '%s.root' % (options.output % str(i))) for i 
 wrappers = [os.path.join(wrapperdir, '%s.sh' % (options.output % str(i))) for i in range(options.nJobs)]
 
 for i, conf in enumerate(confs):
-    tconf.generate(conf, seed = options.seed + i, outputName = outputs[i])
+    reservedVals = [eval(formula) for formula in reservedValFormula]
+    tconf.generate(conf, seed = options.seed + i, outputName = outputs[i], reserved = dict(zip(reservedKeys, reservedVals)))
 
 ## if in local mode, make everything locally in the background
 if options.local:
