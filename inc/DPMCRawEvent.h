@@ -79,7 +79,7 @@ public:
     TVector3 fFinalPos;
     TLorentzVector fFinalMom;
 
-    UInt_t fParentID;
+    Int_t fParentID;
     Int_t fParentPDGCode;
     TString fProcess;
     TString fOriginVol;
