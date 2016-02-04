@@ -58,7 +58,7 @@ file(GLOB headers ${PROJECT_SOURCE_DIR}/include/*.h)
 if(NOT(LIBONLY))
   add_executable(DPSim DPSim.cxx ${sources} ${headers} ${PROJECT_SOURCE_DIR}/src/DPMCRawEventDict.cxx ${PROJECT_SOURCE_DIR}/src/DPSimConfigDict.cxx)
 endif()
-add_library(MCRawEvent SHARED ${PROJECT_SOURCE_DIR}/src/DPMCRawEvent.cxx ${PROJECT_SOURCE_DIR}/src/DPMCRawEventDict.cxx ${PROJECT_SOURCE_DIR}/src/DPSimConfig.cxx ${PROJECT_SOURCE_DIR}/src/DPSimConfigDict.cxx)
+add_library(DPMCRawEvent SHARED ${PROJECT_SOURCE_DIR}/src/DPMCRawEvent.cxx ${PROJECT_SOURCE_DIR}/src/DPMCRawEventDict.cxx ${PROJECT_SOURCE_DIR}/src/DPSimConfig.cxx ${PROJECT_SOURCE_DIR}/src/DPSimConfigDict.cxx)
 
 # ROOT
 find_program(ROOTCONF "root-config")
@@ -72,7 +72,7 @@ execute_process(COMMAND root-config --cflags OUTPUT_VARIABLE ROOT_CFLAGS  OUTPUT
 execute_process(COMMAND root-config --libs   OUTPUT_VARIABLE ROOT_LINK    OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 # install rules, not necessarily needed
-install(TARGETS MCRawEvent DESTINATION "${ROOT_PREFIX}/lib")
+install(TARGETS DPMCRawEvent DESTINATION "${ROOT_PREFIX}/lib")
 install(FILES ${PROJECT_SOURCE_DIR}/inc/DPMCRawEvent.h ${PROJECT_SOURCE_DIR}/inc/DPSimConfig.h DESTINATION "${ROOT_PREFIX}/include")
 
 # the rest packages are not needed for libonly MatrixNode
@@ -125,7 +125,7 @@ endif()
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GEANT4_CFLAGS} ${ROOT_CFLAGS} ${PYTHIA_CFLAGS} ${LHAPDF_CFLAGS} ${MYSQL_CFLAGS}")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${GEANT4_LINK} ${ROOT_LINK} ${PYTHIA_LINK} ${LHAPDF_LINK} ${MYSQL_LINK}")
-set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${ROOT_LINK}" )
+set(CMAKE_SHARED_LINKER_FLAGS "${ROOT_LINK}" )
 if(NOT(LIBONLY))
   target_link_libraries(DPSim ${ROOT_LINK} ${PYTHIA_LINK} ${LHAPDF_LINK} ${Geant4_LIBRARIES})
 endif()

@@ -335,7 +335,7 @@ void DPIOManager::reIndex()
         if(!iter->second) continue;
         iter->first.fTrackID = trackID++;
 
-        if(iter->first.fParentID != 0)
+        if(iter->first.fParentID != 0)  //not a primary particle, at this point the parentID is still geant-assigned ID
         {
             iter->first.fParentPDGCode = tracks[trackIDs[iter->first.fParentID]].first.fPDGCode;
             iter->first.fParentID = tracks[trackIDs[iter->first.fParentID]].first.fTrackID;
@@ -343,6 +343,7 @@ void DPIOManager::reIndex()
         else
         {
             iter->first.fParentPDGCode = 0;
+            iter->first.fParentID = -1;
         }
     }
 
