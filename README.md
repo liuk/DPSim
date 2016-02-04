@@ -7,7 +7,7 @@ This package is developed based on the existing Geant4 Monte Carlo simulation so
 
 ***
 
-### Compile and install
+### Compile, install and run
 
 DPSim relies on following packages:
 
@@ -35,7 +35,9 @@ Following arguments can be specified in cmake:
   - `-DDEBUG_TR=ON (default: OFF)`: this will enable debugging output during tracking process
   - `-DDEBUG_IO=ON (default: OFF)`: this will enable debugging output during I/O process
 
-After that, the executable file `DPSim` will be produced under `build/bin`, and can be used like `./bin/DPSim run_configuration`, an exmaple configuration file is provided under `DPSim/conf/example.conf`, with self-explainary options. A shared library `libRawMCEvent` will be produced under `build/lib`, optionally one can use `make install` to install the header and shared library to ROOT header and library places, as specified by `root-config --prefix`.
+After that, the executable file `DPSim` will be produced under `build/bin`, and can be used like `./bin/DPSim run_configuration`, an example configuration file is provided under `DPSim/conf/example.conf`, with self-explainary options. A shared library `libRawMCEvent` will be produced under `build/lib`, optionally one can use `make install` to install the header and shared library to ROOT header and library places, as specified by `root-config --prefix`.
+
+A sample ROOT macro is provided under the directory `analysis_example` for some very basic analysis using DPSim MC event structure.
 
 ***
 
