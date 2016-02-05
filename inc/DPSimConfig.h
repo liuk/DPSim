@@ -69,6 +69,9 @@ public:
     bool instruInBeam;
     bool airInBeam;
 
+    //Event vertex biasing, i.e. generate vertex evenly instead of according to material
+    bool biasVertexGen;
+
     //Force pion and kaon decay by modifying particle lifetime
     bool forcePionDecay;
     bool forceKaonDecay;

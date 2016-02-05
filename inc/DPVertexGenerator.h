@@ -64,7 +64,7 @@ public:
     double getPARatio() { return interactables[index].protonPerc; }
 
     //get the relative luminosity on this target
-    double getLuminosity() { return probSum; }
+    double getLuminosity() { return p_config->biasVertexGen ? interactables[index].prob : probSum; }
 
     //get the reference to the chosen objects
     const DPBeamLineObject& getInteractable() { return interactables[index]; }

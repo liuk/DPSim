@@ -98,7 +98,7 @@ void DPVertexGenerator::init()
         DPBeamLineObject newObj(pv->GetLogicalVolume()->GetMaterial());
         newObj.name = name;
         newObj.z0 = pos.z()/cm;
-        if(newObj.z0 < 0.)
+        if(!name.Contains("D_"))
         {
             newObj.length = 2.*((G4Tubs*)(pv->GetLogicalVolume()->GetSolid()))->GetZHalfLength()/cm;
             newObj.z_down = newObj.z0 + 0.5*newObj.length;
@@ -141,7 +141,7 @@ void DPVertexGenerator::init()
         std::sort(interactables.begin(), interactables.end());
     }
 
-    //set the quanties that relies on its neighbours
+    //set the quanties that rely on its neighbours
     double attenuationSum = 0.;
     for(unsigned int i = 0; i < interactables.size(); ++i)
     {
@@ -159,9 +159,9 @@ void DPVertexGenerator::init()
     for(unsigned int i = 1; i < nPieces; ++i)
     {
         interactables[i].accumulatedProb = interactables[i-1].accumulatedProb + interactables[i-1].prob;
-        accumulatedProbs[i] = interactables[i].accumulatedProb;
+        accumulatedProbs[i] = p_config->biasVertexGen ? i : interactables[i].accumulatedProb;
     }
-    accumulatedProbs[nPieces] = accumulatedProbs[nPieces-1] + interactables.back().prob;
+    accumulatedProbs[nPieces] = p_config->biasVertexGen ? nPieces : accumulatedProbs[nPieces-1] + interactables.back().prob;
     probSum = accumulatedProbs[nPieces];
 
     //Normalize the probs

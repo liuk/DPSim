@@ -75,7 +75,7 @@ execute_process(COMMAND root-config --libs   OUTPUT_VARIABLE ROOT_LINK    OUTPUT
 install(TARGETS DPMCRawEvent DESTINATION "${ROOT_PREFIX}/lib")
 install(FILES ${PROJECT_SOURCE_DIR}/inc/DPMCRawEvent.h ${PROJECT_SOURCE_DIR}/inc/DPSimConfig.h DESTINATION "${ROOT_PREFIX}/include")
 
-# the rest packages are not needed for libonly MatrixNode
+# the rest packages are not needed for libonly mode
 if(NOT(LIBONLY))
   # Geant4
   find_program(G4CONF "geant4-config")
@@ -108,7 +108,7 @@ if(NOT(LIBONLY))
   execute_process(COMMAND pythia8-config --cxxflags OUTPUT_VARIABLE PYTHIA_CFLAGS  OUTPUT_STRIP_TRAILING_WHITESPACE)
   execute_process(COMMAND pythia8-config --libs     OUTPUT_VARIABLE PYTHIA_LINK    OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-# MySQL
+  # MySQL
   find_program(MYSQLCONF "mysql_config")
   if(MYSQLCONF)
     message("-- Detecting MySQL:   found at ${MYSQLCONF}")

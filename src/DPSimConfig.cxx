@@ -64,6 +64,8 @@ void DPSimConfig::init(TString configFile)
     instruInBeam = pBool("instruInBeam", false);
     airInBeam = pBool("airInBeam", false);
 
+    biasVertexGen = pBool("biasVertexGen", false);
+
     forcePionDecay = pBool("forcePionDecay", false);
     forceKaonDecay = pBool("forceKaonDecay", false);
 
