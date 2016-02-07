@@ -395,7 +395,7 @@ void DPPrimaryGeneratorAction::generateDarkPhotonFromEta()
         if(particles[i].id() == 221)
         {
             DPMCDimuon dimuon;
-            dimuon.fVertex.SetXYZ(G4RandGauss::shoot(0., 1.5), G4RandGauss::shoot(0., 1.5), G4UniformRand()*(620. - 300.) + 300.);
+            dimuon.fVertex.SetXYZ(G4RandGauss::shoot(0., 1.5), G4RandGauss::shoot(0., 1.5), G4UniformRand()*(p_config->zOffsetMax - p_config->zOffsetMin) + p_config->zOffsetMin);
 
             //eta -> gamma A'
             TLorentzVector p_eta(particles[i].px(), particles[i].py(), particles[i].pz(), particles[i].e());
