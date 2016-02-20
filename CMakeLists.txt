@@ -121,6 +121,17 @@ if(NOT(LIBONLY))
   # Warning suppression
   string(REGEX REPLACE "-W[a-z-]*" "" GEANT4_CFLAGS ${GEANT4_CFLAGS})
   string(REPLACE "-pedantic" "" GEANT4_CFLAGS ${GEANT4_CFLAGS})
+
+else()  #only find BOOST in libonly mode
+  find_package(Boost)
+  if(Boost_FOUND)
+    message("-- Detecting BOOST:   found at ${Boost_INCLUDE_DIRS}")
+  elseif(EXISTS $ENV{BOOST_ROOT})
+    message("-- Detecting BOOST:   using $ENV{BOOST_ROOT}")
+  else()
+    message(FATAL_ERROR "-- Detecting BOOST:   not found")
+  endif()
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I${Boost_INCLUDE_DIRS}")
 endif()
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GEANT4_CFLAGS} ${ROOT_CFLAGS} ${PYTHIA_CFLAGS} ${LHAPDF_CFLAGS} ${MYSQL_CFLAGS}")
