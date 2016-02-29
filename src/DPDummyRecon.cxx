@@ -139,10 +139,13 @@ bool DPDummyRecon::swimTo(double z)
     TVector3 trajVec(mom.Px()/mom.Pz()*zstep_final, ty*zstep_final, zstep_final);
     pos = pos - trajVec;
 
-    //re-tracking correction
-    mom.SetX(mom.Pz()*pos_bend.X()/(pos_bend.Z() - z));
-    mom.SetY(mom.Pz()*pos_bend.Y()/(pos_bend.Z() - z));
-
+    if(z < 100)
+    {
+        //re-tracking correction
+        mom.SetX(mom.Pz()*pos_bend.X()/(pos_bend.Z() - z));
+        mom.SetY(mom.Pz()*pos_bend.Y()/(pos_bend.Z() - z));
+    }
+    
     finalPos.set(pos.X()*cm, pos.Y()*cm, pos.Z()*cm);
     finalMom.set(mom.Px()*GeV, mom.Py()*GeV, mom.Pz()*GeV);
 
