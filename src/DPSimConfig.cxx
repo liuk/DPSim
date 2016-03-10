@@ -5,6 +5,9 @@
 #include <sstream>
 #include <wordexp.h> //to expand environmentals
 
+#include <TFile.h>
+#include <TTree.h>
+
 #include <boost/algorithm/string.hpp> //for strip
 #include <boost/lexical_cast.hpp>
 
@@ -102,10 +105,32 @@ bool DPSimConfig::sanityCheck()
 {
     bool ignoreWarnings = pBool("ignoreWarnings", false);
 
-    if(generatorType == "external" && (!checkFile(externalInput)))
+    if(generatorType == "external")
     {
-        std::cout << "ERROR: External input file not found!" << std::endl;
-        return false;
+        if(!checkFile(externalInput))
+        {
+            std::cout << "ERROR: External input file not found!" << std::endl;
+            return false;
+        }
+        else //check if the numbers of events are consistent
+        {
+            TFile exFile(externalInput, "READ");
+            TTree* exTree = (TTree*)exFile.Get("save");
+            int nExternalEvents = exTree->GetEntries();
+
+            if(nEvents > nExternalEvents)
+            {
+                std::cout << "WARNING: number of pythia events is smaller than the number of events to run!" << std::endl;
+                if(ignoreWarnings)
+                {
+                    nEvents = nExternalEvents;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
     }
 
     if(generatorType == "pythia" && (!checkFile(pythiaConfig)))

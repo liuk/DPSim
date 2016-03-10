@@ -68,11 +68,15 @@ for d in (wrapperdir, outputdir, confdir, logdir):
 confs = [os.path.join(confdir, '%s.conf' % (options.output % str(i))) for i in range(options.nJobs)]
 logs = [os.path.join(logdir, '%s.log' % (options.output % str(i))) for i in range(options.nJobs)]
 outputs = [os.path.join(outputdir, '%s.root' % (options.output % str(i))) for i in range(options.nJobs)]
+goutputs = [os.path.join('$CONDOR_DIR_OUTPUT', '%s.root' % (options.output % str(i))) for i in range(options.nJobs)] # local output file on node
 wrappers = [os.path.join(wrapperdir, '%s.sh' % (options.output % str(i))) for i in range(options.nJobs)]
 
 for i, conf in enumerate(confs):
     reservedVals = [eval(formula) for formula in reservedValFormula]
-    tconf.generate(conf, seed = options.seed + i, outputName = outputs[i], reserved = dict(zip(reservedKeys, reservedVals)))
+    if options.local:
+        tconf.generate(conf, seed = options.seed + i, outputName = outputs[i], reserved = dict(zip(reservedKeys, reservedVals)), cmdargs = sys.argv)
+    if options.grid:
+        tconf.generate(conf, seed = options.seed + i, outputName = goutputs[i], reserved = dict(zip(reservedKeys, reservedVals)), cmdargs = sys.argv)
 
 ## if in local mode, make everything locally in the background
 if options.local:
