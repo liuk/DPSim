@@ -3,6 +3,7 @@
 from xml.etree.ElementTree import Element, SubElement, Comment, tostring
 from xml.dom import minidom
 
+query_elements = 'SELECT element,A,Z FROM Elements'
 query_materials = 'SELECT material,density,nComponents,receipt FROM Materials'
 query_box_solid = (
     'SELECT detectorGroupName,if(max(z0+deltaZ)-min(z0+deltaZ)<1.,1.,max(z0+deltaZ)-min(z0+deltaZ)), '
@@ -50,6 +51,10 @@ def addproperty(mother, propertyName, value):
 def addreference(mother, referenceName, ref):
     node = SubElement(mother, referenceName + 'ref')
     node.set('ref', str(ref))
+
+def parseElement(mother, info):
+    node = addnode(mother, 'element', ['Z', 'formula', 'name'], [info[2], info[0], info[0]])
+    addproperty(node, 'atom', info[1])
 
 def parseMaterial(mother, info):
     node = addnode(mother, 'material', ['name'], [info[0]])

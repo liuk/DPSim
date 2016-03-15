@@ -17,7 +17,7 @@ parser.add_option('-p', '--port', type = 'int', dest = 'port', help = 'MySQL por
 (options, args) = parser.parse_args()
 
 ## process target name to make sure the type prefix is added
-options.target = 'T_' + options.target.replace('T_', '') 
+options.target = 'T_' + options.target.replace('T_', '')
 
 ## connect the database
 con = MySQLdb.connect(host = options.server, port = options.port, user = 'seaguest', passwd = 'qqbar2mu+mu-', db = options.input, sql_mode=' ')
@@ -33,8 +33,10 @@ dummy = SubElement(root, "define")
 
 ## materials section, add a temporary D material
 mat = SubElement(root, 'materials')
-mat_D = addnode(mat, 'element', ['Z', 'name'], ['1', 'D'])
-addproperty(mat_D, 'atom', 2.014)
+
+cur.execute(query_elements)
+for row in cur.fetchall():
+    parseElement(mat, row)
 
 cur.execute(query_materials)
 for row in cur.fetchall():
@@ -61,7 +63,7 @@ for row in cur.fetchall():
 
 ## physical volume part, manuall add world
 world = addnode(struct, 'volume', ['name'], ['World'])
-addreference(world, 'material', 'G4_AIR')
+addreference(world, 'material', 'Air')
 addreference(world, 'solid', 'WorldSolid')
 
 cur.execute(query_phys)
