@@ -394,6 +394,12 @@ void DPPrimaryGeneratorAction::generateDarkPhotonFromEta()
     {
         if(particles[i].id() == 221)
         {
+            //Fill eta to particle gun as well, it will probably make no difference in detector
+            particleGun->SetParticleDefinition(particleDict->FindParticle(221));
+            particleGun->SetParticlePosition(G4ThreeVector(particles[i].xProd()*mm, particles[i].yProd()*mm, particles[i].zProd()*mm));
+            particleGun->SetParticleMomentum(G4ThreeVector(particles[i].px()*GeV, particles[i].py()*GeV, particles[i].pz()*GeV));
+            particleGun->GeneratePrimaryVertex(theEvent);
+
             DPMCDimuon dimuon;
             dimuon.fVertex.SetXYZ(G4RandGauss::shoot(0., 1.5), G4RandGauss::shoot(0., 1.5), G4UniformRand()*(p_config->zOffsetMax - p_config->zOffsetMin) + p_config->zOffsetMin);
 
