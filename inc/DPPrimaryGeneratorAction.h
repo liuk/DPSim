@@ -45,7 +45,7 @@ public:
     void generateDebug();
 
     //Dimuon phase space generator
-    bool generateDimuon(double mass, double xF, DPMCDimuon& dimuon);
+    bool generateDimuon(double mass, double xF, DPMCDimuon& dimuon, bool angular = false);
 
 private:
     //pointer to the configuration

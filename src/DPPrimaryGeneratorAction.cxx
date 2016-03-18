@@ -247,7 +247,7 @@ void DPPrimaryGeneratorAction::generateDrellYan()
     DPMCDimuon dimuon;
     double mass = G4UniformRand()*(p_config->massMax - p_config->massMin) + p_config->massMin;
     double xF = G4UniformRand()*(p_config->xfMax - p_config->xfMin) + p_config->xfMin;
-    if(!generateDimuon(mass, xF, dimuon)) return;
+    if(!generateDimuon(mass, xF, dimuon, true)) return;
     p_vertexGen->generateVertex(dimuon);
 
     p_config->nEventsPhysics++;
@@ -445,7 +445,7 @@ void DPPrimaryGeneratorAction::generateCustomDimuon()
     DPMCDimuon dimuon;
     double mass = G4UniformRand()*(p_config->massMax - p_config->massMin) + p_config->massMin;
     double xF = G4UniformRand()*(p_config->xfMax - p_config->xfMin) + p_config->xfMin;
-    if(!generateDimuon(mass, xF, dimuon)) return;
+    if(!generateDimuon(mass, xF, dimuon, true)) return;    //TODO: maybe later need to add an option or flag in lut to specify angular distribution
     p_vertexGen->generateVertex(dimuon);
 
     p_config->nEventsPhysics++;
@@ -592,7 +592,7 @@ void DPPrimaryGeneratorAction::generateDebug()
     particleGun->GeneratePrimaryVertex(theEvent);
 }
 
-bool DPPrimaryGeneratorAction::generateDimuon(double mass, double xF, DPMCDimuon& dimuon)
+bool DPPrimaryGeneratorAction::generateDimuon(double mass, double xF, DPMCDimuon& dimuon, bool angular)
 {
     double pz = xF*(DPGEN::sqrts - mass*mass/DPGEN::sqrts)/2.;
 
@@ -625,11 +625,19 @@ bool DPPrimaryGeneratorAction::generateDimuon(double mass, double xF, DPMCDimuon
     double masses[2] = {DPGEN::mmu, DPGEN::mmu};
     phaseGen.SetDecay(p_dimuon, 2, masses);
 
-    phaseGen.Generate();
-    dimuon.fPosMomentum = *(phaseGen.GetDecay(0));
-    dimuon.fNegMomentum = *(phaseGen.GetDecay(1));
+    bool firstTry = true;
+    while(firstTry || angular)
+    {
+        firstTry = false;
 
-    dimuon.calcVariables();
+        phaseGen.Generate();
+        dimuon.fPosMomentum = *(phaseGen.GetDecay(0));
+        dimuon.fNegMomentum = *(phaseGen.GetDecay(1));
+
+        dimuon.calcVariables();
+        angular = 2.*G4UniformRand() > 1. + dimuon.fCosTh*dimuon.fCosTh;
+    }
+
     if(dimuon.fx1 < p_config->x1Min || dimuon.fx1 > p_config->x1Max) return false;
     if(dimuon.fx2 < p_config->x2Min || dimuon.fx2 > p_config->x2Max) return false;
     if(dimuon.fCosTh < p_config->cosThetaMin || dimuon.fCosTh > p_config->cosThetaMax) return false;
