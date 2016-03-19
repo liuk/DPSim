@@ -403,7 +403,7 @@ void DPPrimaryGeneratorAction::generateDarkPhotonFromEta()
             DPMCDimuon dimuon;
             dimuon.fVertex.SetXYZ(G4RandGauss::shoot(0., 1.5), G4RandGauss::shoot(0., 1.5), G4UniformRand()*(p_config->zOffsetMax - p_config->zOffsetMin) + p_config->zOffsetMin);
 
-            //eta -> gamma A'
+            //eta -> gamma A', this step decays isotropically
             TLorentzVector p_eta(particles[i].px(), particles[i].py(), particles[i].pz(), particles[i].e());
 
             double mass_eta_decays[2] = {G4UniformRand()*(p_eta.M() - 2.*DPGEN::mmu) + 2.*DPGEN::mmu, 0.};
@@ -411,14 +411,20 @@ void DPPrimaryGeneratorAction::generateDarkPhotonFromEta()
             phaseGen.Generate();
             TLorentzVector p_AP = *(phaseGen.GetDecay(0));
 
-            //A' -> mumu
+            //A' -> mumu, this step has a 1 + cos^2\theta distribution
             double mass_AP_decays[2] = {DPGEN::mmu, DPGEN::mmu};
             phaseGen.SetDecay(p_AP, 2, mass_AP_decays);
 
-            phaseGen.Generate();
-            dimuon.fPosMomentum = *(phaseGen.GetDecay(0));
-            dimuon.fNegMomentum = *(phaseGen.GetDecay(1));
-            dimuon.calcVariables();
+            bool angular = true;
+            while(angular)
+            {
+                phaseGen.Generate();
+                dimuon.fPosMomentum = *(phaseGen.GetDecay(0));
+                dimuon.fNegMomentum = *(phaseGen.GetDecay(1));
+                dimuon.calcVariables();
+
+                angular = 2.*G4UniformRand() > 1. + dimuon.fCosTh*dimuon.fCosTh;
+            }
 
             particleGun->SetParticleDefinition(mup);
             particleGun->SetParticlePosition(G4ThreeVector(dimuon.fVertex.X()*cm, dimuon.fVertex.Y()*cm, dimuon.fVertex.Z()*cm));
