@@ -39,7 +39,7 @@ void DPDummyRecon::reconstruct(DPMCRawEvent* rawEvent)
         TVector3 ppos(finalPos.x()/cm, finalPos.y()/cm, finalPos.z()/cm);
         dimuon.fPosMomentum.SetXYZM(finalMom.x()/GeV, finalMom.y()/GeV, finalMom.z()/GeV, 0.10566);
 
-        //swim mu+
+        //swim mu-
         DPMCTrack mum = rawEvent->getTrack(dimuon.fNegTrackID);
         DPMCHit mhit = rawEvent->getHit(mum.fHitIDs[0]);
 
@@ -145,7 +145,7 @@ bool DPDummyRecon::swimTo(double z)
         mom.SetX(mom.Pz()*pos_bend.X()/(pos_bend.Z() - z));
         mom.SetY(mom.Pz()*pos_bend.Y()/(pos_bend.Z() - z));
     }
-    
+
     finalPos.set(pos.X()*cm, pos.Y()*cm, pos.Z()*cm);
     finalMom.set(mom.Px()*GeV, mom.Py()*GeV, mom.Pz()*GeV);
 

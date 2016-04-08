@@ -388,7 +388,7 @@ void DPPrimaryGeneratorAction::generateDarkPhotonFromEta()
     Pythia8::Pythia* p_pythia = G4UniformRand() < pARatio ? &ppGen : &pnGen;
     while(!p_pythia->next()) {}
 
-    int nEtas = 0;
+    int nEtas = 1;
     Pythia8::Event& particles = p_pythia->event;
     for(int i = 1; i < particles.size(); ++i)
     {
