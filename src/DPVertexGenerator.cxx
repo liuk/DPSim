@@ -170,13 +170,13 @@ void DPVertexGenerator::init()
         accumulatedProbs[i] = accumulatedProbs[i]/accumulatedProbs[nPieces];
     }
 
-#ifdef DEBUG_IN
+//#ifdef DEBUG_IN
     std::cout << "Following objects will interact with beam:" << std::endl;
     for(int i = 0; i < nPieces; ++i)
     {
         std::cout << i << " " << interactables[i] << std::endl;
     }
-#endif
+//#endif
 }
 
 double DPVertexGenerator::generateVertex()
