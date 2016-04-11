@@ -52,7 +52,7 @@ void DPDummyRecon::reconstruct(DPMCRawEvent* rawEvent)
         dimuon.fVertex = 0.5*(ppos + mpos);
         dimuon.calcVariables();
 
-        rawEvent->addRecDimuon(dimuon);
+        rawEvent->addRecDimuon(dimuon, dimuon.fDimuonID);
     }
 }
 
