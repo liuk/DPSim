@@ -174,6 +174,11 @@ DPPrimaryGeneratorAction::DPPrimaryGeneratorAction()
             std::cout << " Using geant4 single generator ..." << std::endl;
             p_generator = &DPPrimaryGeneratorAction::generateGeant4Single;
         }
+        else if(p_config->generatorEng == "test")
+        {
+            std::cout << " Using test single generator ..." << std::endl;
+            p_generator = &DPPrimaryGeneratorAction::generateTestSingle;
+        }
         else
         {
             std::cout << "ERROR: Generator engine is not set or not supported in single mode" << std::endl;
@@ -545,6 +550,27 @@ void DPPrimaryGeneratorAction::generateGeant4Single()
     particleGun->SetParticleDefinition(proton);
     particleGun->SetParticlePosition(G4ThreeVector(0., 0., -600*cm));
     particleGun->SetParticleMomentum(G4ThreeVector(0., 0., p_config->beamMomentum*GeV));
+    particleGun->GeneratePrimaryVertex(theEvent);
+}
+
+void DPPrimaryGeneratorAction::generateTestSingle()
+{
+    p_config->nEventsPhysics++;
+
+    double mom = (5. + (p_config->beamMomentum - 5.)*G4UniformRand())*GeV;
+    double costheta = p_config->cosThetaMin + (p_config->cosThetaMax - p_config->cosThetaMin)*G4UniformRand();
+    double phi = G4UniformRand()*DPGEN::twopi;
+    double pz = mom*costheta;
+    double px = mom*TMath::Sqrt(1. - costheta*costheta)*TMath::Cos(phi);
+    double py = mom*TMath::Sqrt(1. - costheta*costheta)*TMath::Cos(phi);
+
+    double x = G4RandGauss::shoot(0., 1.5)*cm;
+    double y = G4RandGauss::shoot(0., 1.5)*cm;
+    double z = (G4UniformRand()*(p_config->zOffsetMax - p_config->zOffsetMin) + p_config->zOffsetMin)*cm;
+
+    particleGun->SetParticleDefinition(G4UniformRand() > 0.5 ? mup : mum);
+    particleGun->SetParticlePosition(G4ThreeVector(x, y, z));
+    particleGun->SetParticleMomentum(G4ThreeVector(px, py, pz));
     particleGun->GeneratePrimaryVertex(theEvent);
 }
 

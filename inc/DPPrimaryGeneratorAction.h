@@ -31,7 +31,8 @@ public:
     void GeneratePrimaries(G4Event* anEvent);
 
 public:
-    //Various generators
+    ///@{
+    //!Various generators
     void generateDrellYan();
     void generateJPsi();
     void generatePsip();
@@ -40,61 +41,67 @@ public:
     void generateCustomDimuon();
     void generatePythiaSingle();
     void generateGeant4Single();
+    void generateTestSingle();
     void generatePhaseSpace();
     void generateExternal();
     void generateDebug();
+    ///@}
 
-    //Dimuon phase space generator
+    //!Dimuon phase space generator
     bool generateDimuon(double mass, double xF, DPMCDimuon& dimuon, bool angular = false);
 
 private:
-    //pointer to the configuration
+    //!pointer to the configuration
     DPSimConfig* p_config;
 
-    //pointer to the IO manager
+    //!pointer to the IO manager
     DPIOManager* p_IOmamnger;
 
-    //pointer to the vertex generator
+    //!pointer to the vertex generator
     DPVertexGenerator* p_vertexGen;
 
-    //pointer to the current G4Event
+    //!pointer to the current G4Event
     G4Event* theEvent;
 
-    //particle gun
+    //!particle gun
     G4ParticleGun* particleGun;
 
-    //Pointer to the particle table
+    //!Pointer to the particle table
     G4ParticleTable* particleDict;
 
-    //ROOT phase space generator
+    //!ROOT phase space generator
     TGenPhaseSpace phaseGen;
 
-    //ROOT TGraph2D based 2-D interpolation
+    //!ROOT TGraph2D based 2-D interpolation
     TGraph2D* lut;
 
-    //PDFs
+    //!PDFs
     LHAPDF::PDF* pdf;
 
     //Pythia generator
-    Pythia8::Pythia ppGen;
-    Pythia8::Pythia pnGen;
+    Pythia8::Pythia ppGen;    //!< Pythia pp generator
+    Pythia8::Pythia pnGen;    //!< Pythia pn generator
 
-    //pointer to the real generator
+    //!pointer to the real generator
     typedef void (DPPrimaryGeneratorAction::*GenPtr)();
     GenPtr p_generator;
 
-    //Used for external input
+    ///@{
+    //!Used for external input
     TFile* externalInputFile;
     TTree* externalInputTree;
     int nExternalParticles;
     int externalParticlePDGs[10000];
     TClonesArray* externalPositions;
     TClonesArray* externalMomentums;
+    ///@}
 
-    //Common particles to save time
+    ///@{
+    //!Common particles to save time
     G4ParticleDefinition* proton;
     G4ParticleDefinition* mup;
     G4ParticleDefinition* mum;
+    ///@}
 };
 
 #endif
