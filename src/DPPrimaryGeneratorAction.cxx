@@ -562,7 +562,7 @@ void DPPrimaryGeneratorAction::generateTestSingle()
     double phi = G4UniformRand()*DPGEN::twopi;
     double pz = mom*costheta;
     double px = mom*TMath::Sqrt(1. - costheta*costheta)*TMath::Cos(phi);
-    double py = mom*TMath::Sqrt(1. - costheta*costheta)*TMath::Cos(phi);
+    double py = mom*TMath::Sqrt(1. - costheta*costheta)*TMath::Sin(phi);
 
     double x = G4RandGauss::shoot(0., 1.5)*cm;
     double y = G4RandGauss::shoot(0., 1.5)*cm;
@@ -639,11 +639,11 @@ bool DPPrimaryGeneratorAction::generateDimuon(double mass, double xF, DPMCDimuon
     }
     else if(p_config->drellyanMode)
     {
-        while(pT > pTmax) pT = DPGEN::pT0DY*sqrt(1./pow(G4UniformRand(), DPGEN::pTpowDY) - 1.);
+        while(pT > pTmax) pT = DPGEN::pT0DY*TMath::Sqrt(1./TMath::Power(G4UniformRand(), DPGEN::pTpowDY) - 1.);
     }
     else
     {
-        while(pT > pTmax) pT = DPGEN::pT0JPsi*sqrt(1./pow(G4UniformRand(), DPGEN::pTpowJPsi) - 1.);
+        while(pT > pTmax) pT = DPGEN::pT0JPsi*TMath::Sqrt(1./TMath::Power(G4UniformRand(), DPGEN::pTpowJPsi) - 1.);
     }
 
     double phi = G4UniformRand()*DPGEN::twopi;
