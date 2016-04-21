@@ -122,13 +122,13 @@ DPPrimaryGeneratorAction::DPPrimaryGeneratorAction()
 
             //Load the range and number of bins in each dimension
             std::string line;
-            int n;
+            int n, n_m, n_xF;
             double m_min, m_max, xF_min, xF_max;
             double m_bin, xF_bin;
 
             getline(fin, line);
             stringstream ss(line);
-            ss >> n >> m_min >> m_max >> m_bin >> xF_min >> xF_max >> xF_bin;
+            ss >> n >> n_m >> m_min >> m_max >> m_bin >> n_xF >> xF_min >> xF_max >> xF_bin;
 
             //test if the range is acceptable
             if(p_config->massMin < m_min || p_config->massMax > m_max || p_config->xfMin < xF_min || p_config->xfMax > xF_max)
@@ -137,8 +137,8 @@ DPPrimaryGeneratorAction::DPPrimaryGeneratorAction()
                 exit(EXIT_FAILURE);
             }
 
-            lut = new TGraph2D(n);
-            int nPoints = 0;
+            lut = new TH2D("LUT", "LUT", n_m, m_min - 0.5*(m_max - m_min)/(n_m - 1), m_max + 0.5*(m_max - m_min)/(n_m - 1),
+                                         n_xF, xF_min - 0.5*(xF_max - xF_min)/(n_xF - 1), xF_max + 0.5*(xF_max - xF_min)/(n_xF - 1));
             while(getline(fin, line))
             {
                 double mass, xF, xsec;
@@ -147,7 +147,7 @@ DPPrimaryGeneratorAction::DPPrimaryGeneratorAction()
                 ss >> mass >> xF >> xsec;
                 xsec *= (m_bin*xF_bin);
 
-                lut->SetPoint(nPoints++, mass, xF, xsec);
+                lut->Fill(mass, xF, xsec);
             }
         }
         else

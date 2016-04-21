@@ -16,7 +16,7 @@
 #include <TClonesArray.h>
 #include <TGenPhaseSpace.h>
 #include <TVector3.h>
-#include <TGraph2D.h>
+#include <TH2D.h>
 
 #include "DPSimConfig.h"
 #include "DPIOManager.h"
@@ -72,8 +72,8 @@ private:
     //!ROOT phase space generator
     TGenPhaseSpace phaseGen;
 
-    //!ROOT TGraph2D based 2-D interpolation
-    TGraph2D* lut;
+    //!ROOT TH2D based 2-D interpolation
+    TH2D* lut;
 
     //!PDFs
     LHAPDF::PDF* pdf;
