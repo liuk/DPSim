@@ -1,0 +1,49 @@
+#!/usr/bin/env python
+
+import os
+import sys
+import re
+
+# compile with ROOT, Geant4, MySQL and BOOST
+def compile(filename):
+
+    ## ROOT part
+    cflags = os.popen('root-config --cflags').readline().strip()
+    ldflags = os.popen('root-config --ldflags --libs').readline().strip()
+
+    ## DPSim part
+    dpsim_inc = os.path.join(os.environ['DPSIM_ROOT'], 'inc')
+    dpsim_ld = os.path.join(os.environ['DPSIM_ROOT'], 'build', 'lib')
+    cflags = cflags + ' -I' + dpsim_inc
+    ldflags = ldflags + ' -L' + dpsim_ld + ' -lDPMCRawEvent'
+
+    os.system('g++ '+cflags+' -c '+filename+'.cxx')
+    os.system('g++ -o '+filename+' '+filename+'.o '+ldflags)
+    os.system('rm '+filename+'.o')
+
+#check usage
+if len(sys.argv) < 2:
+    sys.exit("USAGE: compile <source file>")
+
+arg_filename = sys.argv[1]
+
+# make sure it exists
+if not os.path.isfile(arg_filename.replace('.cxx', '')+'.cxx'):
+    print 'File does not exist!'
+    sys.exit(1)
+
+# extract the path and source file name
+args = re.split('/', arg_filename)
+targetName = args[-1].replace('.cxx', '')
+sourceName = targetName + '.cxx'
+sourcePath = arg_filename.replace('.cxx', '').replace(targetName, '')
+
+# copy the source file to KTRACKER_ROOT, compile an delete it afterwards
+if len(args) == 1 or (len(args) == 2 and args[0] == '.'):
+    compile(targetName)
+elif os.path.isfile(sourceName):
+    print 'File already exists '+arg_filename.replace(sourceName, '')+'!! Please check.'
+else:
+    os.system('cp '+sourcePath+'/'+sourceName+' '+sourceName)
+    compile(targetName)
+    os.system('rm '+sourceName)
