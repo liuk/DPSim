@@ -28,70 +28,84 @@ public:
     DPIOManager();
     ~DPIOManager();
 
-    //Initialize, called at the beginning of each Run
+    //!Enum type for buffer state
+    enum BufferState {INTERNAL, CLEAN, FILLED, FLUSH};
+
+    //!Enum type for save mode
+    enum SaveMode {EVERYTHING, PRIMARY, HITSONLY, INACCONLY};
+
+    //!Initialize, called at the beginning of each Run
     void initialize(int runID);
 
-    //reset the interal containers at the end of each event
+    //!reset the interal containers at the end of each event
     void reset();
 
-    //set the generation info
+    //!set the generation info
     void fillOneDimuon(double weight, const DPMCDimuon& dimuon);
 
-    //Fill one event, called at the end of each event
+    //!Fill one event, called at the end of each event
     void fillOneEvent(const G4Event*);
 
-    //apply all the analysis module enabled, then push the event to tree
+    //!apply all the analysis module enabled, then push the event to tree
     void finalizeEvent();
 
-    //Fill one track, called at the beginning of each track
+    //!Fill one track, called at the beginning of each track
     void fillOneTrack(const DPMCTrack& mcTrack, bool keep = false);
     void updateOneTrack(unsigned int trackID, G4ThreeVector pos, G4ThreeVector mom, bool keep = false);
 
-    //Fill the hit list from G4Event, and digitize the virtual hits
-    //called by fillOneEvent
+    //!Fill the hit list from G4Event, and digitize the virtual hits called by fillOneEvent
     void fillHitsList(const G4Event* theEvent);
 
-    //Re-index the tracks and hits, called by fillOneEvent
+    //!Re-index the tracks and hits, called by fillOneEvent
     void reIndex();
 
-    //Finalize, called at the end of each Run
+    //!External control of the single buffer state
+    void setBufferState(BufferState flag) { bufferState = flag; }
+
+    //!Finalize, called at the end of each Run
     void finalize();
 
 private:
-    //static pointer
+    //!static pointer
     static DPIOManager* p_IOmamnger;
 
-    //Pointer to the configuration
+    //!Pointer to the configuration
     DPSimConfig* p_config;
 
-    //Pointer to the digitizer
+    //!Pointer to the digitizer
     DPDigitizer* p_digitizer;
 
-    //Pointer to the trigger analyzer
+    //!Pointer to the trigger analyzer
     DPTriggerAnalyzer* p_triggerAna;
 
-    //Pointer to dummy reconstruction
+    //!Pointer to dummy reconstruction
     DPDummyRecon* p_dummyRecon;
 
-    //save mode
-    enum SaveMode {EVERYTHING, PRIMARY, HITSONLY, INACCONLY};
+    //!save mode
     SaveMode saveMode;
 
-    //Output file
+    //!@name Output file
+    //@{
     TFile* saveFile;
     TTree* saveTree;
     TTree* configTree;
     DPMCRawEvent* rawEvent;
+    //@}
 
-    //temporary buffer of the single event
+    //!temporary buffer of the single event
     DPMCRawEvent* singleEvent;
 
-    //container of tracks
+    //!flag used to indicate the state of single event buffer
+    BufferState bufferState;
+
+    //!container of tracks
+    //@{
     std::map<unsigned int, unsigned int> trackIDs; //maps real trackID to index in tracks vector
     std::list<DPVirtualHit> hits;
     std::vector<std::pair<DPMCTrack, bool> > tracks;
+    //@}
 
-    //ID of the hit collection
+    //!ID of the hit collection
     int sensHitColID;
 };
 

@@ -196,10 +196,14 @@ DPPrimaryGeneratorAction::DPPrimaryGeneratorAction()
         externalPositions = new TClonesArray("TVector3");
         externalMomentums = new TClonesArray("TVector3");
 
+        externalInputTree->SetBranchAddress("eventID", &externalEventID);
         externalInputTree->SetBranchAddress("n", &nExternalParticles);
         externalInputTree->SetBranchAddress("pdg", externalParticlePDGs);
         externalInputTree->SetBranchAddress("pos", &externalPositions);
         externalInputTree->SetBranchAddress("mom", &externalMomentums);
+
+        //take over the control of the buffer flushing
+        p_IOmamnger->setBufferState(DPIOManager::CLEAN);
     }
     else if(p_config->generatorType == "Debug")
     {
@@ -613,6 +617,11 @@ void DPPrimaryGeneratorAction::generateExternal()
         particleGun->SetParticlePosition(G4ThreeVector(pos.X()*cm, pos.Y()*cm, pos.Z()*cm));
         particleGun->SetParticleMomentum(G4ThreeVector(mom.X()*GeV, mom.Y()*GeV, mom.Z()*GeV));
         particleGun->GeneratePrimaryVertex(theEvent);
+    }
+
+    if((externalEventID + 1) % p_config->bucket_size == 0 || eventID + 1 == p_config->nEvents)
+    {
+        p_IOmamnger->setBufferState(DPIOManager::FLUSH);
     }
 }
 

@@ -118,7 +118,11 @@ bool DPSimConfig::sanityCheck()
             TTree* exTree = (TTree*)exFile.Get("save");
             int nExternalEvents = exTree->GetEntries();
 
-            if(nEvents > nExternalEvents)
+            if(nEvents < 0)
+            {
+                nEvents = nExternalEvents;
+            }
+            else if(nEvents > nExternalEvents)
             {
                 std::cout << "WARNING: number of pythia events is smaller than the number of events to run!" << std::endl;
                 if(ignoreWarnings)

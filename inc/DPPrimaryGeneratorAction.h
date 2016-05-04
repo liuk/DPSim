@@ -31,8 +31,8 @@ public:
     void GeneratePrimaries(G4Event* anEvent);
 
 public:
-    ///@{
     //!Various generators
+    //@{
     void generateDrellYan();
     void generateJPsi();
     void generatePsip();
@@ -45,7 +45,7 @@ public:
     void generatePhaseSpace();
     void generateExternal();
     void generateDebug();
-    ///@}
+    //@}
 
     //!Dimuon phase space generator
     bool generateDimuon(double mass, double xF, DPMCDimuon& dimuon, bool angular = false);
@@ -86,22 +86,23 @@ private:
     typedef void (DPPrimaryGeneratorAction::*GenPtr)();
     GenPtr p_generator;
 
-    ///@{
     //!Used for external input
+    //@{
     TFile* externalInputFile;
     TTree* externalInputTree;
+    int externalEventID;
     int nExternalParticles;
     int externalParticlePDGs[10000];
     TClonesArray* externalPositions;
     TClonesArray* externalMomentums;
-    ///@}
+    //@}
 
-    ///@{
     //!Common particles to save time
+    //@{
     G4ParticleDefinition* proton;
     G4ParticleDefinition* mup;
     G4ParticleDefinition* mum;
-    ///@}
+    //@}
 };
 
 #endif

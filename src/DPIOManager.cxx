@@ -38,6 +38,9 @@ DPIOManager::DPIOManager(): saveFile(NULL), saveTree(NULL), rawEvent(NULL)
 
     //normally we expect less than 2000 tracks, 2000 hits
     tracks.reserve(2000);
+
+    //turn off external control of single event buffer flushsing
+    bufferState = INTERNAL;
 }
 
 DPIOManager::~DPIOManager()
@@ -171,7 +174,7 @@ void DPIOManager::fillOneEvent(const G4Event* theEvent)
         else
         {
             int eventID = theEvent->GetEventID();
-            if(eventID % p_config->bucket_size == 0)
+            if(bufferState == CLEAN || (bufferState == INTERNAL && eventID % p_config->bucket_size == 0))
             {
 #ifdef DEBUG_IO
                 std::cout << __FILE__ << " " << __FUNCTION__ << " singles mode, eventID = " << eventID
@@ -180,11 +183,13 @@ void DPIOManager::fillOneEvent(const G4Event* theEvent)
                 singleEvent->clear();
                 singleEvent->eventHeader().fEventID = eventID/p_config->bucket_size;
                 singleEvent->eventHeader().fSigWeight = 0.;
+
+                bufferState = FILLED;
             }
 
             *singleEvent += (*rawEvent);
 
-            if((eventID + 1) % p_config->bucket_size == 0 || eventID + 1 == p_config->nEvents)
+            if(bufferState == FLUSH || (bufferState == INTERNAL && ((eventID + 1) % p_config->bucket_size == 0 || eventID + 1 == p_config->nEvents)))
             {
 #ifdef DEBUG_IO
                 std::cout << __FILE__ << " " << __FUNCTION__ << " singles mode, eventID = " << eventID
@@ -218,6 +223,9 @@ void DPIOManager::finalizeEvent()
 
     //save the event
     saveTree->Fill();
+
+    //reset the single flush buffer if necessary
+    if(bufferState != INTERNAL) bufferState = CLEAN;
 
     //flush the buffer of TTree every 1000 entries
     if(saveTree->GetEntries() % 1000 == 0) saveTree->AutoSave("SaveSelf");
