@@ -198,8 +198,8 @@ DPPrimaryGeneratorAction::DPPrimaryGeneratorAction()
 
         externalInputTree->SetBranchAddress("n", &nExternalParticles);
         externalInputTree->SetBranchAddress("pdg", externalParticlePDGs);
-        externalInputTree->SetBranchAddress("pos", externalPositions);
-        externalInputTree->SetBranchAddress("mom", externalMomentums);
+        externalInputTree->SetBranchAddress("pos", &externalPositions);
+        externalInputTree->SetBranchAddress("mom", &externalMomentums);
     }
     else if(p_config->generatorType == "Debug")
     {
