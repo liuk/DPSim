@@ -21,16 +21,16 @@ public:
 private:
     DPIOManager* p_IOmamnger;
 
-    //print frequency
+    //!print frequency
     int printFreq;
 
-    //Total number of events to process
+    //!Total number of events to process
     int nEventsAll;
 
-    //Total time so far
+    //!Total time so far
     double timeElapsed;
 
-    //Timer for performance benchmark
+    //!Timer for performance benchmark
     TStopwatch timer;
 };
 

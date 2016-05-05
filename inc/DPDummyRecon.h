@@ -17,19 +17,19 @@ class DPDummyRecon
 public:
     DPDummyRecon();
 
-    //Reconstruct one event
+    //!Reconstruct one event
     void reconstruct(DPMCRawEvent* rawEvent);
 
-    //Set the initial particle and pos/mom
+    //!Set the initial particle and pos/mom
     void setParticle(int pdgCode, G4ThreeVector pos, G4ThreeVector mom);
 
-    //Swim the track
+    //!Swim the track
     bool swimTo(double z);
 
-    //energy loss for muons
+    //!energy loss for muons
     double dedx(double e);
 
-    //Get the tracks after swimming
+    //!Get the tracks after swimming
     G4ThreeVector getFinalPos() { return finalPos; }
     G4ThreeVector getFinalMom() { return finalMom; }
 
@@ -44,20 +44,20 @@ private:
     G4ErrorMode g4eMode;
     */
 
-    //value of pt kick depending on magnet multiplier
+    //!value of pt kick depending on magnet multiplier
     double ptkick;
 
-    //Pointer to the particle table
+    //!Pointer to the particle table
     G4ParticleTable* particleDict;
 
-    //Particle name
+    //!Particle name
     G4String particleName;
 
-    //Initial state
+    //!Initial states
     G4ThreeVector initPos;
     G4ThreeVector initMom;
 
-    //Final state
+    //!Final states
     G4ThreeVector finalPos;
     G4ThreeVector finalMom;
 };

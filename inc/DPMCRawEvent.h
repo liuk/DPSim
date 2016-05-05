@@ -37,17 +37,21 @@ public:
     friend std::ostream& operator << (std::ostream& os, const DPMCHit& hit);
 
 public:
-    //digitized info
+    //!digitized info
+    //@{
     UInt_t fHitID;
     UInt_t fTrackID;
     Short_t fDetectorID;
     Short_t fElementID;
     Double_t fDriftDistance;
+    //@}
 
-    //truth info
+    //!truth info
+    ///@{
     TVector3 fMomentum;
     TVector3 fPosition;
     //Double_t fDepEnergy;
+    //@}
 
     ClassDef(DPMCHit, 1)
 };
@@ -57,10 +61,10 @@ class DPMCTrack: public TObject
 public:
     DPMCTrack();
 
-    //set the acceptance bit
+    //!set the acceptance bit
     void addHit(DPMCHit& hit);
 
-    //test if is accepted by all hodos
+    //!test if is accepted by all hodos
     bool isAccepted() { return fInHodoAcc[0] && fInHodoAcc[1] && fInHodoAcc[2] && fInHodoAcc[3]; }
 
     friend std::ostream& operator << (std::ostream& os, const DPMCTrack& track);
@@ -103,7 +107,8 @@ public:
 
     bool fAccepted;
 
-public:   //derived variables
+public:
+    //! calculate derived variables
     void calcVariables();
     Double_t fMass, fpT, fxF, fx1, fx2, fCosTh, fPhi;
 
@@ -119,7 +124,7 @@ public:
     DPMCRawEvent();
     virtual ~DPMCRawEvent();
 
-    //re-initialize all the IDs and container
+    //!re-initialize all the IDs and container
     void clear(bool partial = false);
 
     DPMCHeader& eventHeader() { return fEvtHeader; }
@@ -140,20 +145,22 @@ public:
     UInt_t addTrack(DPMCTrack track, Int_t index = -1);
     UInt_t addHit(DPMCHit hit, Int_t trackID = -1, Int_t index = -1);
 
-    //Dummy recon part
+    //!Dummy recon part
+    //@{
     UInt_t getNRecDimuons() { return fNRecDimuons; }
     TClonesArray* getRecDimuons() { return fRecDimuons; }
     DPMCDimuon getRecDimuon(Int_t i) { return *(DPMCDimuon*)fRecDimuons->At(i); }
 
     UInt_t addRecDimuon(DPMCDimuon dimuon, Int_t index = -1);
+    //@}
 
-    //combine multiple events
+    //!combine multiple events
     DPMCRawEvent& operator += (const DPMCRawEvent& event);
 
-    //copy one event
+    //!copy one event
     DPMCRawEvent& operator = (const DPMCRawEvent& event);
 
-    //debugging output
+    //!debugging output
     void print() const;
 
 private:
@@ -168,7 +175,7 @@ private:
     UInt_t fNTracks;
     TClonesArray* fTracks;
 
-    //id = 0 for all, and the rest is for each plane
+    //!id = 0 for all, and the rest is for each plane
     UInt_t fNHits[NDETPLANES+1];
     TClonesArray* fHits;
 

@@ -17,11 +17,11 @@ public:
     explicit DPMagField();
     virtual ~DPMagField();
 
-    //overide the get field method
+    //!overide the get field method
     void GetFieldValue(const double Point[3], double* Bfield) const;
 
 private:
-    //Store the FMag and KMag and any future mags
+    //!Store the FMag and KMag and any future mags
     std::map<G4String, DPFieldMap*> fieldMaps;
 };
 

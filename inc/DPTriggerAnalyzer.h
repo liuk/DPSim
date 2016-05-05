@@ -33,19 +33,20 @@ public:
     DPTriggerRoad();
     DPTriggerRoad(const std::list<int>& path);
 
-    //add one hit into the road
+    //! add one hit into the road
     void addTrElement(int uniqueID) { uniqueTrIDs.push_back(uniqueID); }
     void addTrElement(int detectorID, int elementID) { addTrElement(detectorID*1000 + elementID); }
 
-    //Get the sign of LR or TB
+    //!Get the sign of LR or TB
     //int getLR();
     int getTB();
 
-    //flip the LR or TB
+    //!flip the LR or TB
     //void flipLR();
     void flipTB();
 
-    //Other gets
+    //!Other gets
+    //@{
     int getRoadID() const { return roadID; }
     double getSigWeight() const { return sigWeight; }
     double getBkgRate() const { return bkgRate; }
@@ -53,41 +54,46 @@ public:
     int getTrID(unsigned int i) const { return i < NTRPLANES ? uniqueTrIDs[i] : 0; }
     int getTrDetectorID(unsigned int i) const { return getTrID(i)/1000; }
     int getTrElementID(unsigned int i) const { return getTrID(i) % 1000; }
+    //@}
 
-    //Sets
+    //!Sets
+    //@{
     void setRoadID(int id) { roadID = id; }
     void setSigWeight(double weight) { sigWeight = weight; }
     void setBkgRate(double rate) { bkgRate = rate; }
     void setPxMin(double pxmin) { pXmin = pxmin; }
+    //@}
 
-    //comparison
+    //!comparison
+    //@{
     bool operator == (const DPTriggerRoad& elem) const;
     bool operator <  (const DPTriggerRoad& elem) const;
+    //@}
 
-    //printer
+    //!printer
     friend std::ostream& operator << (std::ostream& os, const DPTriggerRoad& road);
 
 private:
-    //unique road ID
+    //!unique road ID
     int roadID;
 
-    //total signal weight
+    //!total signal weight
     double sigWeight;
 
-    //total background occurance
+    //!total background occurance
     double bkgRate;
 
-    //Minimum Px
+    //!Minimum Px
     double pXmin;
 
-    //unique detector element IDs: = 1000*detectorID + elementID
+    //!unique detector element IDs: = 1000*detectorID + elementID
     std::vector<int> uniqueTrIDs;
 };
 
 class DPTriggerAnalyzer
 {
 public:
-    //Forward declaration of MatrixNode format -- TODO will be eventuall private
+    //!Forward declaration of MatrixNode format -- TODO will be eventuall private
     class MatrixNode;
 
 public:
@@ -96,46 +102,48 @@ public:
 
     static DPTriggerAnalyzer* instance();
 
-    //Build the trigger matrix by the input roads list
+    //!Build the trigger matrix by the input roads list
     void buildTriggerMatrix();
 
-    //Test the trigger pattern
+    //!Test the trigger pattern
     void analyzeTrigger(DPMCRawEvent* rawEvent);
 
-    //create the trigger stations hit pattern, return false if one or more plane is missing
+    //!create the trigger stations hit pattern, return false if one or more plane is missing
     bool buildHitPattern(int nTrHits, int uniqueTrIDs[]);
 
-    //search for possible roads
+    //!search for possible roads
     void searchMatrix(MatrixNode* node, int level, int index);
 
-    //Tree deletetion
+    //!Tree deletetion
     void deleteMatrix(MatrixNode* node);
 
-    //Helper functions to print various things
+    //!Helper functions to print various things
     void printHitPattern();
     void printPath();
 
 private:
     static DPTriggerAnalyzer* p_triggerAna;
 
-    //pointer to the digitizer, or geometry for that matter
+    //!pointer to the digitizer, or geometry for that matter
     DPDigitizer* p_digitizer;
 
-    //Internal hit pattern structure
+    //!Internal hit pattern structure
     typedef std::vector<std::set<int> > TrHitPattern;
     TrHitPattern data;
 
-    //the trigger matrix, 0 for mu+, 1 for mu-
+    //!the trigger matrix, 0 for mu+, 1 for mu-
+    //@{
     MatrixNode* matrix[2];
     std::list<DPTriggerRoad> roads[2];
+    //@}
 
-    //container of the roads found for +/-
+    //!container of the roads found for +/-
     std::list<DPTriggerRoad> roads_found[2];
 
-    //temporary container of traversal path
+    //!temporary container of traversal path
     std::list<int> path;
 
-    //flag on NIM-ONLY analysis
+    //!flag on NIM-ONLY analysis
     bool NIMONLY;
 };
 
@@ -144,7 +152,7 @@ class DPTriggerAnalyzer::MatrixNode
 public:
     MatrixNode(int uID);
 
-    //add a child
+    //!add a child
     void add(MatrixNode* child);
 
 public:

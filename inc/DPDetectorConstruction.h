@@ -18,17 +18,17 @@ public:
     virtual G4VPhysicalVolume* Construct();
     virtual void ConstructSDandField();
 
-    //helper function to extract world volume pointer and access geometry
+    //!helper function to extract world volume pointer and access geometry
     G4VPhysicalVolume* GetWorldPtr() { return physicalWorld; }
 
 private:
-    //pointer to the physical volume
+    //!pointer to the physical volume
     G4VPhysicalVolume* physicalWorld;
 
-    //pointer to the global magnetic field
+    //!pointer to the global magnetic field
     DPMagField* globalField;
 
-    //GDML parser
+    //!GDML parser
     G4GDMLParser gdmlParser;
 
 };
