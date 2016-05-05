@@ -622,7 +622,7 @@ void DPPrimaryGeneratorAction::generateExternal()
 
     if(externalEventID - lastFlushPosition >= p_config->bucket_size || eventID + 1 == p_config->nEvents)
     {
-        lastFlushPosition = externalEventID/p_config->bucket_size;
+        lastFlushPosition = (externalEventID/p_config->bucket_size)*p_config->bucket_size;
         p_IOmamnger->setBufferState(DPIOManager::FLUSH);
     }
 }
