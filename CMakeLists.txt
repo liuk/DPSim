@@ -106,7 +106,7 @@ if(NOT(LIBONLY))
     message(FATAL_ERROR "-- Detecting Pythia8: not found")
   endif()
   execute_process(COMMAND pythia8-config --cxxflags OUTPUT_VARIABLE PYTHIA_CFLAGS  OUTPUT_STRIP_TRAILING_WHITESPACE)
-  execute_process(COMMAND pythia8-config --libs     OUTPUT_VARIABLE PYTHIA_LINK    OUTPUT_STRIP_TRAILING_WHITESPACE)
+  execute_process(COMMAND pythia8-config --libs --lhapdf OUTPUT_VARIABLE PYTHIA_LINK    OUTPUT_STRIP_TRAILING_WHITESPACE)
 
   # MySQL
   find_program(MYSQLCONF "mysql_config")
