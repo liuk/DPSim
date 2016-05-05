@@ -203,6 +203,7 @@ DPPrimaryGeneratorAction::DPPrimaryGeneratorAction()
         externalInputTree->SetBranchAddress("mom", &externalMomentums);
 
         //take over the control of the buffer flushing
+        lastFlushPosition = 0;
         p_IOmamnger->setBufferState(DPIOManager::CLEAN);
     }
     else if(p_config->generatorType == "Debug")
@@ -619,8 +620,9 @@ void DPPrimaryGeneratorAction::generateExternal()
         particleGun->GeneratePrimaryVertex(theEvent);
     }
 
-    if((externalEventID + 1) % p_config->bucket_size == 0 || eventID + 1 == p_config->nEvents)
+    if(externalEventID - lastFlushPosition >= p_config->bucket_size || eventID + 1 == p_config->nEvents)
     {
+        lastFlushPosition = externalEventID/p_config->bucket_size;
         p_IOmamnger->setBufferState(DPIOManager::FLUSH);
     }
 }

@@ -91,6 +91,7 @@ private:
     TFile* externalInputFile;
     TTree* externalInputTree;
     int externalEventID;
+    int lastFlushPosition;
     int nExternalParticles;
     int externalParticlePDGs[10000];
     TClonesArray* externalPositions;
