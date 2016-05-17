@@ -538,6 +538,8 @@ void DPPrimaryGeneratorAction::generatePythiaSingle()
     for(int j = 1; j < p_pythia->event.size(); ++j)
     {
         Pythia8::Particle par = p_pythia->event[j];
+
+        //for every muon track, find its mother and fill it to the track list as well
         if(par.status() > 0 && par.id() != 22)
         {
             particleGun->SetParticleDefinition(particleDict->FindParticle(par.id()));
@@ -620,6 +622,9 @@ void DPPrimaryGeneratorAction::generateExternal()
         particleGun->GeneratePrimaryVertex(theEvent);
     }
 
+    //send the flush signal in two cases: 1. the external eventID increment exceeds bucket size,
+    // 2. this is the last event in external tree
+    if(p_config->bucket_size == 1) return;
     if(externalEventID - lastFlushPosition >= p_config->bucket_size || eventID + 1 == p_config->nEvents)
     {
         lastFlushPosition = (externalEventID/p_config->bucket_size)*p_config->bucket_size;
