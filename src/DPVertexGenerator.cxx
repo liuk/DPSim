@@ -81,7 +81,8 @@ void DPVertexGenerator::init()
 {
     //Initialize the geometry if vertex generator is running alone
     DPDetectorConstruction* detectorCon = G4RunManager::GetRunManager() == NULL ? new DPDetectorConstruction : (DPDetectorConstruction*)G4RunManager::GetRunManager()->GetUserDetectorConstruction();
-
+    if(G4RunManager::GetRunManager() == NULL) detectorCon->Construct();
+    
     //Traverse the geometry tree to get all the volumes and hence their materials
     const G4VPhysicalVolume* world = detectorCon->GetWorldPtr();
     const G4LogicalVolume* worldLogical = world->GetLogicalVolume();
