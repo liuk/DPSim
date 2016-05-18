@@ -11,7 +11,6 @@
 
 #include "DPSimConfig.h"
 #include "DPMCRawEvent.h"
-#include "DPDetectorConstruction.h"
 
 class DPBeamLineObject
 {
@@ -35,7 +34,7 @@ public:
     //initialized by material property
     double nucIntLen;        //nuclear interaction length in cm
     double density;          //density in g/cm3
-    double Z, A, N;          //number of protons, necleons, neutrons
+    double Z, A, N;          //number of protons, nucleons, neutrons
     double protonPerc;       //percentage of protons = Z/A;
 
     //intialized by its neighbours
@@ -52,7 +51,7 @@ public:
     static DPVertexGenerator* instance();
 
     //initialize and read the beam line objects from database
-    void init(DPDetectorConstruction* worldPtr = NULL);
+    void init();
 
     //get the vertex generated
     void generateVertex(DPMCDimuon& dimuon);

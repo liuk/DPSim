@@ -55,7 +55,7 @@ int main(int argc, char* argv[])
 
     //Initialize vertex generator
     DPVertexGenerator* p_vertexGen = DPVertexGenerator::instance();
-    p_vertexGen->init(new DPDetectorConstruction);
+    p_vertexGen->init();
 
     //Initialize Output file
     int eventID;
