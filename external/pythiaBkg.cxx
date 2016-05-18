@@ -19,22 +19,26 @@
 #include "DPEventAction.h"
 #include "DPTrackingAction.h"
 #include "DPSteppingAction.h"
+#include "DPVertexGenerator.h"
 #include "DPSimConfig.h"
 
 using namespace std;
 using namespace Pythia8;
 
-//All tracks passed to this function are muons
+//All tracks passed to this function are muons, and the mother
+//particles are pions
 bool keepTrack(double decayLength, double z0, TVector3 mom)
 {
-    double Lint = 20.42; //this is the pion interaction length in iron
+    double Lint = 20.42;       //this is the pion interaction length in iron
+    double dumpLength = 502.;  //this is the total length of beam dump
+    double dumpHoleLen = 25.4; //this is the depth of the hole on dump face
 
     //See if the pion would be absorbed in beam dump
-    double lengthInIron = z0 + decayLength - 25.4;   //there is a hole on the beam dump
+    double lengthInIron = z0 + decayLength - dumpHoleLen;   //there is a hole on the beam dump
     if(G4UniformRand() > TMath::Exp(-lengthInIron/Lint)) return false;
 
-    //see if the muon has enough energy to penetrate beam dump
-    double remainingLengthInIron = lengthInIron > 0 ? 502. - lengthInIron : 502.;
+    //see if the muon has enough energy to penetrate beam dump, conservative cut > 0.01GeV/cm
+    double remainingLengthInIron = lengthInIron > 0 ? dumpLength - lengthInIron : dumpLength;
     if(mom.Mag()/remainingLengthInIron < 0.01) return false;
 
     //see if the opening angle is within acceptance
@@ -47,35 +51,11 @@ int main(int argc, char* argv[])
 {
     //Initialize the configuration
     DPSimConfig* p_config = DPSimConfig::instance();
-    p_config->targetInBeam = true;
-    p_config->dumpInBeam = true;
-    p_config->instruInBeam = true;
-    p_config->airInBeam = true;
-    //p_config->init(argv[1]);
+    p_config->init(argv[1]);
 
-    //set random seed
-    CLHEP::HepRandom::setTheSeed(p_config->seed);
-
-    //General Initialization
-    G4RunManager* runManager = new G4RunManager;
-    runManager->SetUserInitialization(new DPDetectorConstruction);
-
-    /* NOTE: let's see if this works
-    G4PhysListFactory factory;
-    runManager->SetUserInitialization(factory.GetReferencePhysList("FTFP_BERT_EMX"));
-
-    //User actions
-    DPPrimaryGeneratorAction* primaryGenerator = new DPPrimaryGeneratorAction;
-    runManager->SetUserAction(primaryGenerator);
-
-    runManager->SetUserAction(new DPRunAction);
-    runManager->SetUserAction(new DPEventAction);
-    runManager->SetUserAction(new DPTrackingAction);
-    runManager->SetUserAction(new DPSteppingAction);
-
-    runManager->SetRunIDCounter(p_config->seed);   //use seed as the runID
-    */
-    runManager->Initialize();
+    //Initialize vertex generator
+    DPVertexGenerator* p_vertexGen = DPVertexGenerator::instance();
+    p_vertexGen->init(new DPDetectorConstruction);
 
     //Initialize Output file
     int eventID;
@@ -84,34 +64,30 @@ int main(int argc, char* argv[])
     TClonesArray* p_pos = new TClonesArray("TVector3");  p_pos->BypassStreamer(); TClonesArray& pos = *p_pos;
     TClonesArray* p_mom = new TClonesArray("TVector3");  p_mom->BypassStreamer(); TClonesArray& mom = *p_mom;
 
-    TFile* saveFile = new TFile(argv[1], "recreate");
+    TFile* saveFile = new TFile(p_config->outputFileName, "recreate");
     TTree* saveTree = new TTree("save", "save");
 
     saveTree->Branch("eventID", &eventID, "eventID/I");
     saveTree->Branch("n", &n, "n/I");
-    saveTree->Branch("pdg", &pdg, "pdg[n]/I");
-    saveTree->Branch("pos", &pos, 256000, 99);
-    saveTree->Branch("mom", &mom, 256000, 99);
+    saveTree->Branch("pdg", pdg, "pdg[n]/I");
+    saveTree->Branch("pos", &p_pos, 256000, 99);
+    saveTree->Branch("mom", &p_mom, 256000, 99);
 
     //Initialize pythia for pp and pn collisions
     Pythia ppGen;
-    ppGen.readFile(argv[2]);
-    ppGen.readString(Form("Random:seed = %d", atoi(argv[3])));
+    ppGen.readFile(p_config->pythiaConfig.Data());
+    ppGen.readString(Form("Random:seed = %d", p_config->seed));
     ppGen.readString("Beams:idB = 2212");
     ppGen.init();
 
     Pythia pnGen;
-    pnGen.readFile(argv[2]);
-    pnGen.readString(Form("Random:seed = %d", atoi(argv[3])+1));
+    pnGen.readFile(p_config->pythiaConfig.Data());
+    pnGen.readString(Form("Random:seed = %d", p_config->seed));
     pnGen.readString("Beams:idB = 2112");
     pnGen.init();
 
-    //Initialize vertex generator
-    DPVertexGenerator* p_vertexGen = DPVertexGenerator::instance();
-    p_vertexGen->init();
-
     //Main loop
-    int nEvents = atoi(argv[4]);
+    int nEvents = p_config->nEvents;
     for(int i = 0; i < nEvents; ++i)
     {
         double zvtx = p_vertexGen->generateVertex();
@@ -123,7 +99,7 @@ int main(int argc, char* argv[])
 
         n = 0;
         eventID = i;
-        int nParticles = 0;
+        int nParticles = events.size();
         for(int j = 1; j < nParticles; ++j)
         {
             if(abs(events[j].id()) == 13)
@@ -148,12 +124,11 @@ int main(int argc, char* argv[])
             }
         }
 
-        if(n > 0)
-        {
-            saveTree->Fill();
-            mom.Clear();
-            pos.Clear();
-        }
+        if(n == 0) continue;
+
+        saveTree->Fill();
+        mom.Clear();
+        pos.Clear();
     }
 
     //finalize

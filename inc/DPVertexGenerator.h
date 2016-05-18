@@ -11,6 +11,7 @@
 
 #include "DPSimConfig.h"
 #include "DPMCRawEvent.h"
+#include "DPDetectorConstruction.h"
 
 class DPBeamLineObject
 {
@@ -51,7 +52,7 @@ public:
     static DPVertexGenerator* instance();
 
     //initialize and read the beam line objects from database
-    void init();
+    void init(DPDetectorConstruction* worldPtr = NULL);
 
     //get the vertex generated
     void generateVertex(DPMCDimuon& dimuon);

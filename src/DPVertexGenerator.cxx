@@ -77,10 +77,10 @@ DPVertexGenerator::DPVertexGenerator()
     p_config = DPSimConfig::instance();
 }
 
-void DPVertexGenerator::init()
+void DPVertexGenerator::init(DPDetectorConstruction* worldPtr)
 {
     //Traverse the geometry tree to get all the volumes and hence their materials
-    const G4VPhysicalVolume* world = ((DPDetectorConstruction*)G4RunManager::GetRunManager()->GetUserDetectorConstruction())->GetWorldPtr();
+    const G4VPhysicalVolume* world = worldPtr == NULL ? ((DPDetectorConstruction*)G4RunManager::GetRunManager()->GetUserDetectorConstruction())->GetWorldPtr() : (G4VPhysicalVolume*)worldPtr;
     const G4LogicalVolume* worldLogical = world->GetLogicalVolume();
 
     int nDaughters = worldLogical->GetNoDaughters();
