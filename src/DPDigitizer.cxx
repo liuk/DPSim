@@ -215,6 +215,7 @@ void DPDigitizer::digitize(DPVirtualHit& vHit)
         digiHit.fDriftDistance = driftDistance;
         digiHit.fMomentum.SetXYZ(vHit.mom[0]/GeV, vHit.mom[1]/GeV, vHit.mom[2]/GeV);
         digiHit.fPosition.SetXYZ(pos[0], pos[1], pos[2]);
+        digiHit.fDepEnergy = vHit.edep;
 
         if(realize(digiHit)) vHit.digiHits.push_back(digiHit);
 
@@ -234,6 +235,12 @@ void DPDigitizer::digitize(DPVirtualHit& vHit)
                 if(realize(digiHit)) vHit.digiHits.push_back(digiHit);
             }
         }
+    }
+
+    //split the energy deposition to all digihits
+    for(std::vector<DPMCHit>::iterator iter = vHit.digiHits.begin(); iter != vHit.digiHits.end(); ++iter)
+    {
+        iter->fDepEnergy = iter->fDepEnergy/vHit.digiHits.size();
     }
 }
 
