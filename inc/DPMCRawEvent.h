@@ -50,10 +50,10 @@ public:
     ///@{
     TVector3 fMomentum;
     TVector3 fPosition;
-    //Double_t fDepEnergy;
+    Double_t fDepEnergy;
     //@}
 
-    ClassDef(DPMCHit, 1)
+    ClassDef(DPMCHit, 2)
 };
 
 class DPMCTrack: public TObject

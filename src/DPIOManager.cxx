@@ -274,8 +274,20 @@ void DPIOManager::fillHitsList(const G4Event* theEvent)
         hits.push_back(*((*sensHC)[i]));
     }
 
-    //remove duplicate virtual hits before digitization
+    //remove duplicate virtual hits before digitization, merge all the energy deposite to the first of the group, then keep the first hit only
     hits.sort();
+    DPVirtualHit* p_vHit = NULL;
+    for(std::list<DPVirtualHit>::iterator iter = hits.begin(); iter != hits.end(); ++iter)
+    {
+        if(p_vHit == NULL || iter->detectorGroupName != p_vHit->detectorGroupName)  // there comes a new hit
+        {
+            p_vHit = &(*iter);
+        }
+        else
+        {
+            p_vHit->edep += iter->edep;
+        }
+    }
     hits.unique();
 
     for(std::list<DPVirtualHit>::iterator iter = hits.begin(); iter != hits.end(); ++iter)
