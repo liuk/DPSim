@@ -69,6 +69,7 @@ public:
     TString externalInput;    // Input ROOT file containing the generator info
     TString pythiaConfig;     // pythia configuration file
     TString customLUT;        // custom dimuon cross section look-up table, used in custom mode
+    TString testParticle;     // particle type for single particle test generator
     //@}
 
     //!Beam line objects setup

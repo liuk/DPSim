@@ -182,6 +182,22 @@ DPPrimaryGeneratorAction::DPPrimaryGeneratorAction()
         {
             std::cout << " Using test single generator ..." << std::endl;
             p_generator = &DPPrimaryGeneratorAction::generateTestSingle;
+
+            if(p_config->testParticle == "mu")
+            {
+                testPar[0] = mup;
+                testPar[1] = mum;
+            }
+            else if(p_config->testParticle == "e")
+            {
+                testPar[0] = ep;
+                testPar[1] = em;
+            }
+            else if(p_config->testParticle == "pi")
+            {
+                testPar[0] = pip;
+                testPar[1] = pim;
+            }
         }
         else
         {
@@ -579,7 +595,7 @@ void DPPrimaryGeneratorAction::generateTestSingle()
     double y = G4RandGauss::shoot(0., 1.5)*cm;
     double z = (G4UniformRand()*(p_config->zOffsetMax - p_config->zOffsetMin) + p_config->zOffsetMin)*cm;
 
-    particleGun->SetParticleDefinition(G4UniformRand() > 0.5 ? mup : mum);
+    particleGun->SetParticleDefinition(G4UniformRand() > 0.5 ? testPar[0] : testPar[1]);
     particleGun->SetParticlePosition(G4ThreeVector(x, y, z));
     particleGun->SetParticleMomentum(G4ThreeVector(px, py, pz));
     particleGun->GeneratePrimaryVertex(theEvent);
