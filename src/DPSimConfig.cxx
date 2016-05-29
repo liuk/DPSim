@@ -61,6 +61,7 @@ void DPSimConfig::init(TString configFile)
     externalInput = pString("externalInput");
     pythiaConfig = pString("pythiaConfig");
     customLUT = pString("customLUT");
+    testParticle = pString("testParticle", "mu");
 
     targetInBeam = pBool("targetInBeam", true);
     dumpInBeam = pBool("dumpInBeam", false);
