@@ -61,6 +61,10 @@ DPPrimaryGeneratorAction::DPPrimaryGeneratorAction()
     proton = particleDict->FindParticle(2212);
     mup = particleDict->FindParticle(-13);
     mum = particleDict->FindParticle(13);
+    ep = particleDict->FindParticle(-11);
+    em = particleDict->FindParticle(11);
+    pip = particleDict->FindParticle(211);
+    pim = particleDict->FindParticle(-211);
 
     pdf = LHAPDF::mkPDF("CT10nlo", 0);
 
