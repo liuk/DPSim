@@ -215,7 +215,7 @@ void DPDigitizer::digitize(DPVirtualHit& vHit)
         digiHit.fDriftDistance = driftDistance;
         digiHit.fMomentum.SetXYZ(vHit.mom[0]/GeV, vHit.mom[1]/GeV, vHit.mom[2]/GeV);
         digiHit.fPosition.SetXYZ(pos[0], pos[1], pos[2]);
-        digiHit.fDepEnergy = vHit.edep;
+        digiHit.fDepEnergy = vHit.edep/GeV;
 
         if(realize(digiHit)) vHit.digiHits.push_back(digiHit);
 

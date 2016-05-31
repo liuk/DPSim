@@ -279,7 +279,7 @@ void DPIOManager::fillHitsList(const G4Event* theEvent)
     DPVirtualHit* p_vHit = NULL;
     for(std::list<DPVirtualHit>::iterator iter = hits.begin(); iter != hits.end(); ++iter)
     {
-        if(p_vHit == NULL || (iter->detectorGroupName != p_vHit->detectorGroupName && iter->particleID != p_vHit->particleID))  // there comes a new hit
+        if(p_vHit == NULL || (iter->detectorGroupName != p_vHit->detectorGroupName || iter->particleID != p_vHit->particleID))  // there comes a new hit
         {
             p_vHit = &(*iter);
         }
