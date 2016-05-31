@@ -210,6 +210,7 @@ void DPDigitizer::digitize(DPVirtualHit& vHit)
         if(elementID < 1 || elementID > digiPlanes[*dpid].nElements || fabs(driftDistance) > 0.5*digiPlanes[*dpid].cellWidth) continue;
 
         DPMCHit digiHit;
+        digiHit.fPDGCode = vHit.particlePDG;
         digiHit.fDetectorID = digiPlanes[*dpid].detectorID;
         digiHit.fElementID = elementID;
         digiHit.fDriftDistance = driftDistance;

@@ -48,6 +48,7 @@ public:
 
     //!truth info
     ///@{
+    Int_t fPDGCode;
     TVector3 fMomentum;
     TVector3 fPosition;
     Double_t fDepEnergy;
