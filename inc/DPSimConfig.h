@@ -70,6 +70,7 @@ public:
     TString pythiaConfig;     // pythia configuration file
     TString customLUT;        // custom dimuon cross section look-up table, used in custom mode
     TString testParticle;     // particle type for single particle test generator
+    TString physicsList;      // physics list used to simulate detector effects
     //@}
 
     //!Beam line objects setup

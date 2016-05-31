@@ -62,6 +62,7 @@ void DPSimConfig::init(TString configFile)
     pythiaConfig = pString("pythiaConfig");
     customLUT = pString("customLUT");
     testParticle = pString("testParticle", "mu");
+    physicsList = pString("physicsList", "FTFP_BERT_EMX");
 
     targetInBeam = pBool("targetInBeam", true);
     dumpInBeam = pBool("dumpInBeam", false);
