@@ -85,10 +85,12 @@ print inputs, ginputs
 for i, conf in enumerate(confs):
     reservedVals = [eval(formula) for formula in reservedValFormula]
     if options.local:
-        reservedVals.append(inputs[i])
+        if len(options.input) > 0:
+            reservedVals.append(inputs[i])
         tconf.generate(conf, seed = options.seed + i, outputName = outputs[i], reserved = dict(zip(reservedKeys, reservedVals)), cmdargs = sys.argv)
     if options.grid:
-        reservedVals.append(ginputs[i])
+        if len(options.input) > 0:
+            reservedVals.append(ginputs[i])
         tconf.generate(conf, seed = options.seed + i, outputName = goutputs[i], reserved = dict(zip(reservedKeys, reservedVals)), cmdargs = sys.argv)
     print reservedKeys, reservedVals
 
