@@ -6,13 +6,10 @@ from datetime import datetime
 from optparse import OptionParser
 from DPSimJobConf import DPSimJobConf
 
-run_enable = False
-
 ## simple function to run a command
 def runCmd(cmd):
     print cmd
-    if run_enable:
-        os.system(cmd)
+    os.system(cmd)
 
 ## parse the command line controls
 parser = OptionParser('Usage: %prog [options]')
@@ -79,9 +76,6 @@ if len(options.input) > 0:  # used in external input mode only
     inputs = [os.path.abspath(options.input % str(i)) for i in range(options.nJobs)]
     ginputs = ['$CONDOR_DIR_INPUT/%s' % (options.input.split('/')[-1] % str(i)) for i in range(options.nJobs)]  # local input file on node
 
-print outputs, goutputs
-print inputs, ginputs
-
 for i, conf in enumerate(confs):
     reservedVals = [eval(formula) for formula in reservedValFormula]
     if options.local:
@@ -92,7 +86,6 @@ for i, conf in enumerate(confs):
         if len(options.input) > 0:
             reservedVals.append(ginputs[i])
         tconf.generate(conf, seed = options.seed + i, outputName = goutputs[i], reserved = dict(zip(reservedKeys, reservedVals)), cmdargs = sys.argv)
-    print reservedKeys, reservedVals
 
 ## if in local mode, make everything locally in the background
 if options.local:
@@ -137,7 +130,7 @@ if options.grid:
         fout.write('exit $status\n')
 
         fout.close()
-        runCmd('chmod u+x %s' % wrappers[i])
+        os.system('chmod u+x %s' % wrappers[i])
 
     # make jobsub commands and submit
     for i in range(len(confs)):
@@ -146,7 +139,7 @@ if options.grid:
         cmd = cmd + ' -f %s' % confs[i]
         if len(options.input) > 0:
             cmd = cmd + ' -f %s' % inputs[i]
-        cmd = cmd + ' -d OUTPUT %s' % outputs[i]
+        cmd = cmd + ' -d OUTPUT %s' % outputdir
         cmd = cmd + ' file://`which %s`' % wrappers[i]
 
         runCmd(cmd)
