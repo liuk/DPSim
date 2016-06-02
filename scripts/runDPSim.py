@@ -115,8 +115,8 @@ if options.grid:
         fout.write('echo --------------------------------------------------------------------\n')
         fout.write('echo\n')
 
-        #fout.write('source ' + os.path.join(os.getenv('SEAQUEST_DISTRIBUTION_ROOT'), 'setup/setup.sh') + '\n')
-        fout.write('source ' + os.path.join(os.getenv('DPSIM_ROOT'), 'exenv.sh') + '\n')
+        fout.write('source ' + os.path.join(os.getenv('SEAQUEST_DISTRIBUTION_ROOT'), 'setup/setup.sh') + '\n')
+        fout.write('source ' + os.path.join(os.getenv('DPSIM_ROOT'), 'setup.sh') + '\n')
         fout.write('cd $_CONDOR_SCRATCH_DIR\n')
         fout.write('start_sec=$(date +%s)\n')
         fout.write('start_time=$(date +%F_%T)\n')
