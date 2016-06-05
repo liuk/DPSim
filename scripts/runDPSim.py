@@ -91,6 +91,9 @@ for i, conf in enumerate(confs):
 if options.local:
     for i in range(len(confs)):
         cmd = '%s %s > %s &' % (DPSim, confs[i], logs[i])
+        if len(options.input) > 0  and (not os.path.exists(inputs[i])):
+            print 'External input file', inputs[i], 'does not exist!'
+            break
         runCmd(cmd)
 
 ## if in grid mode, assume running on gpvm machines
@@ -141,5 +144,9 @@ if options.grid:
             cmd = cmd + ' -f %s' % inputs[i]
         cmd = cmd + ' -d OUTPUT %s' % outputdir
         cmd = cmd + ' file://`which %s`' % wrappers[i]
+
+        if len(options.input) > 0 and (not os.path.exists(inputs[i])):
+            print 'External input file', inputs[i], 'does not exist!'
+            break
 
         runCmd(cmd)
