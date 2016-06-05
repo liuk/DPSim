@@ -93,7 +93,7 @@ if options.local:
         cmd = '%s %s > %s &' % (DPSim, confs[i], logs[i])
         if len(options.input) > 0  and (not os.path.exists(inputs[i])):
             print 'External input file', inputs[i], 'does not exist!'
-            break
+            continue
         runCmd(cmd)
 
 ## if in grid mode, assume running on gpvm machines
@@ -147,6 +147,6 @@ if options.grid:
 
         if len(options.input) > 0 and (not os.path.exists(inputs[i])):
             print 'External input file', inputs[i], 'does not exist!'
-            break
+            continue
 
         runCmd(cmd)
