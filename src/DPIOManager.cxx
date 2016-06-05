@@ -207,7 +207,7 @@ void DPIOManager::fillOneEvent(const G4Event* theEvent)
 void DPIOManager::finalizeEvent()
 {
     //Pass the event through post-simulation analysis
-    p_triggerAna->analyzeTrigger(rawEvent);
+    p_triggerAna->analyzeTrigger(singleEvent == NULL ? rawEvent : singleEvent);
     if(p_config->enableDummyRecon) p_dummyRecon->reconstruct(rawEvent);
 
 #ifdef DEBUG_IO
