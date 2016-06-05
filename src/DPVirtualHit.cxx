@@ -10,11 +10,10 @@ DPVirtualHit::~DPVirtualHit() {}
 
 bool DPVirtualHit::operator < (const DPVirtualHit& elem) const
 {
-    if(particleID > elem.particleID) return false;
-    if(detectorGroupName > elem.detectorGroupName) return false;
-    if(edep < elem.edep) return false;
+    if(particleID != elem.particleID) return particleID < elem.particleID;
+    if(detectorGroupName != elem.detectorGroupName) return detectorGroupName < elem.detectorGroupName;
 
-    return true;
+    return edep >= elem.edep;
 }
 
 bool DPVirtualHit::operator == (const DPVirtualHit& elem) const
@@ -25,7 +24,7 @@ bool DPVirtualHit::operator == (const DPVirtualHit& elem) const
 std::ostream& operator << (std::ostream& os, const DPVirtualHit& hit)
 {
     os << "Hit comes from track " << hit.particleID << ", with PDG = " << hit.particlePDG << "\n"
-       << "   on detector group " << hit.detectorGroupName << ", energy deposited = " << hit.edep << "\n"
+       << "   on detector group " << hit.detectorGroupName << ", energy deposited = " << hit.edep/GeV << " GeV\n"
        << "   real position = (" << hit.pos[0]/cm << ", " << hit.pos[1]/cm << ", " << hit.pos[2]/cm << ") cm\n"
        << "   real momentum = (" << hit.mom[0]/GeV << ", " << hit.mom[1]/GeV << ", " << hit.mom[2]/GeV << ") GeV\n"
        << "   has " << hit.digiHits.size() << " digi hits attached. ";

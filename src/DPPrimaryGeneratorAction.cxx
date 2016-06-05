@@ -222,7 +222,7 @@ DPPrimaryGeneratorAction::DPPrimaryGeneratorAction()
         externalInputTree->SetBranchAddress("pos", &externalPositions);
         externalInputTree->SetBranchAddress("mom", &externalMomentums);
 
-        //take over the control of the buffer flushing
+        //take over the control of the buffer flushing, TODO: move this thing to somewhere else
         lastFlushPosition = 0;
         p_IOmamnger->setBufferState(DPIOManager::CLEAN);
     }
