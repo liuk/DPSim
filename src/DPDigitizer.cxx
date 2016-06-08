@@ -3,6 +3,9 @@
 
 #include <iomanip>
 #include <cmath>
+#include <fstream>
+#include <sstream>
+#include <string>
 
 #include "G4SystemOfUnits.hh"
 #include "Randomize.hh"
@@ -185,6 +188,27 @@ DPDigitizer::DPDigitizer()
 
     delete res;
     delete server;
+
+    //Load the detector realization setup
+    std::ifstream fin(p_config->detectorEffResol.Data());
+    if(!fin) return;
+
+    std::string line;
+    while(getline(fin, line))
+    {
+        std::string detectorName;
+        int elementID;
+        double eff, res;
+
+        std::stringstream ss(line);
+        ss >> detectorName >> elementID >> eff >> res;
+
+        if(eff >= 0. && eff <= 1. && res >= 0.)
+        {
+            digiPlanes[map_detectorID[detectorName]].efficiency[elementID] = eff;
+            digiPlanes[map_detectorID[detectorName]].resolution[elementID] = res;
+        }
+    }
 }
 
 void DPDigitizer::digitize(DPVirtualHit& vHit)
@@ -247,6 +271,8 @@ void DPDigitizer::digitize(DPVirtualHit& vHit)
 
 bool DPDigitizer::realize(DPMCHit& dHit)
 {
+    if(G4UniformRand() > digiPlanes[dHit.fDetectorID].efficiency[dHit.fElementID]) return false;
+
     dHit.fDriftDistance += (G4RandGauss::shoot(0., digiPlanes[dHit.fDetectorID].resolution[dHit.fElementID]));
-    return G4UniformRand() < digiPlanes[dHit.fDetectorID].efficiency[dHit.fElementID];
+    return true;
 }
