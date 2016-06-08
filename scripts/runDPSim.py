@@ -13,6 +13,7 @@ def runCmd(cmd):
 
 ## parse the command line controls
 parser = OptionParser('Usage: %prog [options]')
+parser.add_option('-p', '--prog', type = 'string', dest = 'prog', help = 'program to run', default = 'DPSim')
 parser.add_option('-t', '--template', type = 'string', dest = 'template', help = 'Input template for the conf file gen', default = 'example.conf')
 parser.add_option('-i', '--input', type = 'string', dest = 'input', help = 'input files', default = '')
 parser.add_option('-o', '--output', type = 'string', dest = 'output', help = 'output file prefix', default = 'out_%s')
@@ -49,7 +50,7 @@ if options.addition != '':
 
 ## initialize the conf file generator, and the executable DPSim
 tconf = DPSimJobConf(options.template, reservedKeys)
-DPSim = os.path.join(os.getenv('DPSIM_ROOT'), 'build', 'bin', 'DPSim')
+prog = os.path.join(os.getenv('DPSIM_ROOT'), 'build', 'bin', options.prog)
 
 ## set up the working directories
 workdir = os.path.abspath(options.workdir)
@@ -90,7 +91,7 @@ for i, conf in enumerate(confs):
 ## if in local mode, make everything locally in the background
 if options.local:
     for i in range(len(confs)):
-        cmd = '%s %s > %s &' % (DPSim, confs[i], logs[i])
+        cmd = '%s %s > %s &' % (prog, confs[i], logs[i])
         if len(options.input) > 0  and (not os.path.exists(inputs[i])):
             print 'External input file', inputs[i], 'does not exist!'
             continue
@@ -123,7 +124,7 @@ if options.grid:
         fout.write('cd $_CONDOR_SCRATCH_DIR\n')
         fout.write('start_sec=$(date +%s)\n')
         fout.write('start_time=$(date +%F_%T)\n')
-        fout.write('%s $CONDOR_DIR_INPUT/%s\n' % (DPSim, confs[i].split('/')[-1]))
+        fout.write('%s $CONDOR_DIR_INPUT/%s\n' % (prog, confs[i].split('/')[-1]))
         fout.write('status=$?\n')
         fout.write('stop_time=$(date +%F_%T)\n')
         fout.write('stop_sec=$(date +%s)\n')

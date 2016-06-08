@@ -43,6 +43,7 @@ void DPSimConfig::init(TString configFile)
     beamCurrent = pDouble("beamCurrent", 1.E12);
 
     geometryGDMLInput = pString("geometryGDMLInput");
+    detectorEffResol = pString("detectorEffResol");
     geometrySchema = pString("geometrySchema");
     mysqlServer = pString("mysqlServer");
     mysqlPort = pInt("mysqlPort", 3306);

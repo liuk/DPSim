@@ -44,6 +44,7 @@ public:
     //!Detector setup
     //@{
     TString geometryGDMLInput;// The GDML file for geometry
+    TString detectorEffResol; // The table of channel-by-channel efficiency and resolution
     TString geometrySchema;   // The sql schema that GMC pulls the geometry information from
     TString mysqlServer;      // Address of the SQL Server, shouldn't need to modify
     Int_t   mysqlPort;        // The port number for MySQL
