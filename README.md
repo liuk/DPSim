@@ -80,6 +80,8 @@ After the above steps, re-compile and re-run the `gdmlWriter.py` to generate the
 
 In scripts directory, a python script `runDPSim.py` is provided to support running DPSim batch jobs either locally or on FermiGrid. Run `./runDPSim.py -h` for more details.
 
+***
+
 ### Line-by-line explaination of the conf file
 
 ```

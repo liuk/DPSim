@@ -99,11 +99,13 @@ DPTriggerAnalyzer::DPTriggerAnalyzer() : NIMONLY(false)
     {
         stringstream ss(line);
 
-        int charge, roadID, uID1, uID2, uID3, uID4;
+        int charge, roadID;
+        int uIDs[NTRPLANES];
         double pXmin, sigWeight, bkgRate;
 
-        ss >> charge >> roadID >> uID1 >> uID2 >> uID3 >> uID4
-           >> pXmin >> sigWeight >> bkgRate;
+        ss >> charge >> roadID;
+        for(int i = 0; i < NTRPLANES; ++i) ss >> uIDs[i];
+        ss >> pXmin >> sigWeight >> bkgRate;
 
         DPTriggerRoad road;
         road.setRoadID(roadID);
@@ -111,11 +113,7 @@ DPTriggerAnalyzer::DPTriggerAnalyzer() : NIMONLY(false)
         road.setBkgRate(bkgRate);
         road.setPxMin(pXmin);
 
-        road.addTrElement(uID1);
-        road.addTrElement(uID2);
-        road.addTrElement(uID3);
-        road.addTrElement(uID4);
-
+        for(int i = 0; i < NTRPLANES; ++i) road.addTrElement(uIDs[i]);
         roads[(-charge+1)/2].push_back(road);
     }
 
