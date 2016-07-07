@@ -75,6 +75,7 @@ DPVertexGenerator* DPVertexGenerator::instance()
 DPVertexGenerator::DPVertexGenerator()
 {
     p_config = DPSimConfig::instance();
+    beamProf = NULL;
 }
 
 void DPVertexGenerator::init()
@@ -174,13 +175,11 @@ void DPVertexGenerator::init()
         accumulatedProbs[i] = accumulatedProbs[i]/accumulatedProbs[nPieces];
     }
 
-//#ifdef DEBUG_IN
     std::cout << "Following objects will interact with beam:" << std::endl;
     for(int i = 0; i < nPieces; ++i)
     {
         std::cout << i << " " << interactables[i] << std::endl;
     }
-//#endif
 }
 
 double DPVertexGenerator::generateVertex()
@@ -194,15 +193,28 @@ void DPVertexGenerator::generateVertex(DPMCDimuon& dimuon)
 {
     findInteractingPiece();
 
-    dimuon.fVertex.SetX(G4RandGauss::shoot(0., 1.5));
-    dimuon.fVertex.SetY(G4RandGauss::shoot(0., 1.5));
-    dimuon.fVertex.SetZ(interactables[index].getZ());
+    double x, y;
+    generateVtxPerp(x, y);
+    dimuon.fVertex.SetXYZ(x, y, interactables[index].getZ());
     dimuon.fOriginVol = interactables[index].name;
 
     if(p_config->zOffsetMin < p_config->zOffsetMax)
     {
         double zOffset = p_config->zOffsetMin + G4UniformRand()*(p_config->zOffsetMax - p_config->zOffsetMin);
         dimuon.fVertex.SetZ(interactables[index].getZ() + zOffset);
+    }
+}
+
+void DPVertexGenerator::generateVtxPerp(double& x, double& y)
+{
+    if(beamProf != NULL)
+    {
+        beamProf->GetRandom2(x, y);
+    }
+    else
+    {
+        x = G4RandGauss::shoot(0., 1.5);
+        y = G4RandGauss::shoot(0., 1.5);
     }
 }
 
