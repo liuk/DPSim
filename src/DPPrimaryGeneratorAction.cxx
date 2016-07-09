@@ -101,8 +101,11 @@ DPPrimaryGeneratorAction::DPPrimaryGeneratorAction()
             ppGen.readFile(p_config->pythiaConfig.Data());
             pnGen.readFile(p_config->pythiaConfig.Data());
 
-            ppGen.init(2212, 2212, 120., 0.);
-            pnGen.init(2212, 2112, 120., 0.);
+            ppGen.readString("Beams:idB = 2212");
+            ppGen.readString("Beams:idB = 2112");
+
+            ppGen.init();
+            pnGen.init();
         }
         else if(p_config->generatorEng == "DarkPhotonFromEta")
         {
@@ -112,8 +115,11 @@ DPPrimaryGeneratorAction::DPPrimaryGeneratorAction()
             ppGen.readFile(p_config->pythiaConfig.Data());
             pnGen.readFile(p_config->pythiaConfig.Data());
 
-            ppGen.init(2212, 2212, 120., 0.);
-            pnGen.init(2212, 2112, 120., 0.);
+            ppGen.readString("Beams:idB = 2212");
+            ppGen.readString("Beams:idB = 2112");
+
+            ppGen.init();
+            pnGen.init();
         }
         else if(p_config->generatorEng == "custom")
         {
@@ -131,7 +137,7 @@ DPPrimaryGeneratorAction::DPPrimaryGeneratorAction()
             double m_bin, xF_bin;
 
             getline(fin, line);
-            stringstream ss(line);
+            std::stringstream ss(line);
             ss >> n >> n_m >> m_min >> m_max >> m_bin >> n_xF >> xF_min >> xF_max >> xF_bin;
 
             //test if the range is acceptable
@@ -147,7 +153,7 @@ DPPrimaryGeneratorAction::DPPrimaryGeneratorAction()
             {
                 double mass, xF, xsec;
 
-                stringstream ss(line);
+                std::stringstream ss(line);
                 ss >> mass >> xF >> xsec;
                 xsec *= (m_bin*xF_bin);
 
@@ -170,8 +176,11 @@ DPPrimaryGeneratorAction::DPPrimaryGeneratorAction()
             ppGen.readFile(p_config->pythiaConfig.Data());
             pnGen.readFile(p_config->pythiaConfig.Data());
 
-            ppGen.init(2212, 2212, 120., 0.);
-            pnGen.init(2212, 2112, 120., 0.);
+            ppGen.readString("Beams:idB = 2212");
+            ppGen.readString("Beams:idB = 2112");
+
+            ppGen.init();
+            pnGen.init();
         }
         else if(p_config->generatorEng == "geant")
         {
