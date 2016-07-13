@@ -8,6 +8,7 @@
 #include "G4Material.hh"
 
 #include <TVector3.h>
+#include <TH2D.h>
 
 #include "DPSimConfig.h"
 #include "DPMCRawEvent.h"
@@ -66,6 +67,9 @@ public:
     //get the relative luminosity on this target
     double getLuminosity() { return p_config->biasVertexGen ? interactables[index].prob : probSum; }
 
+    //use the beam profile to generate
+    void generateVtxPerp(double& x, double& y);
+
     //get the reference to the chosen objects
     const DPBeamLineObject& getInteractable() { return interactables[index]; }
 
@@ -85,6 +89,9 @@ private:
 
     //the index of the piece that is chosen
     int index;
+
+    //beam profile
+    TH2D* beamProf;
 };
 
 #endif
