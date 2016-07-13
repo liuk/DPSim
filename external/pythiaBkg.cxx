@@ -25,17 +25,18 @@
 using namespace std;
 using namespace Pythia8;
 
+
+
 //All tracks passed to this function are muons, and the mother
 //particles are pions
-bool keepTrack(double decayLength, double z0, TVector3 mom)
+bool keepTrack(double decayLength, double z0, int parent, TVector3 mom)
 {
     double Lint = 20.42;       //this is the pion interaction length in iron
+    double Kint = 25.5;       //this is the kaon interaction length in iron
     double dumpLength = 502.;  //this is the total length of beam dump
     double dumpHoleLen = 25.4; //this is the depth of the hole on dump face
-
-    //See if the pion would be absorbed in beam dump
+    double strongDecay = 0.001;//Ignore decays from gamma, J/Psi, vector mesons, etc
     double lengthInIron = z0 + decayLength - dumpHoleLen;   //there is a hole on the beam dump
-    if(G4UniformRand() > TMath::Exp(-lengthInIron/Lint)) return false;
 
     //see if the muon has enough energy to penetrate beam dump, conservative cut > 0.01GeV/cm
     double remainingLengthInIron = lengthInIron > 0 ? dumpLength - lengthInIron : dumpLength;
@@ -43,6 +44,16 @@ bool keepTrack(double decayLength, double z0, TVector3 mom)
 
     //see if the opening angle is within acceptance
     if(fabs(mom.Px()/mom.Pz()) > 0.25 || fabs(mom.Py()/mom.Pz()) > 0.15) return false;
+
+    //See if the pion would be absorbed in beam dump
+    //Ignore decays from gamma, J/Psi, vector mesons, etc
+    //if(decayLength > strongDecay){
+    if(abs(parent)==211){
+	    if(G4UniformRand() > TMath::Exp(-lengthInIron/Lint)) return false;
+    }
+    if(abs(parent)==321 || abs(parent)==130){
+	    if(G4UniformRand() > TMath::Exp(-lengthInIron/Kint)) return false;
+    }
 
     return true;
 }
@@ -61,6 +72,7 @@ int main(int argc, char* argv[])
     int eventID;
     int n;
     int pdg[10000];
+    int parentID[10000];
     TClonesArray* p_pos = new TClonesArray("TVector3");  p_pos->BypassStreamer(); TClonesArray& pos = *p_pos;
     TClonesArray* p_mom = new TClonesArray("TVector3");  p_mom->BypassStreamer(); TClonesArray& mom = *p_mom;
 
@@ -70,6 +82,7 @@ int main(int argc, char* argv[])
     saveTree->Branch("eventID", &eventID, "eventID/I");
     saveTree->Branch("n", &n, "n/I");
     saveTree->Branch("pdg", pdg, "pdg[n]/I");
+    saveTree->Branch("parentID", parentID, "parentID[n]/I");
     saveTree->Branch("pos", &p_pos, 256000, 99);
     saveTree->Branch("mom", &p_mom, 256000, 99);
 
@@ -104,10 +117,12 @@ int main(int argc, char* argv[])
         {
             if(abs(events[j].id()) == 13)
             {
-                if(!keepTrack(events[j].zProd()/10., zvtx, TVector3(events[j].px(), events[j].py(), events[j].pz()))) continue;
+                //if(!keepTrack(events[j].zProd()/10., zvtx, TVector3(events[j].px(), events[j].py(), events[j].pz()))) continue;
+                if(!keepTrack(events[j].zProd()/10., zvtx, events[events[j].mother1()].id(), TVector3(events[j].px(), events[j].py(), events[j].pz()))) continue;
 
                 //Fill muon
                 pdg[n] = events[j].id();
+		parentID[n] = events[events[j].mother1()].id();
                 new(mom[n]) TVector3(events[j].px(), events[j].py(), events[j].pz());
                 new(pos[n]) TVector3(events[j].xProd()/10., events[j].yProd()/10., events[j].zProd()/10. + zvtx);
                 ++n;
