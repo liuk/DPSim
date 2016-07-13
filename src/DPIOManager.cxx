@@ -207,7 +207,7 @@ void DPIOManager::fillOneEvent(const G4Event* theEvent)
 void DPIOManager::finalizeEvent()
 {
     //Pass the event through post-simulation analysis
-    p_triggerAna->analyzeTrigger(rawEvent);
+    p_triggerAna->analyzeTrigger(singleEvent == NULL ? rawEvent : singleEvent);
     if(p_config->enableDummyRecon) p_dummyRecon->reconstruct(rawEvent);
 
 #ifdef DEBUG_IO
@@ -274,8 +274,20 @@ void DPIOManager::fillHitsList(const G4Event* theEvent)
         hits.push_back(*((*sensHC)[i]));
     }
 
-    //remove duplicate virtual hits before digitization
+    //remove duplicate virtual hits before digitization, merge all the energy deposite to the first of the group, then keep the first hit only
     hits.sort();
+    DPVirtualHit* p_vHit = NULL;
+    for(std::list<DPVirtualHit>::iterator iter = hits.begin(); iter != hits.end(); ++iter)
+    {
+        if(p_vHit == NULL || (iter->detectorGroupName != p_vHit->detectorGroupName || iter->particleID != p_vHit->particleID))  // there comes a new hit
+        {
+            p_vHit = &(*iter);
+        }
+        else
+        {
+            p_vHit->edep += iter->edep;
+        }
+    }
     hits.unique();
 
     for(std::list<DPVirtualHit>::iterator iter = hits.begin(); iter != hits.end(); ++iter)

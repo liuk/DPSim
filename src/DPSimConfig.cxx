@@ -43,6 +43,7 @@ void DPSimConfig::init(TString configFile)
     beamCurrent = pDouble("beamCurrent", 1.E12);
 
     geometryGDMLInput = pString("geometryGDMLInput");
+    detectorEffResol = pString("detectorEffResol");
     geometrySchema = pString("geometrySchema");
     mysqlServer = pString("mysqlServer");
     mysqlPort = pInt("mysqlPort", 3306);
@@ -61,6 +62,8 @@ void DPSimConfig::init(TString configFile)
     externalInput = pString("externalInput");
     pythiaConfig = pString("pythiaConfig");
     customLUT = pString("customLUT");
+    testParticle = pString("testParticle", "mu");
+    physicsList = pString("physicsList", "QGSP_BERT");
 
     targetInBeam = pBool("targetInBeam", true);
     dumpInBeam = pBool("dumpInBeam", false);

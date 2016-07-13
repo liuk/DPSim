@@ -31,7 +31,7 @@ int main(int argc, char* argv[])
     runManager->SetUserInitialization(new DPDetectorConstruction);
 
     G4PhysListFactory factory;
-    runManager->SetUserInitialization(factory.GetReferencePhysList("FTFP_BERT_EMX"));
+    runManager->SetUserInitialization(factory.GetReferencePhysList(p_config->physicsList.Data()));
 
     //User actions
     DPPrimaryGeneratorAction* primaryGenerator = new DPPrimaryGeneratorAction;

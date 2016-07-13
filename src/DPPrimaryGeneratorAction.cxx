@@ -61,6 +61,10 @@ DPPrimaryGeneratorAction::DPPrimaryGeneratorAction()
     proton = particleDict->FindParticle(2212);
     mup = particleDict->FindParticle(-13);
     mum = particleDict->FindParticle(13);
+    ep = particleDict->FindParticle(-11);
+    em = particleDict->FindParticle(11);
+    pip = particleDict->FindParticle(211);
+    pim = particleDict->FindParticle(-211);
 
     pdf = LHAPDF::mkPDF("CT10nlo", 0);
 
@@ -97,8 +101,11 @@ DPPrimaryGeneratorAction::DPPrimaryGeneratorAction()
             ppGen.readFile(p_config->pythiaConfig.Data());
             pnGen.readFile(p_config->pythiaConfig.Data());
 
-            ppGen.init(2212, 2212, 120., 0.);
-            pnGen.init(2212, 2112, 120., 0.);
+            ppGen.readString("Beams:idB = 2212");
+            ppGen.readString("Beams:idB = 2112");
+
+            ppGen.init();
+            pnGen.init();
         }
         else if(p_config->generatorEng == "DarkPhotonFromEta")
         {
@@ -108,8 +115,11 @@ DPPrimaryGeneratorAction::DPPrimaryGeneratorAction()
             ppGen.readFile(p_config->pythiaConfig.Data());
             pnGen.readFile(p_config->pythiaConfig.Data());
 
-            ppGen.init(2212, 2212, 120., 0.);
-            pnGen.init(2212, 2112, 120., 0.);
+            ppGen.readString("Beams:idB = 2212");
+            ppGen.readString("Beams:idB = 2112");
+
+            ppGen.init();
+            pnGen.init();
         }
         else if(p_config->generatorEng == "custom")
         {
@@ -127,7 +137,7 @@ DPPrimaryGeneratorAction::DPPrimaryGeneratorAction()
             double m_bin, xF_bin;
 
             getline(fin, line);
-            stringstream ss(line);
+            std::stringstream ss(line);
             ss >> n >> n_m >> m_min >> m_max >> m_bin >> n_xF >> xF_min >> xF_max >> xF_bin;
 
             //test if the range is acceptable
@@ -143,7 +153,7 @@ DPPrimaryGeneratorAction::DPPrimaryGeneratorAction()
             {
                 double mass, xF, xsec;
 
-                stringstream ss(line);
+                std::stringstream ss(line);
                 ss >> mass >> xF >> xsec;
                 xsec *= (m_bin*xF_bin);
 
@@ -166,8 +176,11 @@ DPPrimaryGeneratorAction::DPPrimaryGeneratorAction()
             ppGen.readFile(p_config->pythiaConfig.Data());
             pnGen.readFile(p_config->pythiaConfig.Data());
 
-            ppGen.init(2212, 2212, 120., 0.);
-            pnGen.init(2212, 2112, 120., 0.);
+            ppGen.readString("Beams:idB = 2212");
+            ppGen.readString("Beams:idB = 2112");
+
+            ppGen.init();
+            pnGen.init();
         }
         else if(p_config->generatorEng == "geant")
         {
@@ -178,6 +191,22 @@ DPPrimaryGeneratorAction::DPPrimaryGeneratorAction()
         {
             std::cout << " Using test single generator ..." << std::endl;
             p_generator = &DPPrimaryGeneratorAction::generateTestSingle;
+
+            if(p_config->testParticle == "mu")
+            {
+                testPar[0] = mup;
+                testPar[1] = mum;
+            }
+            else if(p_config->testParticle == "e")
+            {
+                testPar[0] = ep;
+                testPar[1] = em;
+            }
+            else if(p_config->testParticle == "pi")
+            {
+                testPar[0] = pip;
+                testPar[1] = pim;
+            }
         }
         else
         {
@@ -202,7 +231,7 @@ DPPrimaryGeneratorAction::DPPrimaryGeneratorAction()
         externalInputTree->SetBranchAddress("pos", &externalPositions);
         externalInputTree->SetBranchAddress("mom", &externalMomentums);
 
-        //take over the control of the buffer flushing
+        //take over the control of the buffer flushing, TODO: move this thing to somewhere else
         lastFlushPosition = 0;
         p_IOmamnger->setBufferState(DPIOManager::CLEAN);
     }
@@ -575,7 +604,7 @@ void DPPrimaryGeneratorAction::generateTestSingle()
     double y = G4RandGauss::shoot(0., 1.5)*cm;
     double z = (G4UniformRand()*(p_config->zOffsetMax - p_config->zOffsetMin) + p_config->zOffsetMin)*cm;
 
-    particleGun->SetParticleDefinition(G4UniformRand() > 0.5 ? mup : mum);
+    particleGun->SetParticleDefinition(G4UniformRand() > 0.5 ? testPar[0] : testPar[1]);
     particleGun->SetParticlePosition(G4ThreeVector(x, y, z));
     particleGun->SetParticleMomentum(G4ThreeVector(px, py, pz));
     particleGun->GeneratePrimaryVertex(theEvent);

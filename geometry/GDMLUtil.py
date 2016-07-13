@@ -6,7 +6,7 @@ from xml.dom import minidom
 query_elements = 'SELECT element,A,Z FROM Elements'
 query_materials = 'SELECT material,density,nComponents,receipt FROM Materials'
 query_box_solid = (
-    'SELECT detectorGroupName,if(max(z0+deltaZ)-min(z0+deltaZ)<1.,1.,max(z0+deltaZ)-min(z0+deltaZ)), '
+    'SELECT detectorGroupName,if(max(z0+deltaZ)-min(z0+deltaZ)<1.,planeThickness,max(z0+deltaZ)-min(z0+deltaZ)), '
     '1.05*(max(x0+deltaX)-min(x0+deltaX)+planeWidth),1.05*(max(y0+deltaY)-min(y0+deltaY)+planeHeight) '
     'FROM Planes,Alignments WHERE Planes.detectorID=Alignments.detectorID GROUP BY detectorGroupName '
     'UNION '

@@ -103,6 +103,11 @@ private:
     G4ParticleDefinition* proton;
     G4ParticleDefinition* mup;
     G4ParticleDefinition* mum;
+    G4ParticleDefinition* ep;
+    G4ParticleDefinition* em;
+    G4ParticleDefinition* pip;
+    G4ParticleDefinition* pim;
+    G4ParticleDefinition* testPar[2];
     //@}
 };
 
