@@ -95,7 +95,7 @@ int main(int argc, char* argv[])
     int nEvents = p_config->nEvents;
     for(int i = 0; i < nEvents; ++i)
     {
-        double zvtx = p_vertexGen->generateVertex();
+        TVector3 vtx = p_vertexGen->generateVertex();
         double pARatio = p_vertexGen->getPARatio();
 
         Pythia* p_pythia = G4UniformRand() < pARatio ? &ppGen : &pnGen;
@@ -109,12 +109,12 @@ int main(int argc, char* argv[])
         {
             if(abs(events[j].id()) == 13)
             {
-                if(!keepTrack(events[j].zProd()/10., zvtx, events[events[j].mother1()].id(), TVector3(events[j].px(), events[j].py(), events[j].pz()))) continue;
+                if(!keepTrack(events[j].zProd()/10., vtx.Z(), events[events[j].mother1()].id(), TVector3(events[j].px(), events[j].py(), events[j].pz()))) continue;
 
                 //Fill muon
                 pdg[n] = events[j].id();
                 new(mom[n]) TVector3(events[j].px(), events[j].py(), events[j].pz());
-                new(pos[n]) TVector3(events[j].xProd()/10., events[j].yProd()/10., events[j].zProd()/10. + zvtx);
+                new(pos[n]) TVector3(events[j].xProd()/10. + vtx.X(), events[j].yProd()/10. + vtx.Y(), events[j].zProd()/10. + vtx.Z());
                 ++n;
 
                 /*

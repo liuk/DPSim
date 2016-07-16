@@ -56,7 +56,7 @@ public:
 
     //get the vertex generated
     void generateVertex(DPMCDimuon& dimuon);
-    double generateVertex();
+    TVector3 generateVertex();
 
     //do the actual sampling
     void findInteractingPiece();

@@ -182,27 +182,26 @@ void DPVertexGenerator::init()
     }
 }
 
-double DPVertexGenerator::generateVertex()
+TVector3 DPVertexGenerator::generateVertex()
 {
+    //Find the interacting piece
     findInteractingPiece();
+
+    //Generate perpendicular vtx by sampling beam profile
+    double x, y;
+    generateVtxPerp(x, y);
+
+    //Generate z-vtx
     double zOffset = p_config->zOffsetMin < p_config->zOffsetMax ? p_config->zOffsetMin + G4UniformRand()*(p_config->zOffsetMax - p_config->zOffsetMin) : 0.;
-    return interactables[index].getZ() + zOffset;
+    double z = interactables[index].getZ() + zOffset;
+
+    return TVector3(x, y, z);
 }
 
 void DPVertexGenerator::generateVertex(DPMCDimuon& dimuon)
 {
-    findInteractingPiece();
-
-    double x, y;
-    generateVtxPerp(x, y);
-    dimuon.fVertex.SetXYZ(x, y, interactables[index].getZ());
+    dimuon.fVertex = generateVertex();
     dimuon.fOriginVol = interactables[index].name;
-
-    if(p_config->zOffsetMin < p_config->zOffsetMax)
-    {
-        double zOffset = p_config->zOffsetMin + G4UniformRand()*(p_config->zOffsetMax - p_config->zOffsetMin);
-        dimuon.fVertex.SetZ(interactables[index].getZ() + zOffset);
-    }
 }
 
 void DPVertexGenerator::generateVtxPerp(double& x, double& y)

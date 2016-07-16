@@ -421,7 +421,7 @@ void DPPrimaryGeneratorAction::generatePsip()
 
 void DPPrimaryGeneratorAction::generateDarkPhotonFromEta()
 {
-    p_vertexGen->generateVertex();
+    TVector3 vtx = p_vertexGen->generateVertex();
     double pARatio = p_vertexGen->getPARatio();
 
     Pythia8::Pythia* p_pythia = G4UniformRand() < pARatio ? &ppGen : &pnGen;
@@ -434,13 +434,14 @@ void DPPrimaryGeneratorAction::generateDarkPhotonFromEta()
         if(particles[i].id() == 221)
         {
             //Fill eta to particle gun as well, it will probably make no difference in detector
+            G4ThreeVector g4vtx = G4ThreeVector(vtx.X()*cm, vtx.Y()*cm, vtx.Z()*cm) + G4ThreeVector(particles[i].xProd()*mm, particles[i].yProd()*mm, particles[i].zProd()*mm);
             particleGun->SetParticleDefinition(particleDict->FindParticle(221));
-            particleGun->SetParticlePosition(G4ThreeVector(particles[i].xProd()*mm, particles[i].yProd()*mm, particles[i].zProd()*mm));
+            particleGun->SetParticlePosition(g4vtx);
             particleGun->SetParticleMomentum(G4ThreeVector(particles[i].px()*GeV, particles[i].py()*GeV, particles[i].pz()*GeV));
             particleGun->GeneratePrimaryVertex(theEvent);
 
             DPMCDimuon dimuon;
-            dimuon.fVertex.SetXYZ(G4RandGauss::shoot(0., 1.5), G4RandGauss::shoot(0., 1.5), G4UniformRand()*(p_config->zOffsetMax - p_config->zOffsetMin) + p_config->zOffsetMin);
+            dimuon.fVertex.SetXYZ(g4vtx.x(), g4vtx.y(), g4vtx.z());
 
             //eta -> gamma A', this step decays isotropically
             TLorentzVector p_eta(particles[i].px(), particles[i].py(), particles[i].pz(), particles[i].e());
@@ -518,7 +519,7 @@ void DPPrimaryGeneratorAction::generatePythiaDimuon()
     p_config->nEventsPhysics++;
 
     DPMCDimuon dimuon;
-    double zvtx = p_vertexGen->generateVertex();
+    TVector3 vtx = p_vertexGen->generateVertex();
     double pARatio = p_vertexGen->getPARatio();
 
     Pythia8::Pythia* p_pythia = G4UniformRand() < pARatio ? &ppGen : &pnGen;
@@ -530,8 +531,9 @@ void DPPrimaryGeneratorAction::generatePythiaDimuon()
         Pythia8::Particle par = p_pythia->event[i];
         if(par.status() > 0 && par.id() != 22)
         {
+            G4ThreeVector g4vtx = G4ThreeVector(vtx.X()*cm, vtx.Y()*cm, vtx.Z()*cm) + G4ThreeVector(par.xProd()*mm, par.yProd()*mm, par.zProd()*mm);
             particleGun->SetParticleDefinition(particleDict->FindParticle(par.id()));
-            particleGun->SetParticlePosition(G4ThreeVector(par.xProd()*mm, par.yProd()*mm, par.zProd()*mm + zvtx*cm));
+            particleGun->SetParticlePosition(g4vtx);
             particleGun->SetParticleMomentum(G4ThreeVector(par.px()*GeV, par.py()*GeV, par.pz()*GeV));
             particleGun->GeneratePrimaryVertex(theEvent);
 
@@ -540,14 +542,13 @@ void DPPrimaryGeneratorAction::generatePythiaDimuon()
             {
                 dimuon.fPosTrackID = pParID;
                 dimuon.fPosMomentum.SetXYZM(par.px(), par.py(), par.pz(), DPGEN::mmu);
-                dimuon.fVertex.SetXYZ(par.xProd()/10., par.yProd()/10., par.zProd()/10. + zvtx);
             }
             else if(par.id() == 13)
             {
                 dimuon.fNegTrackID = pParID;
                 dimuon.fNegMomentum.SetXYZM(par.px(), par.py(), par.pz(), DPGEN::mmu);
-                dimuon.fVertex.SetXYZ(par.xProd()/10., par.yProd()/10., par.zProd()/10. + zvtx);
             }
+            dimuon.fVertex.SetXYZ(g4vtx.x(), g4vtx.y(), g4vtx.z());
         }
     }
 
@@ -558,7 +559,7 @@ void DPPrimaryGeneratorAction::generatePythiaSingle()
 {
     p_config->nEventsPhysics++;
 
-    double zvtx = p_vertexGen->generateVertex();
+    TVector3 vtx = p_vertexGen->generateVertex();
     double pARatio = p_vertexGen->getPARatio();
 
     Pythia8::Pythia* p_pythia = G4UniformRand() < pARatio ? &ppGen : &pnGen;
@@ -572,7 +573,7 @@ void DPPrimaryGeneratorAction::generatePythiaSingle()
         if(par.status() > 0 && par.id() != 22)
         {
             particleGun->SetParticleDefinition(particleDict->FindParticle(par.id()));
-            particleGun->SetParticlePosition(G4ThreeVector(par.xProd()*mm, par.yProd()*mm, par.zProd()*mm + zvtx*cm));
+            particleGun->SetParticlePosition(G4ThreeVector(vtx.X()*cm, vtx.Y()*cm, vtx.Z()*cm) + G4ThreeVector(par.xProd()*mm, par.yProd()*mm, par.zProd()*mm));
             particleGun->SetParticleMomentum(G4ThreeVector(par.px()*GeV, par.py()*GeV, par.pz()*GeV));
             particleGun->GeneratePrimaryVertex(theEvent);
         }
