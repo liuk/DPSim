@@ -27,15 +27,20 @@ using namespace Pythia8;
 
 //All tracks passed to this function are muons, and the mother
 //particles are pions
-bool keepTrack(double decayLength, double z0, TVector3 mom)
+bool keepTrack(double decayLength, double z0, int parentID, TVector3 mom)
 {
-    double Lint = 20.42;       //this is the pion interaction length in iron
+    double PIint = 20.42;       //this is the pion interaction length in iron
+    double Kint = 25.5;        //this is the Kaon interaction length in iron
     double dumpLength = 502.;  //this is the total length of beam dump
     double dumpHoleLen = 25.4; //this is the depth of the hole on dump face
 
-    //See if the pion would be absorbed in beam dump
+    //See if the pion/kaon would be absorbed in beam dump
     double lengthInIron = z0 + decayLength - dumpHoleLen;   //there is a hole on the beam dump
-    if(G4UniformRand() > TMath::Exp(-lengthInIron/Lint)) return false;
+    if(abs(parentID) == 211 || abs(parentID) == 321 || abs(parentID) == 130)
+    {
+        double Lint = abs(parentID) == 211 ? PIint : Kint;
+        if(G4UniformRand() > TMath::Exp(-lengthInIron/Lint)) return false;
+    }
 
     //see if the muon has enough energy to penetrate beam dump, conservative cut > 0.01GeV/cm
     double remainingLengthInIron = lengthInIron > 0 ? dumpLength - lengthInIron : dumpLength;
@@ -104,7 +109,7 @@ int main(int argc, char* argv[])
         {
             if(abs(events[j].id()) == 13)
             {
-                if(!keepTrack(events[j].zProd()/10., zvtx, TVector3(events[j].px(), events[j].py(), events[j].pz()))) continue;
+                if(!keepTrack(events[j].zProd()/10., zvtx, events[events[j].mother1()].id(), TVector3(events[j].px(), events[j].py(), events[j].pz()))) continue;
 
                 //Fill muon
                 pdg[n] = events[j].id();
