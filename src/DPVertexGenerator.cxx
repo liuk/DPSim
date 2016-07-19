@@ -68,7 +68,7 @@ double DPBeamLineObject::getZ()
 bool DPBeamLineObject::inAcceptance(double x, double y)
 {
     //return x*x/radiusX/radiusX + y*y/radiusY/radiusY < 1.;
-    return x*x/0.19/0.19 + y*y/0.21/0.21 < 1.;
+    return x*x/1.9/1.9 + y*y/2.1/2.1 < 1.;
 }
 
 DPVertexGenerator* DPVertexGenerator::p_vertexGen = NULL;
