@@ -14,6 +14,10 @@ option(DEBUG_IO "Output massive I/O debugging info" OFF)
 option(DEBUG    "General debug flag for non-production compiles" ON)
 option(LIBONLY  "Only build the shared library for the ROOT event structure" OFF)
 
+# STRING options
+set(EXTRAS  ""  CACHE STRING "Extra executables needed to be compiled")
+string(REPLACE "," ";" EXTRALIST ${EXTRAS})
+
 if(DEBUG_IN)
   add_definitions(-DDEBUG_IN)
 endif()
@@ -141,6 +145,13 @@ set(CMAKE_SHARED_LINKER_FLAGS "${ROOT_LINK}" )
 if(NOT(LIBONLY))
   target_link_libraries(DPSim ${ROOT_LINK} ${PYTHIA_LINK} ${LHAPDF_LINK} ${Geant4_LIBRARIES})
 endif()
+
+# extra compiles
+foreach(EXTRA ${EXTRALIST})
+    message("-- Compiling ${EXTRA}...")
+    add_executable(${EXTRA} ${EXTRA}.cxx ${sources} ${headers} ${PROJECT_SOURCE_DIR}/src/DPMCRawEventDict.cxx ${PROJECT_SOURCE_DIR}/src/DPSimConfigDict.cxx)
+    target_link_libraries(${EXTRA} ${ROOT_LINK} ${PYTHIA_LINK} ${LHAPDF_LINK} ${Geant4_LIBRARIES})
+endforeach()
 
 # test stuff
 #add_executable(test_debug test/test.cxx ${sources} ${headers} ${PROJECT_SOURCE_DIR}/src/DPMCRawEventDict.cxx ${PROJECT_SOURCE_DIR}/src/DPSimConfigDict.cxx)
