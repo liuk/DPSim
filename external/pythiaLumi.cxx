@@ -25,37 +25,20 @@
 using namespace std;
 using namespace Pythia8;
 
+DPSimConfig* p_config;
+
 //All tracks passed to this function are muons, and the mother
 //particles are pions
 bool keepTrack(double decayLength, double z0, int parentID, TVector3 mom)
 {
-    double PIint = 20.42;       //this is the pion interaction length in iron
-    double Kint = 25.5;        //this is the Kaon interaction length in iron
-    double dumpLength = 502.;  //this is the total length of beam dump
-    double dumpHoleLen = 25.4; //this is the depth of the hole on dump face
-
-    //See if the pion/kaon would be absorbed in beam dump
-    double lengthInIron = z0 + decayLength - dumpHoleLen;   //there is a hole on the beam dump
-    if(abs(parentID) == 211 || abs(parentID) == 321 || abs(parentID) == 130)
-    {
-        double Lint = abs(parentID) == 211 ? PIint : Kint;
-        if(G4UniformRand() > TMath::Exp(-lengthInIron/Lint)) return false;
-    }
-
-    //see if the muon has enough energy to penetrate beam dump, conservative cut > 0.01GeV/cm
-    double remainingLengthInIron = lengthInIron > 0 ? dumpLength - lengthInIron : dumpLength;
-    if(mom.Mag()/remainingLengthInIron < 0.01) return false;
-
-    //see if the opening angle is within acceptance
-    if(fabs(mom.Px()/mom.Pz()) > 0.25 || fabs(mom.Py()/mom.Pz()) > 0.15) return false;
-
-    return true;
+    double costheta = mom.CosTheta();
+    return costheta < p_config->cosThetaMax && costheta > p_config->cosThetaMin;
 }
 
 int main(int argc, char* argv[])
 {
     //Initialize the configuration
-    DPSimConfig* p_config = DPSimConfig::instance();
+    p_config = DPSimConfig::instance();
     p_config->init(argv[1]);
 
     //Initialize vertex generator
@@ -107,7 +90,7 @@ int main(int argc, char* argv[])
         int nParticles = events.size();
         for(int j = 1; j < nParticles; ++j)
         {
-            if(abs(events[j].id()) == 13)
+            if(events[j].status() > 0)
             {
                 if(!keepTrack(events[j].zProd()/10., vtx.Z(), events[events[j].mother1()].id(), TVector3(events[j].px(), events[j].py(), events[j].pz()))) continue;
 
@@ -116,16 +99,6 @@ int main(int argc, char* argv[])
                 new(mom[n]) TVector3(events[j].px(), events[j].py(), events[j].pz());
                 new(pos[n]) TVector3(events[j].xProd()/10. + vtx.X(), events[j].yProd()/10. + vtx.Y(), events[j].zProd()/10. + vtx.Z());
                 ++n;
-
-                /*
-                //If mother particle exists, fill mother as well
-                int motherID = events[j].mother1();
-                if(motherID < 1 || motherID >= nParticles) continue;
-                if(abs(events[motherID].id()) < 10) continue;
-                pdg[n] = events[motherID].id();
-                new(mom[n]) TVector3(events[motherID].px(), events[motherID].py(), events[motherID].pz());
-                new(pos[n]) TVector3(events[motherID].xProd()/10., events[motherID].yProd()/10., events[motherID].zProd()/10. + zvtx);
-                ++n;*/
             }
         }
 

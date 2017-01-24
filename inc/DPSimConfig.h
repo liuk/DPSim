@@ -82,6 +82,13 @@ public:
     bool airInBeam;
     //@}
 
+    //!Beam profile parameters
+    //@{
+    bool beamProfile;
+    double beamCenterX;
+    double beamCenterY;
+    //@}
+
     //!Event vertex biasing, i.e. generate vertex evenly instead of according to material
     bool biasVertexGen;
 

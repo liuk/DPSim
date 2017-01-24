@@ -33,4 +33,7 @@
 # build folder
 build
 
+# pythin bitcode
+*.pyc
+
 .clang_complete

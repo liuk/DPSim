@@ -5,7 +5,7 @@ project(DPSim CXX C)
 # Put executables into a bin
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
-set(CMAKE_MACOSX_RPATH 1)  # only needed to supress cmake warning
+set(CMAKE_MACOSX_RPATH 1)  # only needed to suppress cmake warning
 
 # Command line options
 option(DEBUG_IN "Output massive initializing debugging info" OFF)
@@ -14,9 +14,12 @@ option(DEBUG_IO "Output massive I/O debugging info" OFF)
 option(DEBUG    "General debug flag for non-production compiles" ON)
 option(LIBONLY  "Only build the shared library for the ROOT event structure" OFF)
 
-# STRING options
-set(EXTRAS  ""  CACHE STRING "Extra executables needed to be compiled")
-string(REPLACE "," ";" EXTRALIST ${EXTRAS})
+# Additional compile targets
+set(ADDTIONAL "" CACHE STRING "Additional compilation targets to build")
+set(ADDTGTLIST "")
+if(NOT("${ADDTIONAL}" STREQUAL ""))
+  string(REPLACE "," ";" ADDTGTLIST ${ADDTIONAL})
+endif()
 
 if(DEBUG_IN)
   add_definitions(-DDEBUG_IN)
@@ -43,14 +46,12 @@ endif()
 # ROOT dict generation
 add_custom_command (
   OUTPUT ${PROJECT_SOURCE_DIR}/src/DPMCRawEventDict.cxx ${PROJECT_SOURCE_DIR}/src/DPMCRawEventDict.h
-  #DEPENDES ${PROJECT_SOURCE_DIR}/inc/DPMCRawEvent.h ${PROJECT_SOURCE_DIR}/inc/DPMCRawEventLinkDef.h
   COMMAND rootcint
   ARGS -f ${PROJECT_SOURCE_DIR}/src/DPMCRawEventDict.cxx -c ${PROJECT_SOURCE_DIR}/inc/DPMCRawEvent.h ${PROJECT_SOURCE_DIR}/inc/DPMCRawEventLinkDef.h
   )
 
 add_custom_command (
   OUTPUT ${PROJECT_SOURCE_DIR}/src/DPSimConfigDict.cxx ${PROJECT_SOURCE_DIR}/src/DPSimConfigDict.h
-  #DEPENDES ${PROJECT_SOURCE_DIR}/inc/DPSimConfig.h ${PROJECT_SOURCE_DIR}/inc/DPSimConfigLinkDef.h
   COMMAND rootcint
   ARGS -f ${PROJECT_SOURCE_DIR}/src/DPSimConfigDict.cxx -c ${PROJECT_SOURCE_DIR}/inc/DPSimConfig.h ${PROJECT_SOURCE_DIR}/inc/DPSimConfigLinkDef.h
   )
@@ -146,12 +147,19 @@ if(NOT(LIBONLY))
   target_link_libraries(DPSim ${ROOT_LINK} ${PYTHIA_LINK} ${LHAPDF_LINK} ${Geant4_LIBRARIES})
 endif()
 
-# extra compiles
-foreach(EXTRA ${EXTRALIST})
-    message("-- Compiling ${EXTRA}...")
-    add_executable(${EXTRA} ${EXTRA}.cxx ${sources} ${headers} ${PROJECT_SOURCE_DIR}/src/DPMCRawEventDict.cxx ${PROJECT_SOURCE_DIR}/src/DPSimConfigDict.cxx)
-    target_link_libraries(${EXTRA} ${ROOT_LINK} ${PYTHIA_LINK} ${LHAPDF_LINK} ${Geant4_LIBRARIES})
-endforeach()
+# add additional targets
+foreach(TGT ${ADDTGTLIST})
+  message(STATUS "Adding additional targets to the compile list: ${TGT}")
+
+  # strip all the file extensions and paths -- very ugly
+  string(REPLACE "/" ";" TEMPTGTLIST ${TGT})
+  list(GET TEMPTGTLIST -1 TGTFILENAME)
+  string(REPLACE ".cxx" "" TGTNAME ${TGTFILENAME})
+
+  # add executables
+  add_executable(${TGTNAME} ${TGT} ${sources} ${headers} ${PROJECT_SOURCE_DIR}/src/DPMCRawEventDict.cxx ${PROJECT_SOURCE_DIR}/src/DPSimConfigDict.cxx)
+  target_link_libraries(${TGTNAME} ${ROOT_LINK} ${PYTHIA_LINK} ${LHAPDF_LINK} ${Geant4_LIBRARIES})
+endforeach(TGT)
 
 # test stuff
 #add_executable(test_debug test/test.cxx ${sources} ${headers} ${PROJECT_SOURCE_DIR}/src/DPMCRawEventDict.cxx ${PROJECT_SOURCE_DIR}/src/DPSimConfigDict.cxx)

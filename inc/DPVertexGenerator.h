@@ -8,7 +8,7 @@
 #include "G4Material.hh"
 
 #include <TVector3.h>
-#include <TH2D.h>
+#include <TF2.h>
 
 #include "DPSimConfig.h"
 #include "DPMCRawEvent.h"
@@ -22,6 +22,9 @@ public:
     //get the expotential z distribution
     double getZ();
 
+    //check if the beam is in acceptance
+    bool inAcceptance(double x, double y);
+
     bool operator < (const DPBeamLineObject& obj) const;
     friend std::ostream& operator << (std::ostream& os, const DPBeamLineObject& obj);
 
@@ -31,6 +34,8 @@ public:
     //intialized by geometry
     double z_up, z_down, z0; //the z position of upstram/downstream face and center
     double length;           //length of the stuff
+    double radiusX;          //radiusX
+    double radiusY;          //radiusY
 
     //initialized by material property
     double nucIntLen;        //nuclear interaction length in cm
@@ -56,7 +61,7 @@ public:
 
     //get the vertex generated
     void generateVertex(DPMCDimuon& dimuon);
-    double generateVertex();
+    TVector3 generateVertex();
 
     //do the actual sampling
     void findInteractingPiece();
@@ -91,7 +96,7 @@ private:
     int index;
 
     //beam profile
-    TH2D* beamProf;
+    TF2* beamProf;
 };
 
 #endif

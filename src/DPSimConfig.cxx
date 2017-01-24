@@ -70,6 +70,10 @@ void DPSimConfig::init(TString configFile)
     instruInBeam = pBool("instruInBeam", false);
     airInBeam = pBool("airInBeam", false);
 
+    beamProfile = pBool("beamProfile", false);
+    beamCenterX = pDouble("beamCenterX", 0.);
+    beamCenterY = pDouble("beamCenterY", 0.);
+
     biasVertexGen = pBool("biasVertexGen", false);
 
     forcePionDecay = pBool("forcePionDecay", false);

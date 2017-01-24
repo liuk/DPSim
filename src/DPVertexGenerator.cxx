@@ -65,6 +65,12 @@ double DPBeamLineObject::getZ()
     return z_up - nucIntLen*TMath::Log(1. - attenuationSelf*G4UniformRand());
 }
 
+bool DPBeamLineObject::inAcceptance(double x, double y)
+{
+    //return x*x/radiusX/radiusX + y*y/radiusY/radiusY < 1.;
+    return x*x/1.9/1.9 + y*y/2.1/2.1 < 1.;
+}
+
 DPVertexGenerator* DPVertexGenerator::p_vertexGen = NULL;
 DPVertexGenerator* DPVertexGenerator::instance()
 {
@@ -76,6 +82,15 @@ DPVertexGenerator::DPVertexGenerator()
 {
     p_config = DPSimConfig::instance();
     beamProf = NULL;
+
+    if(p_config->beamProfile)
+    {
+        beamProf = new TF2("beamProf", "exp(-0.5*(x-[0])*(x-[0])/[1]/[1])*exp(-0.5*(y-[2])*(y-[2])/[3]/[3])", -10., 10., -10., 10.);
+        beamProf->SetParameter(0, p_config->beamCenterX);
+        beamProf->SetParameter(1, 0.68);
+        beamProf->SetParameter(2, p_config->beamCenterY);
+        beamProf->SetParameter(3, 0.76);
+    }
 }
 
 void DPVertexGenerator::init()
@@ -108,6 +123,8 @@ void DPVertexGenerator::init()
             newObj.length = 2.*((G4Tubs*)(pv->GetLogicalVolume()->GetSolid()))->GetZHalfLength()/cm;
             newObj.z_down = newObj.z0 + 0.5*newObj.length;
             newObj.z_up = newObj.z0 - 0.5*newObj.length;
+            newObj.radiusX = ((G4Tubs*)(pv->GetLogicalVolume()->GetSolid()))->GetOuterRadius();
+            newObj.radiusY = newObj.radiusX;
         }
         else  //special treatment for beam dump, make it box shaped and drill a hole
         {
@@ -115,6 +132,8 @@ void DPVertexGenerator::init()
             newObj.z_down = newObj.z0 + 0.5*newObj.length;
             newObj.z_up = newObj.z0 - 0.5*newObj.length + 10.*2.54;
             newObj.length = newObj.length - 10.*2.54;
+            newObj.radiusX = 500.;
+            newObj.radiusY = 500.;
         }
         interactables.push_back(newObj);
     }
@@ -182,32 +201,35 @@ void DPVertexGenerator::init()
     }
 }
 
-double DPVertexGenerator::generateVertex()
+TVector3 DPVertexGenerator::generateVertex()
 {
-    findInteractingPiece();
+    //Generate perpendicular vtx by sampling beam profile
+    double x, y;
+    generateVtxPerp(x, y);
+
+    //Find the interacting piece
+    do
+    {
+        findInteractingPiece();
+    }
+    while(p_config->beamProfile && !interactables[index].inAcceptance(x, y));
+
+    //Generate z-vtx
     double zOffset = p_config->zOffsetMin < p_config->zOffsetMax ? p_config->zOffsetMin + G4UniformRand()*(p_config->zOffsetMax - p_config->zOffsetMin) : 0.;
-    return interactables[index].getZ() + zOffset;
+    double z = interactables[index].getZ() + zOffset;
+
+    return TVector3(x, y, z);
 }
 
 void DPVertexGenerator::generateVertex(DPMCDimuon& dimuon)
 {
-    findInteractingPiece();
-
-    double x, y;
-    generateVtxPerp(x, y);
-    dimuon.fVertex.SetXYZ(x, y, interactables[index].getZ());
+    dimuon.fVertex = generateVertex();
     dimuon.fOriginVol = interactables[index].name;
-
-    if(p_config->zOffsetMin < p_config->zOffsetMax)
-    {
-        double zOffset = p_config->zOffsetMin + G4UniformRand()*(p_config->zOffsetMax - p_config->zOffsetMin);
-        dimuon.fVertex.SetZ(interactables[index].getZ() + zOffset);
-    }
 }
 
 void DPVertexGenerator::generateVtxPerp(double& x, double& y)
 {
-    if(beamProf != NULL)
+    if(p_config->beamProfile)
     {
         beamProf->GetRandom2(x, y);
     }
