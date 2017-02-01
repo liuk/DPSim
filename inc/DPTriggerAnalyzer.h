@@ -11,7 +11,7 @@
 #include "DPDigitizer.h"
 
 #define SetBit(n) (1 << (n))
-#define NTRPLANES 4
+#define NTRPLANES 3
 
 enum DPTriggerType
 {
@@ -116,6 +116,9 @@ public:
 
     //!Tree deletetion
     void deleteMatrix(MatrixNode* node);
+
+    //!Helper function to retrieve the found road list
+    std::list<DPTriggerRoad>& getRoadsFound(int index) { return roads_found[index]; }
 
     //!Helper functions to print various things
     void printHitPattern();
