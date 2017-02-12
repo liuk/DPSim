@@ -15,10 +15,10 @@ option(DEBUG    "General debug flag for non-production compiles" ON)
 option(LIBONLY  "Only build the shared library for the ROOT event structure" OFF)
 
 # Additional compile targets
-set(ADDTIONAL "" CACHE STRING "Additional compilation targets to build")
+set(ADDITIONAL "" CACHE STRING "Additional compilation targets to build")
 set(ADDTGTLIST "")
-if(NOT("${ADDTIONAL}" STREQUAL ""))
-  string(REPLACE "," ";" ADDTGTLIST ${ADDTIONAL})
+if(NOT("${ADDITIONAL}" STREQUAL ""))
+  string(REPLACE "," ";" ADDTGTLIST ${ADDITIONAL})
 endif()
 
 if(DEBUG_IN)
