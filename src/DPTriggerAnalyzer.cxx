@@ -62,6 +62,17 @@ bool DPTriggerRoad::operator < (const DPTriggerRoad& elem) const
     return sigWeight < elem.sigWeight;
 }
 
+TString DPTriggerRoad::getStringID()
+{
+    TString sid;
+    for(unsigned int i = 0; i < uniqueTrIDs.size(); ++i)
+    {
+        sid = sid + TString(uniqueTrIDs[i]);
+    }
+
+    return sid;
+}
+
 std::ostream& operator << (std::ostream& os, const DPTriggerRoad& road)
 {
     os << "Trigger Road ID = " << road.roadID << ", signal = " << road.sigWeight << ", bkg = " << road.bkgRate << "\n   ";
@@ -114,7 +125,7 @@ DPTriggerAnalyzer::DPTriggerAnalyzer() : NIMONLY(false)
         road.setPxMin(pXmin);
 
         for(int i = 0; i < NTRPLANES; ++i) road.addTrElement(uIDs[i]);
-        roads[(-charge+1)/2].push_back(road);
+        roads[(-charge+1)/2].insert(std::map<TString, DPTriggerRoad>::value_type(road.getStringID(), road));
     }
 
     //build the search matrix
@@ -218,13 +229,13 @@ void DPTriggerAnalyzer::buildTriggerMatrix()
     for(int i = 0; i < 2; ++i)
     {
         matrix[i] = new MatrixNode(-1);
-        for(std::list<DPTriggerRoad>::iterator iter = roads[i].begin(); iter != roads[i].end(); ++iter)
+        for(std::map<TString, DPTriggerRoad>::iterator iter = roads[i].begin(); iter != roads[i].end(); ++iter)
         {
             MatrixNode* parentNode[NTRPLANES+1]; //NOTE: the last entry is useless, just to keep the following code simpler
             parentNode[0] = matrix[i];
             for(int j = 0; j < NTRPLANES; ++j)
             {
-                int uniqueID = iter->getTrID(j);
+                int uniqueID = iter->second.getTrID(j);
                 bool isNewNode = true;
                 for(std::list<MatrixNode*>::iterator jter = parentNode[j]->children.begin(); jter != parentNode[j]->children.end(); ++jter)
                 {
@@ -281,7 +292,8 @@ void DPTriggerAnalyzer::searchMatrix(MatrixNode* node, int level, int index)
     if(node->children.empty())
     {
         //printPath();
-        roads_found[index].push_back(DPTriggerRoad(path));
+        DPTriggerRoad road_found(path);
+        if(roads[index].find(road_found.getStringID()) != roads[index].end()) roads_found[index].push_back(DPTriggerRoad(path));
         path.pop_back();
 
         return;

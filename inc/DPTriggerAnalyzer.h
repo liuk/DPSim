@@ -5,13 +5,16 @@
 #include <vector>
 #include <set>
 #include <list>
+#include <map>
+
+#include <TString.h>
 
 #include "DPSimConfig.h"
 #include "DPMCRawEvent.h"
 #include "DPDigitizer.h"
 
 #define SetBit(n) (1 << (n))
-#define NTRPLANES 3
+#define NTRPLANES 4
 
 enum DPTriggerType
 {
@@ -54,6 +57,7 @@ public:
     int getTrID(unsigned int i) const { return i < NTRPLANES ? uniqueTrIDs[i] : 0; }
     int getTrDetectorID(unsigned int i) const { return getTrID(i)/1000; }
     int getTrElementID(unsigned int i) const { return getTrID(i) % 1000; }
+    TString getStringID();
     //@}
 
     //!Sets
@@ -137,7 +141,7 @@ private:
     //!the trigger matrix, 0 for mu+, 1 for mu-
     //@{
     MatrixNode* matrix[2];
-    std::list<DPTriggerRoad> roads[2];
+    std::map<TString, DPTriggerRoad> roads[2];
     //@}
 
     //!container of the roads found for +/-
