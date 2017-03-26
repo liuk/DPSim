@@ -16,6 +16,7 @@ DPTriggerRoad::DPTriggerRoad(const std::list<int>& path) : roadID(0), sigWeight(
     uniqueTrIDs.clear();
     for(std::list<int>::const_iterator iter = path.begin(); iter != path.end(); ++iter)
     {
+        if(*iter < 0) continue;
         uniqueTrIDs.push_back(*iter);
     }
 }
@@ -144,10 +145,10 @@ void DPTriggerAnalyzer::analyzeTrigger(DPMCRawEvent* rawEvent)
     rawEvent->eventHeader().fTriggerBit = 0;
 
     //NIM trigger first
-    bool HXT = rawEvent->getNHits(26) > 0 && rawEvent->getNHits(32) > 0 && rawEvent->getNHits(34) > 0 && rawEvent->getNHits(40) > 0;
-    bool HXB = rawEvent->getNHits(25) > 0 && rawEvent->getNHits(31) > 0 && rawEvent->getNHits(33) > 0 && rawEvent->getNHits(39) > 0;
-    bool HYL = rawEvent->getNHits(27) > 0 && rawEvent->getNHits(29) > 0 && rawEvent->getNHits(35) > 0 && rawEvent->getNHits(37) > 0;
-    bool HYR = rawEvent->getNHits(28) > 0 && rawEvent->getNHits(30) > 0 && rawEvent->getNHits(36) > 0 && rawEvent->getNHits(38) > 0;
+    bool HXT = (rawEvent->getNHits(26) > 0) && (rawEvent->getNHits(32) > 0) && (rawEvent->getNHits(34) > 0) && (rawEvent->getNHits(40) > 0);
+    bool HXB = (rawEvent->getNHits(25) > 0) && (rawEvent->getNHits(31) > 0) && (rawEvent->getNHits(33) > 0) && (rawEvent->getNHits(39) > 0);
+    bool HYL = (rawEvent->getNHits(27) > 0) && (rawEvent->getNHits(29) > 0) && (rawEvent->getNHits(35) > 0) && (rawEvent->getNHits(37) > 0);
+    bool HYR = (rawEvent->getNHits(28) > 0) && (rawEvent->getNHits(30) > 0) && (rawEvent->getNHits(36) > 0) && (rawEvent->getNHits(38) > 0);
     if(HYL || HYR) rawEvent->eventHeader().fTriggerBit |= NIM1;
     if(HXT || HXB) rawEvent->eventHeader().fTriggerBit |= NIM2;
 
@@ -293,7 +294,7 @@ void DPTriggerAnalyzer::searchMatrix(MatrixNode* node, int level, int index)
     {
         //printPath();
         DPTriggerRoad road_found(path);
-        if(roads[index].find(road_found.getStringID()) != roads[index].end()) roads_found[index].push_back(DPTriggerRoad(path));
+        if(roads[index].find(road_found.getStringID()) != roads[index].end()) roads_found[index].push_back(road_found);
         path.pop_back();
 
         return;
