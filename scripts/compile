@@ -13,7 +13,7 @@ def compile(filename):
 
     ## DPSim part
     dpsim_inc = os.path.join(os.environ['DPSIM_ROOT'], 'inc')
-    dpsim_ld = os.path.join(os.environ['DPSIM_ROOT'], 'build', 'lib')
+    dpsim_ld = os.path.join(os.environ['DPSIM_ROOT'], 'lib')
     cflags = cflags + ' -I' + dpsim_inc
     ldflags = ldflags + ' -L' + dpsim_ld + ' -lDPMCRawEvent'
 

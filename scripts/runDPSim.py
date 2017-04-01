@@ -50,7 +50,7 @@ if options.addition != '':
 
 ## initialize the conf file generator, and the executable DPSim
 tconf = DPSimJobConf(options.template, reservedKeys)
-prog = os.path.join(os.getenv('DPSIM_ROOT'), 'build', 'bin', options.prog)
+prog = os.path.join(os.getenv('DPSIM_ROOT'), 'bin', options.prog)
 
 ## set up the working directories
 workdir = os.path.abspath(options.workdir)
