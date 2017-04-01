@@ -3,8 +3,8 @@ cmake_minimum_required(VERSION 2.6 FATAL_ERROR)
 project(DPSim CXX C)
 
 # Put executables into a bin
-set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR})
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
 set(CMAKE_MACOSX_RPATH 1)  # only needed to suppress cmake warning
 
 # Command line options
@@ -13,13 +13,6 @@ option(DEBUG_TR "Output massive tracking debugging info" OFF)
 option(DEBUG_IO "Output massive I/O debugging info" OFF)
 option(DEBUG    "General debug flag for non-production compiles" ON)
 option(LIBONLY  "Only build the shared library for the ROOT event structure" OFF)
-
-# Additional compile targets
-set(ADDITIONAL "" CACHE STRING "Additional compilation targets to build")
-set(ADDTGTLIST "")
-if(NOT("${ADDITIONAL}" STREQUAL ""))
-  string(REPLACE "," ";" ADDTGTLIST ${ADDITIONAL})
-endif()
 
 if(DEBUG_IN)
   add_definitions(-DDEBUG_IN)
@@ -60,10 +53,6 @@ add_custom_command (
 include_directories(${PROJECT_SOURCE_DIR}/inc)
 file(GLOB sources ${PROJECT_SOURCE_DIR}/src/*.cxx)
 file(GLOB headers ${PROJECT_SOURCE_DIR}/include/*.h)
-if(NOT(LIBONLY))
-  add_executable(DPSim DPSim.cxx ${sources} ${headers} ${PROJECT_SOURCE_DIR}/src/DPMCRawEventDict.cxx ${PROJECT_SOURCE_DIR}/src/DPSimConfigDict.cxx)
-endif()
-add_library(DPMCRawEvent SHARED ${PROJECT_SOURCE_DIR}/src/DPMCRawEvent.cxx ${PROJECT_SOURCE_DIR}/src/DPMCRawEventDict.cxx ${PROJECT_SOURCE_DIR}/src/DPSimConfig.cxx ${PROJECT_SOURCE_DIR}/src/DPSimConfigDict.cxx)
 
 # ROOT
 find_program(ROOTCONF "root-config")
@@ -75,10 +64,6 @@ endif()
 execute_process(COMMAND root-config --prefix OUTPUT_VARIABLE ROOT_PREFIX  OUTPUT_STRIP_TRAILING_WHITESPACE)
 execute_process(COMMAND root-config --cflags OUTPUT_VARIABLE ROOT_CFLAGS  OUTPUT_STRIP_TRAILING_WHITESPACE)
 execute_process(COMMAND root-config --libs   OUTPUT_VARIABLE ROOT_LINK    OUTPUT_STRIP_TRAILING_WHITESPACE)
-
-# install rules, not necessarily needed
-install(TARGETS DPMCRawEvent DESTINATION "${ROOT_PREFIX}/lib")
-install(FILES ${PROJECT_SOURCE_DIR}/inc/DPMCRawEvent.h ${PROJECT_SOURCE_DIR}/inc/DPSimConfig.h DESTINATION "${ROOT_PREFIX}/include")
 
 # the rest packages are not needed for libonly mode
 if(NOT(LIBONLY))
@@ -142,25 +127,20 @@ endif()
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GEANT4_CFLAGS} ${ROOT_CFLAGS} ${PYTHIA_CFLAGS} ${LHAPDF_CFLAGS} ${MYSQL_CFLAGS}")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${GEANT4_LINK} ${ROOT_LINK} ${PYTHIA_LINK} ${LHAPDF_LINK} ${MYSQL_LINK}")
-set(CMAKE_SHARED_LINKER_FLAGS "${ROOT_LINK}" )
+set(CMAKE_SHARED_LINKER_FLAGS "${ROOT_LINK}")
+
+add_library(DPMCRawEvent SHARED ${PROJECT_SOURCE_DIR}/src/DPMCRawEvent.cxx ${PROJECT_SOURCE_DIR}/src/DPMCRawEventDict.cxx ${PROJECT_SOURCE_DIR}/src/DPSimConfig.cxx ${PROJECT_SOURCE_DIR}/src/DPSimConfigDict.cxx)
 if(NOT(LIBONLY))
-  target_link_libraries(DPSim ${ROOT_LINK} ${PYTHIA_LINK} ${LHAPDF_LINK} ${Geant4_LIBRARIES})
+  file(GLOB execs ${PROJECT_SOURCE_DIR}/exe/*.cxx)
+  foreach(exec ${execs})
+    string(REPLACE  "${PROJECT_SOURCE_DIR}/exe/" "" exec ${exec})
+    string(REPLACE  ".cxx" "" exec ${exec})
+    message(STATUS "Adding targets to the compile list: ${exec}")
+    add_executable(${exec} ${PROJECT_SOURCE_DIR}/exe/${exec}.cxx ${sources} ${headers} ${PROJECT_SOURCE_DIR}/src/DPMCRawEventDict.cxx ${PROJECT_SOURCE_DIR}/src/DPSimConfigDict.cxx)
+    target_link_libraries(${exec} ${ROOT_LINK} ${PYTHIA_LINK} ${LHAPDF_LINK} ${Geant4_LIBRARIES})
+  endforeach(exec)
 endif()
 
-# add additional targets
-foreach(TGT ${ADDTGTLIST})
-  message(STATUS "Adding additional targets to the compile list: ${TGT}")
-
-  # strip all the file extensions and paths -- very ugly
-  string(REPLACE "/" ";" TEMPTGTLIST ${TGT})
-  list(GET TEMPTGTLIST -1 TGTFILENAME)
-  string(REPLACE ".cxx" "" TGTNAME ${TGTFILENAME})
-
-  # add executables
-  add_executable(${TGTNAME} ${TGT} ${sources} ${headers} ${PROJECT_SOURCE_DIR}/src/DPMCRawEventDict.cxx ${PROJECT_SOURCE_DIR}/src/DPSimConfigDict.cxx)
-  target_link_libraries(${TGTNAME} ${ROOT_LINK} ${PYTHIA_LINK} ${LHAPDF_LINK} ${Geant4_LIBRARIES})
-endforeach(TGT)
-
-# test stuff
-#add_executable(test_debug test/test.cxx ${sources} ${headers} ${PROJECT_SOURCE_DIR}/src/DPMCRawEventDict.cxx ${PROJECT_SOURCE_DIR}/src/DPSimConfigDict.cxx)
-#target_link_libraries(test_debug ${Geant4_LIBRARIES})
+# install rules, not necessarily needed
+install(TARGETS DPMCRawEvent DESTINATION "${ROOT_PREFIX}/lib")
+install(FILES ${PROJECT_SOURCE_DIR}/inc/DPMCRawEvent.h ${PROJECT_SOURCE_DIR}/inc/DPSimConfig.h DESTINATION "${ROOT_PREFIX}/include")
