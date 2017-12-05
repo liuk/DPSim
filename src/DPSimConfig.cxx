@@ -62,6 +62,7 @@ void DPSimConfig::init(TString configFile)
     externalInput = pString("externalInput");
     pythiaConfig = pString("pythiaConfig");
     customLUT = pString("customLUT");
+    finalParticle = pString("finalParticle", "mu");
     testParticle = pString("testParticle", "mu");
     physicsList = pString("physicsList", "QGSP_BERT");
 

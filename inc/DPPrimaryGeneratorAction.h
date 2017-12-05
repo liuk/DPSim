@@ -108,6 +108,7 @@ private:
     G4ParticleDefinition* pip;
     G4ParticleDefinition* pim;
     G4ParticleDefinition* testPar[2];
+    G4ParticleDefinition* finalPar[2];
     //@}
 };
 

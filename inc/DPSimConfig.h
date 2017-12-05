@@ -70,6 +70,7 @@ public:
     TString externalInput;    // Input ROOT file containing the generator info
     TString pythiaConfig;     // pythia configuration file
     TString customLUT;        // custom dimuon cross section look-up table, used in custom mode
+    TString finalParticle;    // particle type for final states -- i.e. it can be muon/electron/pion
     TString testParticle;     // particle type for single particle test generator
     TString physicsList;      // physics list used to simulate detector effects
     //@}

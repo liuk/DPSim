@@ -66,6 +66,22 @@ DPPrimaryGeneratorAction::DPPrimaryGeneratorAction()
     pip = particleDict->FindParticle(211);
     pim = particleDict->FindParticle(-211);
 
+    if(p_config->finalParticle == "mu")
+    {
+        finalPar[0] = mup;
+        finalPar[1] = mum;
+    }
+    else if(p_config->finalParticle == "e")
+    {
+        finalPar[0] = ep;
+        finalPar[1] = em;
+    }
+    else if(p_config->finalParticle == "pi")
+    {
+        finalPar[0] = pip;
+        finalPar[1] = pim;
+    }
+
     pdf = LHAPDF::mkPDF("CT10nlo", 0);
 
     //TODO: need to find a way to pass the random number seed to pythia as well
@@ -291,12 +307,12 @@ void DPPrimaryGeneratorAction::generateDrellYan()
 
     p_config->nEventsPhysics++;
 
-    particleGun->SetParticleDefinition(mup);
+    particleGun->SetParticleDefinition(finalPar[0]);
     particleGun->SetParticlePosition(G4ThreeVector(dimuon.fVertex.X()*cm, dimuon.fVertex.Y()*cm, dimuon.fVertex.Z()*cm));
     particleGun->SetParticleMomentum(G4ThreeVector(dimuon.fPosMomentum.X()*GeV, dimuon.fPosMomentum.Y()*GeV, dimuon.fPosMomentum.Z()*GeV));
     particleGun->GeneratePrimaryVertex(theEvent);
 
-    particleGun->SetParticleDefinition(mum);
+    particleGun->SetParticleDefinition(finalPar[1]);
     particleGun->SetParticlePosition(G4ThreeVector(dimuon.fVertex.X()*cm, dimuon.fVertex.Y()*cm, dimuon.fVertex.Z()*cm));
     particleGun->SetParticleMomentum(G4ThreeVector(dimuon.fNegMomentum.X()*GeV, dimuon.fNegMomentum.Y()*GeV, dimuon.fNegMomentum.Z()*GeV));
     particleGun->GeneratePrimaryVertex(theEvent);
@@ -362,12 +378,12 @@ void DPPrimaryGeneratorAction::generateJPsi()
 
     p_config->nEventsPhysics++;
 
-    particleGun->SetParticleDefinition(mup);
+    particleGun->SetParticleDefinition(finalPar[0]);
     particleGun->SetParticlePosition(G4ThreeVector(dimuon.fVertex.X()*cm, dimuon.fVertex.Y()*cm, dimuon.fVertex.Z()*cm));
     particleGun->SetParticleMomentum(G4ThreeVector(dimuon.fPosMomentum.X()*GeV, dimuon.fPosMomentum.Y()*GeV, dimuon.fPosMomentum.Z()*GeV));
     particleGun->GeneratePrimaryVertex(theEvent);
 
-    particleGun->SetParticleDefinition(mum);
+    particleGun->SetParticleDefinition(finalPar[1]);
     particleGun->SetParticlePosition(G4ThreeVector(dimuon.fVertex.X()*cm, dimuon.fVertex.Y()*cm, dimuon.fVertex.Z()*cm));
     particleGun->SetParticleMomentum(G4ThreeVector(dimuon.fNegMomentum.X()*GeV, dimuon.fNegMomentum.Y()*GeV, dimuon.fNegMomentum.Z()*GeV));
     particleGun->GeneratePrimaryVertex(theEvent);
@@ -395,12 +411,12 @@ void DPPrimaryGeneratorAction::generatePsip()
 
     p_config->nEventsPhysics++;
 
-    particleGun->SetParticleDefinition(mup);
+    particleGun->SetParticleDefinition(finalPar[0]);
     particleGun->SetParticlePosition(G4ThreeVector(dimuon.fVertex.X()*cm, dimuon.fVertex.Y()*cm, dimuon.fVertex.Z()*cm));
     particleGun->SetParticleMomentum(G4ThreeVector(dimuon.fPosMomentum.X()*GeV, dimuon.fPosMomentum.Y()*GeV, dimuon.fPosMomentum.Z()*GeV));
     particleGun->GeneratePrimaryVertex(theEvent);
 
-    particleGun->SetParticleDefinition(mum);
+    particleGun->SetParticleDefinition(finalPar[1]);
     particleGun->SetParticlePosition(G4ThreeVector(dimuon.fVertex.X()*cm, dimuon.fVertex.Y()*cm, dimuon.fVertex.Z()*cm));
     particleGun->SetParticleMomentum(G4ThreeVector(dimuon.fNegMomentum.X()*GeV, dimuon.fNegMomentum.Y()*GeV, dimuon.fNegMomentum.Z()*GeV));
     particleGun->GeneratePrimaryVertex(theEvent);
@@ -441,18 +457,19 @@ void DPPrimaryGeneratorAction::generateDarkPhotonFromEta()
             particleGun->GeneratePrimaryVertex(theEvent);
 
             DPMCDimuon dimuon;
-            dimuon.fVertex.SetXYZ(g4vtx.x(), g4vtx.y(), g4vtx.z());
+            //dimuon.fVertex.SetXYZ(g4vtx.x(), g4vtx.y(), g4vtx.z());
+            dimuon.fVertex.SetXYZ(G4RandGauss::shoot(0., 1.5), G4RandGauss::shoot(0., 1.5), G4UniformRand()*(p_config->zOffsetMax - p_config->zOffsetMin) + p_config->zOffsetMin);
 
             //eta -> gamma A', this step decays isotropically
             TLorentzVector p_eta(particles[i].px(), particles[i].py(), particles[i].pz(), particles[i].e());
 
-            double mass_eta_decays[2] = {G4UniformRand()*(p_eta.M() - 2.*DPGEN::mmu) + 2.*DPGEN::mmu, 0.};
+            double mass_eta_decays[2] = {G4UniformRand()*(p_eta.M() - 2.*finalPar[0]->GetPDGMass()/GeV) + 2.*finalPar[0]->GetPDGMass()/GeV, 0.};
             phaseGen.SetDecay(p_eta, 2, mass_eta_decays);
             phaseGen.Generate();
             TLorentzVector p_AP = *(phaseGen.GetDecay(0));
 
             //A' -> mumu, this step has a 1 + cos^2\theta distribution
-            double mass_AP_decays[2] = {DPGEN::mmu, DPGEN::mmu};
+            double mass_AP_decays[2] = {finalPar[0]->GetPDGMass()/GeV, finalPar[0]->GetPDGMass()/GeV};
             phaseGen.SetDecay(p_AP, 2, mass_AP_decays);
 
             bool angular = true;
@@ -466,12 +483,12 @@ void DPPrimaryGeneratorAction::generateDarkPhotonFromEta()
                 angular = 2.*G4UniformRand() > 1. + dimuon.fCosTh*dimuon.fCosTh;
             }
 
-            particleGun->SetParticleDefinition(mup);
+            particleGun->SetParticleDefinition(finalPar[0]);
             particleGun->SetParticlePosition(G4ThreeVector(dimuon.fVertex.X()*cm, dimuon.fVertex.Y()*cm, dimuon.fVertex.Z()*cm));
             particleGun->SetParticleMomentum(G4ThreeVector(dimuon.fPosMomentum.X()*GeV, dimuon.fPosMomentum.Y()*GeV, dimuon.fPosMomentum.Z()*GeV));
             particleGun->GeneratePrimaryVertex(theEvent);
 
-            particleGun->SetParticleDefinition(mum);
+            particleGun->SetParticleDefinition(finalPar[1]);
             particleGun->SetParticlePosition(G4ThreeVector(dimuon.fVertex.X()*cm, dimuon.fVertex.Y()*cm, dimuon.fVertex.Z()*cm));
             particleGun->SetParticleMomentum(G4ThreeVector(dimuon.fNegMomentum.X()*GeV, dimuon.fNegMomentum.Y()*GeV, dimuon.fNegMomentum.Z()*GeV));
             particleGun->GeneratePrimaryVertex(theEvent);
@@ -496,12 +513,12 @@ void DPPrimaryGeneratorAction::generateCustomDimuon()
 
     p_config->nEventsPhysics++;
 
-    particleGun->SetParticleDefinition(mup);
+    particleGun->SetParticleDefinition(finalPar[0]);
     particleGun->SetParticlePosition(G4ThreeVector(dimuon.fVertex.X()*cm, dimuon.fVertex.Y()*cm, dimuon.fVertex.Z()*cm));
     particleGun->SetParticleMomentum(G4ThreeVector(dimuon.fPosMomentum.X()*GeV, dimuon.fPosMomentum.Y()*GeV, dimuon.fPosMomentum.Z()*GeV));
     particleGun->GeneratePrimaryVertex(theEvent);
 
-    particleGun->SetParticleDefinition(mum);
+    particleGun->SetParticleDefinition(finalPar[1]);
     particleGun->SetParticlePosition(G4ThreeVector(dimuon.fVertex.X()*cm, dimuon.fVertex.Y()*cm, dimuon.fVertex.Z()*cm));
     particleGun->SetParticleMomentum(G4ThreeVector(dimuon.fNegMomentum.X()*GeV, dimuon.fNegMomentum.Y()*GeV, dimuon.fNegMomentum.Z()*GeV));
     particleGun->GeneratePrimaryVertex(theEvent);
@@ -538,15 +555,15 @@ void DPPrimaryGeneratorAction::generatePythiaDimuon()
             particleGun->GeneratePrimaryVertex(theEvent);
 
             ++pParID;
-            if(par.id() == -13)
+            if(par.id() == finalPar[0]->GetPDGEncoding())
             {
                 dimuon.fPosTrackID = pParID;
-                dimuon.fPosMomentum.SetXYZM(par.px(), par.py(), par.pz(), DPGEN::mmu);
+                dimuon.fPosMomentum.SetXYZM(par.px(), par.py(), par.pz(), finalPar[0]->GetPDGMass()/GeV);
             }
-            else if(par.id() == 13)
+            else if(par.id() == finalPar[1]->GetPDGEncoding())
             {
                 dimuon.fNegTrackID = pParID;
-                dimuon.fNegMomentum.SetXYZM(par.px(), par.py(), par.pz(), DPGEN::mmu);
+                dimuon.fNegMomentum.SetXYZM(par.px(), par.py(), par.pz(), finalPar[1]->GetPDGMass()/GeV);
             }
             dimuon.fVertex.SetXYZ(g4vtx.x(), g4vtx.y(), g4vtx.z());
         }
@@ -621,12 +638,12 @@ void DPPrimaryGeneratorAction::generatePhaseSpace()
 
     p_config->nEventsPhysics++;
 
-    particleGun->SetParticleDefinition(mup);
+    particleGun->SetParticleDefinition(finalPar[0]);
     particleGun->SetParticlePosition(G4ThreeVector(dimuon.fVertex.X()*cm, dimuon.fVertex.Y()*cm, dimuon.fVertex.Z()*cm));
     particleGun->SetParticleMomentum(G4ThreeVector(dimuon.fPosMomentum.X()*GeV, dimuon.fPosMomentum.Y()*GeV, dimuon.fPosMomentum.Z()*GeV));
     particleGun->GeneratePrimaryVertex(theEvent);
 
-    particleGun->SetParticleDefinition(mum);
+    particleGun->SetParticleDefinition(finalPar[1]);
     particleGun->SetParticlePosition(G4ThreeVector(dimuon.fVertex.X()*cm, dimuon.fVertex.Y()*cm, dimuon.fVertex.Z()*cm));
     particleGun->SetParticleMomentum(G4ThreeVector(dimuon.fNegMomentum.X()*GeV, dimuon.fNegMomentum.Y()*GeV, dimuon.fNegMomentum.Z()*GeV));
     particleGun->GeneratePrimaryVertex(theEvent);
@@ -664,7 +681,7 @@ void DPPrimaryGeneratorAction::generateExternal()
 
 void DPPrimaryGeneratorAction::generateDebug()
 {
-    particleGun->SetParticleDefinition(mup);
+    particleGun->SetParticleDefinition(finalPar[0]);
     particleGun->SetParticlePosition(G4ThreeVector(0., 0., -500.*cm));
     particleGun->SetParticleMomentum(G4ThreeVector(0., 0., 50.*GeV));
     particleGun->GeneratePrimaryVertex(theEvent);
@@ -700,7 +717,7 @@ bool DPPrimaryGeneratorAction::generateDimuon(double mass, double xF, DPMCDimuon
     TLorentzVector p_dimuon;
     p_dimuon.SetXYZM(px, py, pz, mass);
     p_dimuon.Boost(DPGEN::bv_cms);
-    double masses[2] = {DPGEN::mmu, DPGEN::mmu};
+    double masses[2] = {finalPar[0]->GetPDGMass()/GeV, finalPar[1]->GetPDGMass()/GeV};
     phaseGen.SetDecay(p_dimuon, 2, masses);
 
     bool firstTry = true;
