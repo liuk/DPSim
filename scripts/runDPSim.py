@@ -5,6 +5,7 @@ import sys
 from datetime import datetime
 from optparse import OptionParser
 from DPSimJobConf import DPSimJobConf
+import GridUtil
 
 ## simple function to run a command
 def runCmd(cmd):
@@ -36,6 +37,9 @@ if options.local and options.grid:
     print 'Cannot be in both local and grid mode!'
     sys.exit()
 
+if options.grid:
+    GridUtil.gridInit()
+
 if options.workdir == '':
     options.workdir = os.getcwd()
 
@@ -50,7 +54,7 @@ if options.addition != '':
 
 ## initialize the conf file generator, and the executable DPSim
 tconf = DPSimJobConf(options.template, reservedKeys)
-prog = os.path.join(os.getenv('DPSIM_ROOT'), 'bin', options.prog)
+prog = os.path.join(os.getenv('DPSIM_ROOT'), options.prog)
 
 ## set up the working directories
 workdir = os.path.abspath(options.workdir)
@@ -100,6 +104,11 @@ if options.local:
 ## if in grid mode, assume running on gpvm machines
 if options.grid:
 
+    # point everything to cvmfs
+    prog = prog.replace('/e906/app/software/osg', '/cvmfs/seaquest.opensciencegrid.org/seaquest')
+    gSetup = os.path.join(os.getenv('SEAQUEST_DISTRIBUTION_ROOT'), 'setup/setup.sh').replace('/e906/app/software/osg', '/cvmfs/seaquest.opensciencegrid.org/seaquest')
+    lSetup = os.path.join(os.getenv('DPSIM_ROOT'), 'setup.sh').replace('/e906/app/software/osg', '/cvmfs/seaquest.opensciencegrid.org/seaquest')
+
     # write wrapper files first
     for i in range(len(confs)):
         fout = open(wrappers[i], 'w')
@@ -119,12 +128,16 @@ if options.grid:
         fout.write('echo --------------------------------------------------------------------\n')
         fout.write('echo\n')
 
-        fout.write('source ' + os.path.join(os.getenv('SEAQUEST_DISTRIBUTION_ROOT'), 'setup/setup.sh') + '\n')
-        fout.write('source ' + os.path.join(os.getenv('DPSIM_ROOT'), 'setup.sh') + '\n')
+        fout.write('source ' + gSetup + '\n')
+        fout.write('source ' + lSetup + '\n')
+        fout.write('source /cvmfs/seaquest.opensciencegrid.org/seaquest/software/r1.7.0/externals/geant/setup410.sh\n')  #temp fix to use geant4.10
         fout.write('cd $_CONDOR_SCRATCH_DIR\n')
         fout.write('start_sec=$(date +%s)\n')
         fout.write('start_time=$(date +%F_%T)\n')
         fout.write('%s $CONDOR_DIR_INPUT/%s\n' % (prog, confs[i].split('/')[-1]))
+        #fout.write('conf=$( ifdh fetchInput %s)\n' % confs[i])
+        #fout.write('echo ${conf}\n')
+        #fout.write('%s ${conf}\n' % prog)
         fout.write('status=$?\n')
         fout.write('stop_time=$(date +%F_%T)\n')
         fout.write('stop_sec=$(date +%s)\n')
@@ -136,9 +149,13 @@ if options.grid:
         fout.close()
         os.system('chmod u+x %s' % wrappers[i])
 
+    # change permissions for grid node access
+    runCmd('chmod -R 01755 ' + options.workdir)
+
     # make jobsub commands and submit
+    cmds = []
     for i in range(len(confs)):
-        cmd = 'jobsub_submit -g --OS=SL6 --use_gftp --resource-provides=usage_model=DEDICATED,OPPORTUNISTIC -e IFDHC_VERSION'
+        cmd = 'jobsub_submit -g --OS=SL6 -expected-lifetime=2h --use_gftp --resource-provides=usage_model=DEDICATED,OPPORTUNISTIC,OFFSITE -e IFDHC_VERSION'
         cmd = cmd + ' -L %s' % logs[i]
         cmd = cmd + ' -f %s' % confs[i]
         if len(options.input) > 0:
@@ -150,4 +167,8 @@ if options.grid:
             print 'External input file', inputs[i], 'does not exist!'
             continue
 
-        runCmd(cmd)
+        cmds.append(cmd)
+
+    #submit all
+    GridUtil.submitAllJobs(cmds, 5)
+    GridUtil.stopGridGuard()
